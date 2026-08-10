@@ -7,6 +7,8 @@
     "dev": "remotion studio",
     "studio": "remotion studio",
     "render": "remotion render ProductLaunch out/product-launch.mp4",
+    "render:ad": "remotion render ConsulTechAd out/consultech-ad-master.mp4 --crf=22",
+    "render:ad:max": "remotion render ConsulTechAd out/consultech-ad-lossless.mp4 --crf=14",
     "render:hello": "remotion render HelloFrame out/hello-frame.mp4",
     "still": "remotion still ProductLaunch out/poster.png --frame=60",
     "typecheck": "tsc --noEmit",

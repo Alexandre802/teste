@@ -1,6 +1,10 @@
 node_modules/
-out/
 build/
+
+# Scratch renders and stills. Deliverables that should survive the working
+# copy go in dist/ instead, which IS versioned.
+out/
+
 .remotion/
 *.log
 .DS_Store
