@@ -21,11 +21,11 @@ const center: React.CSSProperties = {
 export const SceneBirth: React.FC = () => {
 	const frame = useCurrentFrame();
 
-	const assemble = interpolate(frame, [6, 52], [0, 1], {
+	const assemble = interpolate(frame, [2, 36], [0, 1], {
 		extrapolateLeft: 'clamp',
 		extrapolateRight: 'clamp',
 	});
-	const burst = interpolate(frame, [44, 62], [0, 1], {
+	const burst = interpolate(frame, [28, 46], [0, 1], {
 		extrapolateLeft: 'clamp',
 		extrapolateRight: 'clamp',
 	});
@@ -36,7 +36,7 @@ export const SceneBirth: React.FC = () => {
 	return (
 		<AbsoluteFill style={center}>
 			{beams.map((angle, i) => {
-				const travel = interpolate(frame, [i * 1.6, 42 + i * 1.6], [1, 0], {
+				const travel = interpolate(frame, [i * 1.1, 30 + i * 1.1], [1, 0], {
 					extrapolateLeft: 'clamp',
 					extrapolateRight: 'clamp',
 				});
@@ -46,8 +46,8 @@ export const SceneBirth: React.FC = () => {
 						key={i}
 						style={{
 							position: 'absolute',
-							width: 4,
-							height: 150 * (0.4 + travel),
+							width: 7,
+							height: 210 * (0.4 + travel),
 							borderRadius: 4,
 							background: `linear-gradient(180deg, transparent, ${C.cyan})`,
 							opacity: (1 - travel) * 0.9,
@@ -70,7 +70,7 @@ export const SceneBirth: React.FC = () => {
 				<LogoMark size={300} progress={assemble} />
 			</div>
 
-			<div style={{marginTop: 56, opacity: interpolate(frame, [56, 74], [0, 1])}}>
+			<div style={{marginTop: 56, opacity: interpolate(frame, [38, 56], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'})}}>
 				<div style={{fontSize: 88, fontWeight: 700, letterSpacing: -2}}>
 					<span style={{color: C.ink}}>Consul</span>
 					<span style={{color: C.blueBright}}>Tech</span>

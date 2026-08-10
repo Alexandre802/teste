@@ -25,13 +25,13 @@ export const LogoMark: React.FC<{
 		extrapolateLeft: 'clamp',
 		extrapolateRight: 'clamp',
 	});
-	const fillIn = interpolate(progress, [0.45, 0.8], [0, 1], {
+	const fillIn = interpolate(progress, [0.2, 0.55], [0, 1], {
 		extrapolateLeft: 'clamp',
 		extrapolateRight: 'clamp',
 	});
 	/* Starts early and finishes with the fill, so the mark reads as a "C"
 	   through most of the assembly instead of a blob at the end. */
-	const swoosh = interpolate(progress, [0.32, 0.86], [0, 1], {
+	const swoosh = interpolate(progress, [0.28, 0.78], [0, 1], {
 		extrapolateLeft: 'clamp',
 		extrapolateRight: 'clamp',
 	});

@@ -117,7 +117,15 @@ def sine(freq, n, phase=0.0):
 
 
 def tri(freq, n):
-    return [2.0 / math.pi * math.asin(math.sin(2 * math.pi * freq * (i / SR))) for i in range(n)]
+    # Phase accumulator rather than asin(sin(x)) — same shape, far cheaper.
+    out = []
+    p = 0.0
+    inc = freq / SR
+    for _ in range(n):
+        p -= math.floor(p)
+        out.append(4.0 * abs(p - 0.5) - 1.0)
+        p += inc
+    return out
 
 
 def note(semitones_from_a4):
@@ -202,7 +210,11 @@ def bass(freq, dur, gain=1.0):
 
 def pluck(freq, dur, gain=1.0):
     n = int(dur * SR)
-    sig = [tri(freq, n)[i] * 0.7 + saw(freq * 2, n)[i] * 0.18 for i in range(n)]
+    # Generate each waveform once. Calling tri()/saw() inside the comprehension
+    # would rebuild the whole buffer per sample — quadratic, and it never ends.
+    a = tri(freq, n)
+    b = saw(freq * 2, n)
+    sig = [a[i] * 0.7 + b[i] * 0.18 for i in range(n)]
     sig = lowpass(sig, 2600)
     e = env_ad(n, 0.004, 15)
     return [sig[i] * e[i] * gain for i in range(n)]
@@ -266,6 +278,7 @@ def build_music():
         t0 = b * bar
         if t0 > total:
             break
+        print(f'    bar {b + 1}/{n_bars}  t={t0:5.1f}s', flush=True)
         chord = prog[b % 4]
         root = roots[b % 4]
         e = energy(t0)
@@ -472,9 +485,180 @@ def sfx_riser(dur=1.6):
     return out
 
 
+def sfx_text_whoosh():
+    """Entrada de texto — short and airy, must not compete with the voice."""
+    n = int(0.24 * SR)
+    src = highpass([rng.uniform(-1, 1) for _ in range(n)], 1900)
+    src = lowpass(src, 8000)
+    out = []
+    for i in range(n):
+        x = i / n
+        out.append(src[i] * (math.sin(math.pi * x) ** 2.0) * 0.5)
+    return out
+
+
+def sfx_hit_soft():
+    """Texto com impacto — a punch in the mids, not the full sub boom."""
+    n = int(0.5 * SR)
+    out = []
+    phase = 0.0
+    for i in range(n):
+        t = i / SR
+        f = 72 + 150 * math.exp(-22 * t)
+        phase += f / SR
+        body = math.sin(2 * math.pi * phase) * math.exp(-9 * t)
+        knock = rng.uniform(-1, 1) * math.exp(-90 * t) * 0.22
+        out.append(body * 0.8 + knock)
+    return lowpass(out, 3200)
+
+
+def sfx_beep(freq=2100, dur=0.07):
+    """Número subindo — one digital blip; several get sequenced per counter."""
+    n = int(dur * SR)
+    sig = sine(freq, n)
+    sq = [1.0 if v > 0 else -1.0 for v in sig]
+    mixed = [sig[i] * 0.75 + sq[i] * 0.12 for i in range(n)]
+    e = env_ad(n, 0.002, 55)
+    return [mixed[i] * e[i] * 0.45 for i in range(n)]
+
+
+def sfx_digital_sweep():
+    """Linha/gráfico sendo desenhado — a sweep with quantised, 'digital' steps."""
+    n = int(0.62 * SR)
+    out = [0.0] * n
+    phase = 0.0
+    steps = 18
+    for i in range(n):
+        x = i / n
+        # quantising the frequency is what makes it read as digital
+        q = math.floor(x * steps) / steps
+        f = 500 + 2400 * q
+        phase += f / SR
+        out[i] = math.sin(2 * math.pi * phase) * 0.34
+    air = highpass([rng.uniform(-1, 1) for _ in range(n)], 3000)
+    for i in range(n):
+        x = i / n
+        env = math.sin(math.pi * x) ** 1.3
+        out[i] = (out[i] + air[i] * 0.3) * env
+    return out
+
+
+def sfx_low_whoosh():
+    """Elemento 3D entrando — dark and heavy, moves a lot of air."""
+    n = int(0.85 * SR)
+    src = lowpass([rng.uniform(-1, 1) for _ in range(n)], 900)
+    sub = []
+    phase = 0.0
+    for i in range(n):
+        x = i / n
+        f = 38 + 55 * math.sin(math.pi * x)
+        phase += f / SR
+        sub.append(math.sin(2 * math.pi * phase))
+    out = []
+    for i in range(n):
+        x = i / n
+        env = math.sin(math.pi * x) ** 1.5
+        out.append((src[i] * 0.6 + sub[i] * 0.55) * env)
+    return out
+
+
+def sfx_whoosh_stereo():
+    """Transição de cena — travels hard left to right across the field."""
+    n = int(0.6 * SR)
+    src = highpass([rng.uniform(-1, 1) for _ in range(n)], 500)
+    src = lowpass(src, 6500)
+    left, right = [], []
+    for i in range(n):
+        x = i / n
+        env = math.sin(math.pi * x) ** 1.4
+        # equal-power pan sweeping across the stereo field
+        theta = x * (math.pi / 2)
+        v = src[i] * env
+        left.append(v * math.cos(theta))
+        right.append(v * math.sin(theta))
+    return left, right
+
+
+def sfx_shimmer():
+    """Light sweep — bright, slow-attack sparkle riding a light pass."""
+    n = int(1.3 * SR)
+    out = [0.0] * n
+    base = note(24)  # A6
+    for mult, amp in ((1.0, 1.0), (1.5, 0.5), (2.02, 0.36), (3.03, 0.2), (4.1, 0.12)):
+        s = sine(base * mult, n)
+        for i in range(n):
+            x = i / n
+            env = (math.sin(math.pi * x) ** 2.2) * math.exp(-1.1 * (i / SR))
+            out[i] += s[i] * amp * env
+    air = highpass([rng.uniform(-1, 1) for _ in range(n)], 6000)
+    for i in range(n):
+        x = i / n
+        out[i] = out[i] * 0.32 + air[i] * (math.sin(math.pi * x) ** 3) * 0.18
+    return out
+
+
+def sfx_ui_click():
+    """Pequenos elementos — dry, tight, almost no tail."""
+    n = int(0.032 * SR)
+    src = highpass([rng.uniform(-1, 1) for _ in range(n)], 2600)
+    src = lowpass(src, 9000)
+    e = env_exp(n, 240)
+    return [src[i] * e[i] * 0.8 for i in range(n)]
+
+
+def sfx_impact_sub():
+    """Cena de destaque — impact with a very restrained sub underneath."""
+    n = int(2.0 * SR)
+    out = []
+    phase = 0.0
+    sub_phase = 0.0
+    for i in range(n):
+        t = i / SR
+        f = 46 + 120 * math.exp(-14 * t)
+        phase += f / SR
+        body = math.sin(2 * math.pi * phase) * math.exp(-4.0 * t)
+        # the sub sits an octave below and decays slowly — felt, not heard
+        sub_phase += 33.0 / SR
+        sub = math.sin(2 * math.pi * sub_phase) * math.exp(-1.9 * t) * 0.42
+        crack = rng.uniform(-1, 1) * math.exp(-55 * t) * 0.24
+        out.append(body * 0.75 + sub + crack)
+    return out
+
+
+def sfx_rise_clean():
+    """CTA — a clean tonal rise, no noise wash."""
+    n = int(1.9 * SR)
+    out = [0.0] * n
+    for mult, amp in ((1.0, 1.0), (2.0, 0.4), (3.0, 0.18)):
+        phase = 0.0
+        for i in range(n):
+            x = i / n
+            f = (180 + 720 * (x ** 2.0)) * mult
+            phase += f / SR
+            out[i] += math.sin(2 * math.pi * phase) * amp * (x ** 1.8)
+    return [v * 0.34 for v in out]
+
+
+def sfx_impact_clean():
+    """CTA — the landing. Tuned low note, tight click, no grit."""
+    n = int(1.4 * SR)
+    root = note(-24)  # A2
+    out = [0.0] * n
+    for mult, amp in ((1.0, 1.0), (2.0, 0.34), (3.0, 0.14)):
+        s = sine(root * mult, n)
+        for i in range(n):
+            out[i] += s[i] * amp * math.exp(-3.4 * (i / SR))
+    click = lowpass([rng.uniform(-1, 1) for _ in range(n)], 4000)
+    e = env_exp(n, 120)
+    return [out[i] * 0.55 + click[i] * e[i] * 0.3 for i in range(n)]
+
+
 def build_sfx():
     d = os.path.join(OUT, 'sfx')
+    # Reset so the effect set is identical whether or not the music ran first.
+    rng.seed(913377)
 
+    # Base set
     write_wav(os.path.join(d, 'whoosh.wav'), sfx_whoosh(0.55, 2800))
     write_wav(os.path.join(d, 'whoosh-soft.wav'), sfx_whoosh(0.40, 1500, 0.7))
     write_wav(os.path.join(d, 'boom.wav'), sfx_boom())
@@ -487,10 +671,31 @@ def build_sfx():
     write_wav(os.path.join(d, 'glitch.wav'), sfx_glitch())
     write_wav(os.path.join(d, 'riser.wav'), sfx_riser())
 
+    # Set matching the event/SFX brief
+    write_wav(os.path.join(d, 'text-whoosh.wav'), sfx_text_whoosh())
+    write_wav(os.path.join(d, 'hit-soft.wav'), sfx_hit_soft())
+    write_wav(os.path.join(d, 'beep.wav'), sfx_beep())
+    write_wav(os.path.join(d, 'beep-low.wav'), sfx_beep(1500, 0.08))
+    write_wav(os.path.join(d, 'digital-sweep.wav'), sfx_digital_sweep())
+    write_wav(os.path.join(d, 'low-whoosh.wav'), sfx_low_whoosh())
+    l, r = sfx_whoosh_stereo()
+    write_wav(os.path.join(d, 'whoosh-stereo.wav'), l, r)
+    write_wav(os.path.join(d, 'shimmer.wav'), sfx_shimmer())
+    write_wav(os.path.join(d, 'ui-click.wav'), sfx_ui_click())
+    write_wav(os.path.join(d, 'impact-sub.wav'), sfx_impact_sub())
+    write_wav(os.path.join(d, 'rise-clean.wav'), sfx_rise_clean())
+    write_wav(os.path.join(d, 'impact-clean.wav'), sfx_impact_clean())
+
 
 if __name__ == '__main__':
-    print('sound effects:')
-    build_sfx()
-    print('music bed:')
-    build_music()
-    print('done')
+    import sys
+
+    what = sys.argv[1] if len(sys.argv) > 1 else 'all'
+
+    if what in ('all', 'sfx'):
+        print('sound effects:', flush=True)
+        build_sfx()
+    if what in ('all', 'music'):
+        print('music bed:', flush=True)
+        build_music()
+    print('done', flush=True)

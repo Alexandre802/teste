@@ -1,7 +1,7 @@
 import React from 'react';
 import {AbsoluteFill, interpolate, random, useCurrentFrame} from 'remotion';
 import {C} from '../theme';
-import {HEIGHT, START, WIDTH} from '../timing';
+import {HEIGHT, START, TOTAL_DURATION, WIDTH} from '../timing';
 
 /**
  * The background is not one look for 70 seconds — it changes with the story.
@@ -282,12 +282,23 @@ export const OrbField: React.FC<{opacity: number}> = ({opacity}) => {
  * The stack: cross-fades the layers across the ad's acts.
  * ------------------------------------------------------------------ */
 
-/** Ramps to 1 between `a`→`b` and back to 0 between `c`→`d`. */
-const window_ = (frame: number, a: number, b: number, c: number, d: number) =>
-	interpolate(frame, [a, b, c, d], [0, 1, 1, 0], {
+/**
+ * Ramps to 1 between `a`→`b` and back to 0 between `c`→`d`.
+ * Omit `c`/`d` to fade in and hold to the end of the ad.
+ *
+ * `interpolate` requires a strictly increasing input range, so the hold case
+ * has to place its trailing stops past the end rather than repeating a value.
+ */
+const window_ = (frame: number, a: number, b: number, c?: number, d?: number) => {
+	const hold = c === undefined || d === undefined;
+	const cc = hold ? TOTAL_DURATION + 100 : c;
+	const dd = hold ? TOTAL_DURATION + 200 : d;
+
+	return interpolate(frame, [a, b, cc, dd], [0, 1, 1, 0], {
 		extrapolateLeft: 'clamp',
 		extrapolateRight: 'clamp',
 	});
+};
 
 export const BackdropStack: React.FC = () => {
 	const frame = useCurrentFrame();
@@ -315,9 +326,9 @@ export const BackdropStack: React.FC = () => {
 		START.payPerUse,
 		START.payPerUse + 30,
 	);
-	const orbs = window_(frame, START.payPerUse, START.payPerUse + 40, 1e9, 1e9);
+	const orbs = window_(frame, START.payPerUse, START.payPerUse + 40);
 	/* Rings come back for the close, tying the ending to the opening. */
-	const ringsBack = window_(frame, START.benefits, START.cta, 1e9, 1e9);
+	const ringsBack = window_(frame, START.benefits, START.cta);
 
 	return (
 		<AbsoluteFill style={{pointerEvents: 'none'}}>
