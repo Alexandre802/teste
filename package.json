@@ -1,0 +1,27 @@
+{
+  "name": "remotion-video-example",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Remotion example video built with React",
+  "scripts": {
+    "dev": "remotion studio",
+    "studio": "remotion studio",
+    "render": "remotion render ProductLaunch out/product-launch.mp4",
+    "render:hello": "remotion render HelloFrame out/hello-frame.mp4",
+    "still": "remotion still ProductLaunch out/poster.png --frame=60",
+    "typecheck": "tsc --noEmit",
+    "upgrade": "remotion upgrade"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.507",
+    "@remotion/transitions": "4.0.507",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "remotion": "4.0.507"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.6.0"
+  }
+}
