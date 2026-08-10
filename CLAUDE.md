@@ -48,3 +48,19 @@ Rendering needs a Chrome/Chromium. If Remotion cannot download its own
 ```bash
 npx remotion render <id> out/video.mp4 --browser-executable=/path/to/chrome
 ```
+
+## ConsulTech ad (`src/ConsulTech/`)
+
+A 70s vertical (1080×1920) ad cut to a supplied voiceover.
+
+- **Timing is derived, not guessed.** `public/audio/narration.mp3` was analysed
+  with ffmpeg `silencedetect` to find every pause; the cut points in
+  `timing.ts` sit inside those pauses, and `BEAT` holds the in-scene beats where
+  the narrator lists items. Re-record the voiceover → re-run the analysis and
+  update `CUT`/`BEAT`.
+- **No subtitles.** On-screen copy is only ever a few heavy words reinforcing
+  the voice. Never caption the narration.
+- **Poppins is vendored** in `public/fonts/` and loaded via `FontFace` +
+  `delayRender()` in `theme.ts`. Do not switch to a CDN webfont — a network
+  fetch at render time is non-deterministic and silently falls back.
+- Everything on screen is drawn (SVG/DOM). No bitmap assets from the brand deck.

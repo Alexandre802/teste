@@ -5,6 +5,8 @@ import {HelloFrame} from './HelloFrame';
 import {FPS, HEIGHT, TOTAL_DURATION, WIDTH} from './ProductLaunch/timing';
 import {PokedexShowcase, POKEDEX_DURATION} from './Pokedex/PokedexShowcase';
 import {AnimateGallery} from './lib/animate/AnimateGallery';
+import {ConsulTechAd} from './ConsulTech/ConsulTechAd';
+import * as CT from './ConsulTech/timing';
 
 /**
  * Every `<Composition>` registered here shows up as an entry in Remotion Studio
@@ -13,6 +15,16 @@ import {AnimateGallery} from './lib/animate/AnimateGallery';
 export const RemotionRoot: React.FC = () => {
 	return (
 		<>
+			{/* The ConsulTech ad — vertical 9:16, cut to the supplied voiceover. */}
+			<Composition
+				id="ConsulTechAd"
+				component={ConsulTechAd}
+				durationInFrames={CT.TOTAL_DURATION}
+				fps={CT.FPS}
+				width={CT.WIDTH}
+				height={CT.HEIGHT}
+			/>
+
 			<Composition
 				id="ProductLaunch"
 				component={ProductLaunch}
