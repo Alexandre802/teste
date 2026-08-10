@@ -8,9 +8,12 @@ import {
 	useCurrentFrame,
 } from 'remotion';
 
+import {BackdropStack} from './components/Backdrops';
+import {Camera, type CameraMove} from './components/Camera';
 import {CircuitBackdrop} from './components/CircuitBackdrop';
 import {HudFrame} from './components/HudFrame';
 import {LogoBadge} from './components/Logo';
+import {SoundDesign} from './Sound';
 import {C} from './theme';
 import {DUR, START} from './timing';
 
@@ -39,7 +42,46 @@ import {SceneBenefits, SceneCTA, ScenePayPerUse} from './scenes/Close';
  *
  * There are no subtitles — the on-screen copy is only ever a few heavy words
  * reinforcing what is being said, in the style of the reference ad.
+ *
+ * Three things keep it from reading as flat: a virtual camera that pushes,
+ * pulls and punches per scene (`components/Camera`), a background that changes
+ * with the act rather than holding one look (`components/Backdrops`), and a
+ * synthesised music bed with effects pinned to the animation (`Sound.tsx`).
  */
+
+/** The camera move for each scene, chosen to match what the scene is doing. */
+const CAMERA: Record<keyof typeof DUR, {move: CameraMove; strength?: number; shake?: number}> = {
+	/* Tiles land one by one — pull back to take them all in. */
+	professions: {move: 'pull'},
+	/* A single stinger: hit it hard. */
+	askMe: {move: 'punch', shake: 0.7},
+	/* Windows pile up around the viewer — creep outward as the mess grows. */
+	scattered: {move: 'pull', strength: 1.25},
+	/* The warning slams in. */
+	worse: {move: 'punch', strength: 1.2, shake: 1},
+	/* Slow press in as the loss sinks in. */
+	loss: {move: 'push', strength: 1.1},
+	/* Recoil off the impact of the mark assembling. */
+	birth: {move: 'recoil', shake: 0.8},
+	/* Push into the dashboard, then the counter lands. */
+	platform: {move: 'push', strength: 1.2},
+	/* Pull back as the four categories fill the grid. */
+	categories: {move: 'pull'},
+	/* Speed line — punch. */
+	seconds: {move: 'punch', strength: 0.9},
+	/* The list stacks upward, so the camera cranes with it. */
+	services: {move: 'craneUp', strength: 1.15},
+	/* Everything converges: hard recoil on the collapse. */
+	onePlace: {move: 'recoil', strength: 0.9, shake: 0.6},
+	/* Drift across the struck-out list. */
+	noMiddleman: {move: 'driftRight', strength: 0.8},
+	/* Push down the price stack. */
+	payPerUse: {move: 'push', strength: 0.9},
+	/* Pull back over the three rings. */
+	benefits: {move: 'pull', strength: 0.9},
+	/* Settle on the close. */
+	cta: {move: 'push', strength: 0.7},
+};
 
 /** Backdrop mood/intensity ride the story rather than sitting at one setting. */
 const useBackdropDrive = () => {
@@ -89,9 +131,46 @@ const CutFlashes: React.FC = () => {
 	);
 };
 
-export const ConsulTechAd: React.FC = () => {
+/**
+ * The background pushes in slightly against every camera move so the zoom reads
+ * as depth rather than a flat scale of the whole picture.
+ */
+const BackgroundLayer: React.FC = () => {
 	const frame = useCurrentFrame();
 	const {intensity, mood} = useBackdropDrive();
+
+	const parallax = 1.06 + Math.sin(frame * 0.0085) * 0.035;
+
+	return (
+		<AbsoluteFill style={{transform: `scale(${parallax})`}}>
+			<CircuitBackdrop intensity={intensity} mood={mood} />
+			<BackdropStack />
+		</AbsoluteFill>
+	);
+};
+
+type SceneKey = keyof typeof DUR;
+
+const SCENES: {key: SceneKey; Component: React.FC}[] = [
+	{key: 'professions', Component: SceneProfessions},
+	{key: 'askMe', Component: SceneAskMe},
+	{key: 'scattered', Component: SceneScattered},
+	{key: 'worse', Component: SceneWorse},
+	{key: 'loss', Component: SceneLoss},
+	{key: 'birth', Component: SceneBirth},
+	{key: 'platform', Component: ScenePlatform},
+	{key: 'categories', Component: SceneCategories},
+	{key: 'seconds', Component: SceneSeconds},
+	{key: 'services', Component: SceneServices},
+	{key: 'onePlace', Component: SceneOnePlace},
+	{key: 'noMiddleman', Component: SceneNoMiddleman},
+	{key: 'payPerUse', Component: ScenePayPerUse},
+	{key: 'benefits', Component: SceneBenefits},
+	{key: 'cta', Component: SceneCTA},
+];
+
+export const ConsulTechAd: React.FC = () => {
+	const frame = useCurrentFrame();
 
 	/* The corner badge steps aside when a full logo owns the frame. */
 	const badgeHidden =
@@ -102,70 +181,19 @@ export const ConsulTechAd: React.FC = () => {
 	return (
 		<AbsoluteFill style={{backgroundColor: C.bg}}>
 			<Audio src={staticFile('audio/narration.mp3')} />
+			<SoundDesign />
 
 			{/* One continuous backdrop under every scene — it never restarts. */}
-			<CircuitBackdrop intensity={intensity} mood={mood} />
+			<BackgroundLayer />
 
 			<Series>
-				<Series.Sequence durationInFrames={DUR.professions}>
-					<SceneProfessions />
-				</Series.Sequence>
-
-				<Series.Sequence durationInFrames={DUR.askMe}>
-					<SceneAskMe />
-				</Series.Sequence>
-
-				<Series.Sequence durationInFrames={DUR.scattered}>
-					<SceneScattered />
-				</Series.Sequence>
-
-				<Series.Sequence durationInFrames={DUR.worse}>
-					<SceneWorse />
-				</Series.Sequence>
-
-				<Series.Sequence durationInFrames={DUR.loss}>
-					<SceneLoss />
-				</Series.Sequence>
-
-				<Series.Sequence durationInFrames={DUR.birth}>
-					<SceneBirth />
-				</Series.Sequence>
-
-				<Series.Sequence durationInFrames={DUR.platform}>
-					<ScenePlatform />
-				</Series.Sequence>
-
-				<Series.Sequence durationInFrames={DUR.categories}>
-					<SceneCategories />
-				</Series.Sequence>
-
-				<Series.Sequence durationInFrames={DUR.seconds}>
-					<SceneSeconds />
-				</Series.Sequence>
-
-				<Series.Sequence durationInFrames={DUR.services}>
-					<SceneServices />
-				</Series.Sequence>
-
-				<Series.Sequence durationInFrames={DUR.onePlace}>
-					<SceneOnePlace />
-				</Series.Sequence>
-
-				<Series.Sequence durationInFrames={DUR.noMiddleman}>
-					<SceneNoMiddleman />
-				</Series.Sequence>
-
-				<Series.Sequence durationInFrames={DUR.payPerUse}>
-					<ScenePayPerUse />
-				</Series.Sequence>
-
-				<Series.Sequence durationInFrames={DUR.benefits}>
-					<SceneBenefits />
-				</Series.Sequence>
-
-				<Series.Sequence durationInFrames={DUR.cta}>
-					<SceneCTA />
-				</Series.Sequence>
+				{SCENES.map(({key, Component}) => (
+					<Series.Sequence key={key} durationInFrames={DUR[key]}>
+						<Camera duration={DUR[key]} {...CAMERA[key]}>
+							<Component />
+						</Camera>
+					</Series.Sequence>
+				))}
 			</Series>
 
 			<HudFrame />

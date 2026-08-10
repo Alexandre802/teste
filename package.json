@@ -12,7 +12,8 @@
     "render:hello": "remotion render HelloFrame out/hello-frame.mp4",
     "still": "remotion still ProductLaunch out/poster.png --frame=60",
     "typecheck": "tsc --noEmit",
-    "upgrade": "remotion upgrade"
+    "upgrade": "remotion upgrade",
+    "audio": "bash tools/build-audio.sh"
   },
   "dependencies": {
     "@remotion/cli": "4.0.507",

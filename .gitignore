@@ -10,3 +10,8 @@ out/
 .DS_Store
 .env
 .env.local
+
+# Audio intermediates — tools/build-audio.sh converts these to mp3,
+# and only the mp3s are committed.
+public/audio/*.wav
+public/audio/sfx/*.wav
