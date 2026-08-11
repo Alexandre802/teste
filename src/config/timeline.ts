@@ -18,6 +18,12 @@ export const HEIGHT = 1920;
 /** Duração exata do arquivo de narração (public/audio/narration.mp3). */
 export const NARRATION_SEC = 70.1649;
 
+/**
+ * Ganho da narração. O arquivo original é baixo (pico -5,5 dBFS); 1.25 leva a
+ * voz para ~-3,2 dBFS de pico, sem clipar quando somada aos efeitos.
+ */
+export const NARRATION_VOLUME = 1.25;
+
 /** Sobra depois da última palavra, para o CTA respirar antes de terminar. */
 export const TAIL_SEC = 1.45;
 

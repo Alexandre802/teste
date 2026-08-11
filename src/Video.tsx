@@ -1,10 +1,34 @@
 import React from "react";
 import { AbsoluteFill, Audio, Sequence, staticFile, useCurrentFrame } from "remotion";
-import { SCENES, TOTAL_FRAMES, TRANSITION_FRAMES } from "./config/timeline";
+import { NARRATION_VOLUME, SCENES, TOTAL_FRAMES, TRANSITION_FRAMES } from "./config/timeline";
 import { Cue, cue } from "./config/sfx";
 import { EASE, ip } from "./lib/anim";
+import { FONT_WEIGHTS_PROBE, fontFamily } from "./lib/fonts";
 import { SfxTrack } from "./lib/SfxTrack";
 import { SCENE_COMPONENTS } from "./scenes";
+
+/**
+ * Mantém os 5 pesos da Poppins em uso desde o frame 0, para nenhum frame ser
+ * pintado com fonte de fallback.
+ */
+const FontProbe: React.FC = () => (
+  <div
+    aria-hidden
+    style={{
+      position: "absolute",
+      left: -9999,
+      top: -9999,
+      opacity: 0,
+      pointerEvents: "none",
+    }}
+  >
+    {FONT_WEIGHTS_PROBE.map((w) => (
+      <span key={w} style={{ fontFamily, fontWeight: w }}>
+        ConsulTech 1.248 98,7%
+      </span>
+    ))}
+  </div>
+);
 
 /**
  * Efeitos sonoros da trilha global (transições entre cenas) — em frames
@@ -31,8 +55,10 @@ export const ConsulTechVideo: React.FC = () => {
 
   return (
     <AbsoluteFill style={{ background: "#000" }}>
+      <FontProbe />
+
       {/* narração */}
-      <Audio src={staticFile("audio/narration.mp3")} volume={1} />
+      <Audio src={staticFile("audio/narration.mp3")} volume={NARRATION_VOLUME} />
 
       {/* efeitos das transições */}
       <SfxTrack cues={globalCues} />

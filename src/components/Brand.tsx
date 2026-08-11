@@ -1,6 +1,6 @@
 import React from "react";
 import { BRAND } from "../config/copy";
-import { C, FW, LOGO_GRADIENT, SHADOW } from "../config/theme";
+import { C, FW, SHADOW } from "../config/theme";
 import { fontFamily } from "../lib/fonts";
 
 /** Ícone hexagonal da marca (cubo com fita branca). */

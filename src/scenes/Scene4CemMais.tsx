@@ -29,7 +29,6 @@ import { SfxTrack } from "../lib/SfxTrack";
 import { DashboardLogo, SlideHeader } from "../components/Brand";
 import { AreaChart, Donut, DonutLegend, MiniBars, Sparkline, TrendLine } from "../components/Charts";
 import { Asterisk, CurvedArrow, GlowBlob, Swoosh } from "../components/Decor";
-import { Icon } from "../components/Icons";
 import {
   BadgeCircle,
   CheckSeal,

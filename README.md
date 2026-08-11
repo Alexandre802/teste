@@ -139,6 +139,31 @@ Nenhum elemento é animado "como imagem inteira": tudo é camada.
 - **Transições** — cross-dissolve de 12 frames com zoom/push/punch + desfoque;
   escalas sempre ≥ 1 para as bordas do quadro nunca aparecerem.
 
+### Sobre as referências de animação
+
+O vocabulário de movimento segue as referências citadas no briefing
+(animate.css, transições de herói do flutter_pokedex, molas do
+SwiftUI-Animations), mas **reimplementado em `src/lib/anim.ts`** em função de
+`useCurrentFrame()`:
+
+| Referência | Equivalente aqui |
+|---|---|
+| `fadeInUp` / `fadeInLeft` | `fadeUp()` / `fadeSide()` |
+| `zoomIn` / `bounceIn` | `popIn()` / preset de mola `bouncy` |
+| `pulse` / `flash` | `glowPulse()` |
+| transição de herói (card → tela) | `card3dIn()` + `SceneShell` |
+| mola de UI declarativa | presets `soft / snappy / bouncy / pop / heavy` |
+
+O motivo de não usar as bibliotecas CSS diretamente é técnico: keyframes de CSS
+avançam pelo relógio do navegador, e no Remotion o tempo é o número do frame —
+uma animação em CSS sairia dessincronizada e não determinística entre renders.
+Tudo aqui é função pura do frame, o que garante o mesmo resultado em qualquer
+máquina e permite fazer scrub na timeline.
+
+Os repositórios de referência não são acessíveis a partir deste ambiente (a
+política de egresso bloqueia github.com), então o mapeamento acima foi feito a
+partir dos padrões conhecidos dessas bibliotecas.
+
 ## Efeitos sonoros
 
 Não havia biblioteca de áudio disponível offline, então os 18 efeitos pedidos

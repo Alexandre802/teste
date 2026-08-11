@@ -9,7 +9,13 @@
  *  Para mexer no mix inteiro, ajuste MASTER_SFX_VOLUME.
  */
 
-export const MASTER_SFX_VOLUME = 1;
+/**
+ * Mix: a narração fornecida tem pico de -5,5 dBFS e RMS de voz de -21 dBFS.
+ * Com NARRATION_VOLUME em 1.25 a voz vai para ~-3,2 dBFS de pico (-18,7 dBFS
+ * de RMS) e os efeitos, em 0.6, ficam ~4 dB acima do RMS da voz: audíveis como
+ * acento, sem mascarar a locução e sem clipar a soma.
+ */
+export const MASTER_SFX_VOLUME = 0.6;
 
 export const SFX = {
   /** Whoosh / Swoosh curto — entradas rápidas de textos e elementos */
