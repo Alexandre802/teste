@@ -25,8 +25,8 @@ npm run render     # gera out/consultech-reel.mp4
 | 1 | `scene-1-oportunidades` | 2/8 — "Quantas oportunidades você perdeu?" | 0,00 s | 16,47 s |
 | 2 | `scene-2-eoPior` | 3/8 — "E o pior..." | 16,47 s | 8,60 s |
 | 3 | `scene-3-precisaConsultar` | 5/8 — "Precisa consultar?" | 25,07 s | 17,37 s |
-| 4 | `scene-4-cemMais` | 5/8 — "100+ tipos de consultas" | 42,44 s | 16,70 s |
-| 5 | `scene-5-pagueSo` | 8/8 — "Pague só pelo que usar" | 59,15 s | 12,46 s |
+| 4 | `scene-4-cemMais` | 5/8 — "100+ tipos de consultas" | 42,44 s | 16,73 s |
+| 5 | `scene-5-pagueSo` | 8/8 — "Pague só pelo que usar" | 59,15 s | 12,43 s |
 
 Cada cena também existe como composição isolada no Studio, para revisar uma
 tela por vez sem esperar o vídeo inteiro.
@@ -91,7 +91,8 @@ src/
   lib/
     anim.ts          fadeUp, fadeSide, popIn, card3dIn, stagger, float,
                      glowPulse, camera, typewriter, countUp, drawPath
-    fonts.ts         Poppins local (400/500/600/700/800)
+    fonts.ts         injeta a Poppins embutida (400/500/600/700/800)
+    poppinsCss.ts    GERADO — @font-face em data: URI
     SfxTrack.tsx     toca listas de cues
   components/
     SceneShell.tsx   transições + câmera + RevealText (revelação por máscara)
@@ -109,8 +110,9 @@ public/
   audio/sfx/*.wav    18 efeitos gerados
   fonts/*.woff2      Poppins
 tools/
-  gen_sfx.py         gerador dos efeitos sonoros
+  gen_sfx.py         gerador dos 18 efeitos sonoros
   analyze-audio.mjs  analisador de fala da narração
+  inline-fonts.mjs   embute os woff2 como data: URI
 ```
 
 ---
@@ -180,14 +182,22 @@ success chime · sparkle/shine · logo sting
 npm run sfx    # regenera public/audio/sfx/*.wav
 ```
 
+### Mix
+
+A narração fornecida é baixa (pico −5,5 dBFS, RMS de voz −21 dBFS), então
+`NARRATION_VOLUME = 1.25` (em `timeline.ts`) leva a voz para ≈ −3,2 dBFS de pico
+e `MASTER_SFX_VOLUME = 0.6` (em `sfx.ts`) deixa os efeitos ≈ 4 dB acima do RMS
+da voz — audíveis como acento, sem mascarar a locução e sem clipar a soma.
+
 Cada cena declara seus cues em frames relativos; as transições têm cues
 absolutos em `src/Video.tsx` (reverse whoosh → whoosh encorpado → bass hit) para
 poderem atravessar o corte.
 
 ## Notas de fidelidade
 
-- Tipografia: **Poppins** (400–800) empacotada localmente em `public/fonts`,
-  carregada via `@remotion/fonts` — nada depende de CDN em tempo de render.
+- Tipografia: **Poppins** (400–800) embutida no bundle como data: URI — nada
+  depende de CDN nem do servidor de arquivos estáticos em tempo de render
+  (`npm run fonts` regenera a partir de `public/fonts`).
 - Cores, raios, sombras, gradientes e posições foram extraídos das imagens de
   referência e centralizados em `theme.ts`; nenhuma cor nova foi inventada.
 - A ampulheta 3D da tela 3/8 e o cubo do logo foram **reconstruídos em SVG**

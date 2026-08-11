@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill, Audio, Sequence, staticFile, useCurrentFrame } from "remotion";
-import { NARRATION_VOLUME, SCENES, TOTAL_FRAMES, TRANSITION_FRAMES } from "./config/timeline";
+import { NARRATION_VOLUME, SCENES, TOTAL_FRAMES } from "./config/timeline";
 import { Cue, cue } from "./config/sfx";
 import { EASE, ip } from "./lib/anim";
 import { FONT_WEIGHTS_PROBE, fontFamily } from "./lib/fonts";
@@ -86,5 +86,3 @@ export const ConsulTechVideo: React.FC = () => {
     </AbsoluteFill>
   );
 };
-
-export { TRANSITION_FRAMES };
