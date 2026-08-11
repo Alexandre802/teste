@@ -13,7 +13,8 @@
     "still": "remotion still ProductLaunch out/poster.png --frame=60",
     "typecheck": "tsc --noEmit",
     "upgrade": "remotion upgrade",
-    "audio": "bash tools/build-audio.sh"
+    "audio": "bash tools/build-audio.sh && python3 tools/measure-levels.py",
+    "audio:levels": "python3 tools/measure-levels.py"
   },
   "dependencies": {
     "@remotion/cli": "4.0.507",
