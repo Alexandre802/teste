@@ -224,7 +224,14 @@ const CUES: Cue[] = [
 	{at: S.cta + 80, name: 'ui-click', offset: V.textIn},
 ];
 
-export const SoundDesign: React.FC = () => {
+/**
+ * Which layers to play. Used for measurement: rendering a short slice with a
+ * single stem gives an exact level for that layer, where measuring the full mix
+ * always catches a neighbouring cue's tail and reads high.
+ */
+export type Stem = 'all' | 'music' | 'sfx' | 'voice';
+
+export const SoundDesign: React.FC<{stem?: Stem}> = ({stem = 'all'}) => {
 	const frame = useCurrentFrame();
 
 	/**
@@ -260,10 +267,13 @@ export const SoundDesign: React.FC = () => {
 
 	return (
 		<>
-			<Audio src={staticFile('audio/music.mp3')} volume={musicVolume} />
-			{CUES.map((cue, i) => (
-				<Hit key={i} {...cue} />
-			))}
+			{stem === 'all' || stem === 'music' ? (
+				<Audio src={staticFile('audio/music.mp3')} volume={musicVolume} />
+			) : null}
+
+			{stem === 'all' || stem === 'sfx'
+				? CUES.map((cue, i) => <Hit key={i} {...cue} />)
+				: null}
 		</>
 	);
 };

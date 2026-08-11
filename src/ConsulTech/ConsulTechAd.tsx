@@ -13,7 +13,7 @@ import {Camera, type CameraMove} from './components/Camera';
 import {CircuitBackdrop} from './components/CircuitBackdrop';
 import {HudFrame} from './components/HudFrame';
 import {LogoBadge} from './components/Logo';
-import {SoundDesign} from './Sound';
+import {SoundDesign, type Stem} from './Sound';
 import {C} from './theme';
 import {DUR, START} from './timing';
 
@@ -169,7 +169,7 @@ const SCENES: {key: SceneKey; Component: React.FC}[] = [
 	{key: 'cta', Component: SceneCTA},
 ];
 
-export const ConsulTechAd: React.FC = () => {
+export const ConsulTechAd: React.FC<{stem?: Stem}> = ({stem = 'all'}) => {
 	const frame = useCurrentFrame();
 
 	/* The corner badge steps aside when a full logo owns the frame. */
@@ -180,8 +180,10 @@ export const ConsulTechAd: React.FC = () => {
 
 	return (
 		<AbsoluteFill style={{backgroundColor: C.bg}}>
-			<Audio src={staticFile('audio/narration.mp3')} />
-			<SoundDesign />
+			{stem === 'all' || stem === 'voice' ? (
+				<Audio src={staticFile('audio/narration.mp3')} />
+			) : null}
+			<SoundDesign stem={stem} />
 
 			{/* One continuous backdrop under every scene — it never restarts. */}
 			<BackgroundLayer />

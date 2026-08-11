@@ -65,6 +65,22 @@ export const MUSIC_OFFSET = {
 const dbToLinear = (decibels: number) => Math.pow(10, decibels / 20);
 
 /**
+ * Closed-loop trims, from measuring isolated stems of the rendered cut
+ * (`npm run mix:stems`).
+ *
+ * The per-file calculation above gets the assets into the right *relationship*
+ * with each other, but a few dB of systematic offset survives it — the
+ * narration reads about 3 dB lower inside the mix than the source file
+ * measures, and simultaneous cues sum. Rather than fudge the individual
+ * numbers, the residual is measured once and applied here.
+ *
+ * Last measured: narration -26.4 dBFS, effects -6.0 dB relative (target -15),
+ * music -25.7 dB relative (target -27, already in band).
+ */
+const SFX_TRIM_DB = -9.0;
+const MUSIC_TRIM_DB = -1.5;
+
+/**
  * Linear gain that lands `asset` at `offset` dB below the narration.
  * Falls back to a conservative -20 dB if an asset has not been measured, so a
  * missing entry is quiet rather than deafening.
@@ -76,11 +92,15 @@ export const gainFor = (asset: string, offset: number) => {
 	}
 
 	const targetDb = NARRATION_DBFS - offset;
-	return dbToLinear(targetDb - assetDb);
+	return dbToLinear(targetDb - assetDb + SFX_TRIM_DB);
 };
 
 /** Same, for the music bed, whose offset changes across the ad. */
-export const musicGain = (offset: number) => gainFor('music', offset);
+export const musicGain = (offset: number) => {
+	const assetDb = ASSET_DBFS.music ?? -20;
+	const targetDb = NARRATION_DBFS - offset;
+	return dbToLinear(targetDb - assetDb + MUSIC_TRIM_DB);
+};
 
 /** The level a cue will actually sit at, for verification/logging. */
 export const resultingDbfs = (offset: number) => NARRATION_DBFS - offset;
