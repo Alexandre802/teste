@@ -25,6 +25,7 @@ import {
 } from "../lib/anim";
 import { fontFamily } from "../lib/fonts";
 import { SfxTrack } from "../lib/SfxTrack";
+import { alignWordsToPhrase, sceneSync } from "../lib/sync";
 import { SlideHeader } from "../components/Brand";
 import { Sparkline } from "../components/Charts";
 import { BlueRing, CurvedArrow, GlowBlob, Swoosh } from "../components/Decor";
@@ -40,25 +41,36 @@ import {
 import { RevealText, SceneShell } from "../components/SceneShell";
 
 // ---------------------------------------------------------------------------
+// BEATS — ancorados na fala (ver src/lib/sync.ts)
+const S = sceneSync("precisaConsultar");
+
+/** "Precisa" / "consultar?" na 1ª frase falada */
+const HL = alignWordsToPhrase("precisaConsultar", SCENE3.headline.map((w) => w.text), 0);
+
 const B = {
-  header: 2,
-  h1: 4,
-  h2: 18,
-  decor: 8,
-  cards: [52, 74, 96, 118],
-  boltBadge: 132,
-  search1: 148,
-  typing1: 158,
-  search2: 178,
-  typing2: 190,
-  trustCard: 220,
-  segCard: 266,
-  statCard: 310,
-  statCount: 322,
-  chartBadge: 358,
-  activity: 418,
-  arrow: 456,
-  footer: 484,
+  header: 0,
+  h1: HL[0],
+  h2: HL[1],
+  decor: 0,
+  /**
+   * Os 4 cards entram um por frase falada: a narração enumera os tipos de
+   * consulta, e as frases 2 a 5 desta cena são justamente 4 frases curtas
+   * seguidas (0,5s / 1,0s / 1,1s / 1,1s).
+   */
+  cards: [S.phrase(2), S.phrase(3), S.phrase(4), S.phrase(5)],
+  boltBadge: S.beat(4),
+  search1: S.phrase(6),
+  typing1: S.phrase(6) + 5,
+  search2: S.phrase(7),
+  typing2: S.phrase(7) + 5,
+  trustCard: S.beat(28),
+  segCard: S.beat(31),
+  statCard: S.phrase(8),
+  statCount: S.phrase(8) + 6,
+  chartBadge: S.beat(38),
+  activity: S.phrase(9),
+  arrow: S.beat(42),
+  footer: S.phrase(10),
 };
 
 const L = {

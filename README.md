@@ -33,21 +33,55 @@ tela por vez sem esperar o vídeo inteiro.
 
 ## Sincronia com a narração
 
-O áudio foi analisado por envelope RMS (janela de 10 ms) e produziu um mapa de
-**41 grupos de fala** entre 0,11 s e 69,72 s, gravado em
-`src/config/speechMap.ts`. Os quatro cortes de cena foram posicionados **dentro
-de pausas reais da locução** (16,47 s / 25,07 s / 42,44 s / 59,15 s), e os
-beats internos de cada cena estão ancorados nos inícios de frase — por isso os
-elementos entram junto com a fala, e não em intervalos arbitrários.
+O áudio é analisado em **três granularidades** (`npm run analyze`, gera
+`src/config/speechMap.ts`):
 
-Para regerar o mapa depois de trocar o áudio:
+| | quantidade | serve para |
+|---|---|---|
+| `PHRASES` | 41 grupos de fala | posicionar os cortes de cena nas pausas e trocar de assunto |
+| `BEATS` | 194 onsets de palavra (166 pal/min) | **âncora principal**: cada card, ícone e título entra numa palavra falada |
+| `SYLLABLES` | 281 núcleos silábicos (4,0 síl/s) | acentos finos (ticks, brilhos) |
 
-```bash
-node tools/analyze-audio.mjs public/audio/narration.mp3
+Nenhuma cena usa frames arbitrários: o timing sai de `src/lib/sync.ts`, que
+traduz esses instantes em delays de animação.
+
+```ts
+const S = sceneSync("precisaConsultar");
+const B = {
+  cards: [S.phrase(2), S.phrase(3), S.phrase(4), S.phrase(5)], // 1 card por frase
+  boltBadge: S.beat(4),                                        // na 5ª palavra
+};
 ```
 
-O comando imprime as frases e as maiores pausas — basta colar em
-`speechMap.ts` e ajustar `SCENE_STARTS`.
+### Dois níveis de sincronia
+
+**Por ritmo (sem transcrição, é o estado atual).** Os títulos são distribuídos
+dentro da frase falada por **peso silábico** e encaixados no onset de palavra
+mais próximo — "Quantas / oportunidades / você / perdeu?" entra nos frames
+6 / 18 / 46 / 62, cada um numa palavra real da locução.
+
+**Por conteúdo (com transcrição).** Salve o texto da narração em
+`narration.txt` e rode:
+
+```bash
+npm run align
+```
+
+O alinhador (`tools/align_text.py`) faz um alinhamento forçado leve — distribui
+as palavras pelas frases detectadas por peso silábico e encaixa cada uma no
+onset mais próximo — gerando `src/config/narrationText.ts` com o instante de
+**cada palavra**. A partir daí:
+
+- `alignWordsToPhrase()` passa a usar o instante **exato** em que cada palavra
+  do título é dita (sem precisar mexer em nenhuma cena);
+- o comando imprime os segundos sugeridos para `SCENE_STARTS`, procurando as
+  palavras-chave de cada tela na transcrição.
+
+### Conferir a sincronia
+
+A composição `ConsulTechReel-sync` (no Studio) mostra o vídeo com timecode,
+nome da cena, contador de frases e um pisca a cada palavra falada — é o jeito
+mais rápido de apontar "em 0:34 já era a tela 100+".
 
 ---
 
@@ -87,8 +121,10 @@ src/
     theme.ts         identidade visual (cores, pesos, sombras)
     copy.ts          todos os textos
     sfx.ts           biblioteca de efeitos + volumes
-    speechMap.ts     mapa de fala da narração
+    speechMap.ts     GERADO — frases, palavras e sílabas do áudio
+    narrationText.ts GERADO — transcrição alinhada (opcional)
   lib/
+    sync.ts          traduz fala em delays de animação
     anim.ts          fadeUp, fadeSide, popIn, card3dIn, stagger, float,
                      glowPulse, camera, typewriter, countUp, drawPath
     fonts.ts         injeta a Poppins embutida (400/500/600/700/800)
@@ -111,7 +147,8 @@ public/
   fonts/*.woff2      Poppins
 tools/
   gen_sfx.py         gerador dos 18 efeitos sonoros
-  analyze-audio.mjs  analisador de fala da narração
+  analyze_audio.py   extrai frases/palavras/sílabas do áudio -> speechMap.ts
+  align_text.py      alinha a transcrição ao áudio -> narrationText.ts
   inline-fonts.mjs   embute os woff2 como data: URI
 ```
 

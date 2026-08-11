@@ -13,6 +13,7 @@ import { C, FW, TEXT_GLOW_WHITE } from "../config/theme";
 import { EASE, float, glowPulse, ip, popIn, prog, spr, typewriter } from "../lib/anim";
 import { fontFamily } from "../lib/fonts";
 import { SfxTrack } from "../lib/SfxTrack";
+import { alignWordsToPhrase, sceneSync } from "../lib/sync";
 import { SlideHeader } from "../components/Brand";
 import { BureauLogo, BureauName } from "../components/Bureaus";
 import { Asterisk, ClockOutline, CurvedArrow, GlowBlob } from "../components/Decor";
@@ -20,30 +21,42 @@ import { Chip, GlassCard, SearchField, SkeletonLine } from "../components/Primit
 import { RevealText, SceneShell } from "../components/SceneShell";
 
 // ---------------------------------------------------------------------------
-// BEATS (frames @30fps) — ancorados nos inícios de frase da narração
+// BEATS — todos ancorados na fala (ver src/lib/sync.ts)
 // ---------------------------------------------------------------------------
+const S = sceneSync("oportunidades");
+
+/** as 4 palavras do título entram junto com a locução da 1ª frase */
+const HL = alignWordsToPhrase(
+  "oportunidades",
+  SCENE1.headline.map((w) => w.text),
+  0,
+);
+
+/** os 13 elementos flutuantes: um por palavra falada, do beat 8 ao 46 */
+const EL = S.spreadBetween(13, 8, 46);
+
 const B = {
-  header: 2,
-  h1: 4,
-  h2: 15,
-  h3: 27,
-  h4: 38,
-  clock: 58,
-  spc: 80,
-  avatar: 93,
-  chipFast: 106,
-  search: 118,
-  typing: 132,
-  chipTrust: 176,
-  serasa: 190,
-  squares: 205,
-  boavista: 220,
-  dots: 242,
-  receita: 280,
-  chipAlert: 302,
-  arrow: 352,
-  asterisk: 408,
-  shine: 470,
+  header: 0,
+  h1: HL[0],
+  h2: HL[1],
+  h3: HL[2],
+  h4: HL[3],
+  clock: S.phrase(1),
+  spc: EL[0],
+  avatar: EL[1],
+  chipFast: EL[2],
+  search: EL[3],
+  typing: EL[3] + 5,
+  chipTrust: EL[4],
+  serasa: EL[5],
+  squares: EL[6],
+  boavista: EL[7],
+  dots: EL[8],
+  receita: EL[9],
+  chipAlert: EL[10],
+  arrow: EL[11],
+  asterisk: EL[12],
+  shine: S.beat(47),
 };
 
 // ---------------------------------------------------------------------------

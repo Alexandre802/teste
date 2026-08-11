@@ -13,6 +13,7 @@ import { C, FW, SHADOW } from "../config/theme";
 import { EASE, card3dIn, float, glowPulse, ip, popIn, prog, spr } from "../lib/anim";
 import { fontFamily } from "../lib/fonts";
 import { SfxTrack } from "../lib/SfxTrack";
+import { alignWordsToPhrase, sceneSync } from "../lib/sync";
 import { LogoMark, SlideHeader } from "../components/Brand";
 import { ArcLines, DottedGrid } from "../components/Decor";
 import { Icon, IconName } from "../components/Icons";
@@ -20,23 +21,34 @@ import { BadgeCircle, CtaButton, IconCircle, WhiteCard } from "../components/Pri
 import { RevealText, SceneShell } from "../components/SceneShell";
 
 // ---------------------------------------------------------------------------
+// BEATS — ancorados na fala (ver src/lib/sync.ts)
+const S = sceneSync("pagueSo");
+
+/** "Pague só" / "pelo que usar" na 1ª frase falada */
+const HL = alignWordsToPhrase("pagueSo", SCENE5.headline.map((w) => w.text), 0);
+
+/**
+ * A última frase da narração é uma lista de benefícios (8 frases curtas
+ * seguidas), então os 9 cards entram um por palavra falada.
+ */
+const ROW1 = [S.phrase(2), S.beat(11)];
+const ROW2 = S.spread(3, 12);
+const ROW3 = S.spread(4, 17);
+
 const B = {
-  header: 2,
-  h1: 4,
-  h2: 16,
-  sub: 32,
-  arcs: 10,
-  row1: 58,
-  row1Step: 12,
-  row2: 88,
-  row2Step: 11,
-  row3: 128,
-  row3Step: 11,
-  shieldBadge: 182,
-  boltBadge: 194,
-  seal: 238,
-  cta: 264,
-  ctaShine: 292,
+  header: 0,
+  h1: HL[0],
+  h2: HL[1],
+  sub: S.phrase(1),
+  arcs: S.beat(1),
+  row1: ROW1,
+  row2: ROW2,
+  row3: ROW3,
+  shieldBadge: S.beat(15),
+  boltBadge: S.beat(16),
+  seal: S.phrase(5),
+  cta: S.phrase(6),
+  ctaShine: S.phrase(7),
 };
 
 const L = {
@@ -57,9 +69,9 @@ export const scene5Cues: Cue[] = [
   cue(B.h2 - 3, "whoosh", 0.9, 1.08),
   cue(B.h2 + 1, "impact", 0.55),
   cue(B.sub, "popSoft", 0.7),
-  ...[0, 1].map((i) => cue(B.row1 + i * B.row1Step, "pop", 0.85, 1 + i * 0.05)),
-  ...[0, 1, 2].map((i) => cue(B.row2 + i * B.row2Step, "pop", 0.8, 1.05 + i * 0.05)),
-  ...[0, 1, 2, 3].map((i) => cue(B.row3 + i * B.row3Step, "popSoft", 0.85, 1.1 + i * 0.05)),
+  ...B.row1.map((f, i) => cue(f, "pop", 0.85, 1 + i * 0.05)),
+  ...B.row2.map((f, i) => cue(f, "pop", 0.8, 1.05 + i * 0.05)),
+  ...B.row3.map((f, i) => cue(f, "popSoft", 0.85, 1.1 + i * 0.05)),
   cue(B.shieldBadge, "popSoft", 1),
   cue(B.boltBadge, "popSoft", 1, 1.08),
   cue(B.seal - 6, "reverse", 0.6),
@@ -154,12 +166,12 @@ const Row: React.FC<{
   items: { title: string; sub: string; icon: IconName; well?: boolean }[];
   y: number;
   h: number;
-  base: number;
-  step: number;
+  /** delay de cada card, em frames — um por palavra falada */
+  delays: number[];
   frame: number;
   fps: number;
   compact?: boolean;
-}> = ({ items, y, h, base, step, frame, fps, compact = false }) => {
+}> = ({ items, y, h, delays, frame, fps, compact = false }) => {
   const totalGap = L.grid.gap * (items.length - 1);
   const w = (L.grid.w - totalGap) / items.length;
   return (
@@ -175,7 +187,7 @@ const Row: React.FC<{
       }}
     >
       {items.map((it, i) => {
-        const delay = base + i * step;
+        const delay = delays[Math.min(i, delays.length - 1)];
         const enter = card3dIn(frame, fps, delay, {
           y: 46,
           x: 0,
@@ -349,8 +361,7 @@ export const Scene5PagueSo: React.FC<{ duration: number }> = ({ duration }) => {
         items={SCENE5.row1.map((c) => ({ ...c, well: c.well }))}
         y={L.row1.y}
         h={L.row1.h}
-        base={B.row1}
-        step={B.row1Step}
+        delays={B.row1}
         frame={frame}
         fps={fps}
       />
@@ -358,8 +369,7 @@ export const Scene5PagueSo: React.FC<{ duration: number }> = ({ duration }) => {
         items={SCENE5.row2}
         y={L.row2.y}
         h={L.row2.h}
-        base={B.row2}
-        step={B.row2Step}
+        delays={B.row2}
         frame={frame}
         fps={fps}
         compact
@@ -368,8 +378,7 @@ export const Scene5PagueSo: React.FC<{ duration: number }> = ({ duration }) => {
         items={SCENE5.row3}
         y={L.row3.y}
         h={L.row3.h}
-        base={B.row3}
-        step={B.row3Step}
+        delays={B.row3}
         frame={frame}
         fps={fps}
         compact

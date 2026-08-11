@@ -74,6 +74,11 @@ export const SCENE4 = {
     line4a: "em ",
     line4b: "segundos.",
   },
+  /**
+   * Como as linhas do título são FALADAS — usado só para o alinhamento
+   * silábico com a narração ("100+" não tem vogais para pesar).
+   */
+  headlineSpoken: ["mais de cem", "tipos de", "consultas", "em segundos"],
   search: "Buscar consulta...",
   list: [
     { label: "Veículo", icon: "car" as const },

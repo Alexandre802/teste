@@ -3,6 +3,7 @@ import { Composition } from "remotion";
 import { FPS, HEIGHT, SCENES, TOTAL_FRAMES, WIDTH } from "./config/timeline";
 import { ConsulTechVideo } from "./Video";
 import { SceneOnly } from "./SceneOnly";
+import { SyncCheck } from "./SyncCheck";
 import "./lib/fonts";
 
 export const RemotionRoot: React.FC = () => {
@@ -12,6 +13,16 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="ConsulTechReel"
         component={ConsulTechVideo}
+        durationInFrames={TOTAL_FRAMES}
+        fps={FPS}
+        width={WIDTH}
+        height={HEIGHT}
+      />
+
+      {/* mesma peça com timecode e régua de frases, para conferir sincronia */}
+      <Composition
+        id="ConsulTechReel-sync"
+        component={SyncCheck}
         durationInFrames={TOTAL_FRAMES}
         fps={FPS}
         width={WIDTH}

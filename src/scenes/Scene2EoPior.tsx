@@ -13,6 +13,7 @@ import { C, FW, TEXT_GLOW_WHITE } from "../config/theme";
 import { EASE, float, glowPulse, ip, popIn, prog, spr } from "../lib/anim";
 import { fontFamily } from "../lib/fonts";
 import { SfxTrack } from "../lib/SfxTrack";
+import { alignWordsToPhrase, sceneSync } from "../lib/sync";
 import { SlideHeader } from "../components/Brand";
 import { BoltTriangle, GlowBlob, Hourglass, Swoosh } from "../components/Decor";
 import { Icon } from "../components/Icons";
@@ -20,19 +21,27 @@ import { BadgeCircle, SkeletonLine } from "../components/Primitives";
 import { RevealText, SceneShell } from "../components/SceneShell";
 
 // ---------------------------------------------------------------------------
+// BEATS — ancorados na fala (ver src/lib/sync.ts)
+// ---------------------------------------------------------------------------
+const S = sceneSync("eoPior");
+
+/** "E o" / "pior..." entram junto com a locução da 1ª frase */
+const HL = alignWordsToPhrase("eoPior", SCENE2.headline.map((w) => w.text), 0);
+
 const B = {
-  header: 2,
-  h1: 4,
-  h2: 20,
-  hourglass: 38,
-  alert1: 58,
-  exclam: 66,
-  alert2: 96,
-  curve: 110,
-  alert3: 132,
-  alert4: 162,
-  bolt: 186,
-  pulse: 204,
+  header: 0,
+  h1: HL[0],
+  h2: HL[1],
+  hourglass: S.beat(5),
+  exclam: S.beat(7),
+  // cada alerta entra numa frase nova da narração
+  alert1: S.phrase(1),
+  alert2: S.phrase(2),
+  alert3: S.beat(14),
+  alert4: S.phrase(3),
+  curve: S.beat(10),
+  bolt: S.beat(20),
+  pulse: S.beat(22),
 };
 
 const L = {

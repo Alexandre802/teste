@@ -26,6 +26,7 @@ import {
 } from "../lib/anim";
 import { fontFamily } from "../lib/fonts";
 import { SfxTrack } from "../lib/SfxTrack";
+import { alignWordsToPhrase, sceneSync } from "../lib/sync";
 import { DashboardLogo, SlideHeader } from "../components/Brand";
 import { AreaChart, Donut, DonutLegend, MiniBars, Sparkline, TrendLine } from "../components/Charts";
 import { Asterisk, CurvedArrow, GlowBlob, Swoosh } from "../components/Decor";
@@ -41,35 +42,43 @@ import {
 import { RevealText, SceneShell } from "../components/SceneShell";
 
 // ---------------------------------------------------------------------------
+// BEATS — ancorados na fala (ver src/lib/sync.ts)
+const S = sceneSync("cemMais");
+
+/** as 4 linhas do título, alinhadas às 2 primeiras frases faladas */
+const HL = alignWordsToPhrase("cemMais", SCENE4.headlineSpoken, 0, 1);
+
+/** os 7 tipos de consulta entram um por palavra falada (enumeração) */
+const LIST = S.spread(7, 14);
+
 const B = {
-  header: 2,
-  hundred: 6,
-  count: 8,
-  plus: 40,
-  h2: 44,
-  h3: 56,
-  h4: 70,
-  boltBadge: 84,
-  arrow: 98,
-  search: 112,
-  typing: 122,
-  list: 132,
-  listStep: 11,
-  panel: 196,
-  stat1: 214,
-  stat2: 230,
-  stat3: 246,
-  area: 262,
-  donut: 290,
-  legend: 300,
-  chip1: 338,
-  chip2: 354,
-  chip3: 370,
-  activity: 390,
+  header: 0,
+  hundred: HL[0],
+  count: HL[0] + 2,
+  plus: HL[1] - 4,
+  h2: HL[1],
+  h3: HL[2],
+  h4: HL[3],
+  boltBadge: S.beat(9),
+  arrow: S.beat(10),
+  search: S.beat(11),
+  typing: S.beat(11) + 5,
+  list: LIST,
+  panel: S.phrase(5),
+  stat1: S.beat(22),
+  stat2: S.beat(23),
+  stat3: S.beat(24),
+  area: S.beat(25),
+  donut: S.beat(28),
+  legend: S.beat(30),
+  chip1: S.beat(32),
+  chip2: S.beat(33),
+  chip3: S.beat(34),
+  activity: S.beat(36),
   activityStep: 12,
-  chartBadge: 440,
-  asterisk: 456,
-  shine: 478,
+  chartBadge: S.beat(40),
+  asterisk: S.beat(42),
+  shine: S.beat(44),
 };
 
 const L = {
@@ -106,8 +115,8 @@ export const scene4Cues: Cue[] = [
   cue(B.search - 3, "swipe", 0.7),
   cue(B.typing, "click"),
   cue(B.typing + 10, "tick", 0.7),
-  ...SCENE4.list.map((_, i) => cue(B.list + i * B.listStep, "popSoft", 0.8, 1 + i * 0.03)),
-  cue(B.list + 6 * B.listStep + 6, "success", 0.5),
+  ...SCENE4.list.map((_, i) => cue(B.list[i], "popSoft", 0.8, 1 + i * 0.03)),
+  cue(B.list[6] + 6, "success", 0.5),
   cue(B.panel - 5, "reverse", 0.6),
   cue(B.panel, "whooshBig", 0.5),
   cue(B.stat1, "tick", 0.7),
@@ -382,7 +391,7 @@ export const Scene4CemMais: React.FC<{ duration: number }> = ({ duration }) => {
 
       {/* lista lateral de consultas */}
       {SCENE4.list.map((item, i) => {
-        const delay = B.list + i * B.listStep;
+        const delay = B.list[i];
         const enter = card3dIn(frame, fps, delay, {
           y: 30,
           x: -90,
