@@ -78,9 +78,18 @@ relationship the client signed off on.
 pulse with the music. Keep it in sync with `bpm` in `tools/make-audio.py`;
 if one changes, change both.
 
-### Third-party reference audio
+### Music bed
 
-Do not lift music or effects out of a reference video into this ad. Beyond
-the licensing exposure, reference edits carry a continuous bed, so no effect
-can be isolated cleanly. Match the measurable characteristics instead —
-tempo, spectral tilt, energy curve — and re-synthesise.
+`public/audio/music.mp3` is currently the **reference video's own track**,
+looped to length by `tools/build-reference-bed.py`. The client chose this
+after being shown the exposure: it is another studio's licensed track, so the
+campaign can draw a copyright claim or a takedown on Meta/TikTok/YouTube.
+
+`public/audio/music-synth.mp3` is the licence-safe alternative — synthesised
+by `tools/make-audio.py`, matched to the same 134.6 BPM and spectral tilt.
+Swapping the two files and re-running `npm run audio:levels` is the whole
+switch; nothing else depends on which bed is in place.
+
+Note that a reference edit's own effects cannot be lifted out of it: its music
+never drops below -35 dBFS, so no effect is ever isolated. This ad's effects
+are all synthesised and cued to its own animation.

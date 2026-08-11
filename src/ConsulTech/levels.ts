@@ -28,7 +28,7 @@ export const ASSET_DBFS: Record<string, number> = {
 	'impact-clean': -10.3,
 	'impact-sub': -11.6,
 	'low-whoosh': -8.0,
-	'music': -20.8,
+	'music': -14.8,
 	'pop': -12.7,
 	'pop-high': -12.0,
 	'rise-clean': -6.9,
