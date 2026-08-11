@@ -41,36 +41,42 @@ import {
 import { RevealText, SceneShell } from "../components/SceneShell";
 
 // ---------------------------------------------------------------------------
-// BEATS — ancorados na fala (ver src/lib/sync.ts)
+// BEATS — ancorados nas palavras da narração (ver src/lib/sync.ts)
 const S = sceneSync("precisaConsultar");
 
-/** "Precisa" / "consultar?" na 1ª frase falada */
-const HL = alignWordsToPhrase("precisaConsultar", SCENE3.headline.map((w) => w.text), 0);
+/**
+ * A locução desta cena:
+ *  33,9s "Precisa consultar um veículo?"
+ *  35,7s "Verificar score de crédito?"
+ *  37,2s "Emitir o CRLV-e?"
+ *  38,1s "Consultar protestos, restrições ou histórico veicular?"
+ *  41,2s "Está tudo em um só lugar."
+ *  42,8s "Sem perder tempo pulando de sistema em sistema. Sem depender de terceiros."
+ *
+ * Os 4 cards entram exatamente quando a narração diz o nome de cada consulta.
+ */
+const CARDS = S.atWords(["veiculo", "score", "CRLV", "protestos"], 4);
 
 const B = {
   header: 0,
-  h1: HL[0],
-  h2: HL[1],
+  h1: S.atWord("precisa", 0),
+  h2: S.atWord("consultar", 1),
   decor: 0,
-  /**
-   * Os 4 cards entram um por frase falada: a narração enumera os tipos de
-   * consulta, e as frases 2 a 5 desta cena são justamente 4 frases curtas
-   * seguidas (0,5s / 1,0s / 1,1s / 1,1s).
-   */
-  cards: [S.phrase(2), S.phrase(3), S.phrase(4), S.phrase(5)],
-  boltBadge: S.beat(4),
-  search1: S.phrase(6),
-  typing1: S.phrase(6) + 5,
-  search2: S.phrase(7),
-  typing2: S.phrase(7) + 5,
-  trustCard: S.beat(28),
-  segCard: S.beat(31),
-  statCard: S.phrase(8),
-  statCount: S.phrase(8) + 6,
-  chartBadge: S.beat(38),
-  activity: S.phrase(9),
-  arrow: S.beat(42),
-  footer: S.phrase(10),
+  cards: CARDS,
+  boltBadge: S.atWord("verificar", 6),
+  search1: S.atWord("emitir", 9),
+  typing1: S.atWord("emitir", 9) + 5,
+  search2: S.atWord("restricoes", 15),
+  typing2: S.atWord("restricoes", 15) + 5,
+  trustCard: S.atWord("historico", 17),
+  segCard: S.atWord("veicular", 19),
+  statCard: S.atWord("esta", 21),
+  statCount: S.atWord("esta", 21) + 6,
+  // "Está tudo em um só lugar." — o rodapé entra na palavra "tudo"
+  footer: S.atWord("tudo", 22),
+  chartBadge: S.atWord("lugar", 24),
+  activity: S.atWord("pulando", 27),
+  arrow: S.atWord("sistema", 30),
 };
 
 const L = {

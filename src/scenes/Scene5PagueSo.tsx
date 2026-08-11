@@ -21,34 +21,44 @@ import { BadgeCircle, CtaButton, IconCircle, WhiteCard } from "../components/Pri
 import { RevealText, SceneShell } from "../components/SceneShell";
 
 // ---------------------------------------------------------------------------
-// BEATS — ancorados na fala (ver src/lib/sync.ts)
+// BEATS — ancorados nas palavras da narração (ver src/lib/sync.ts)
 const S = sceneSync("pagueSo");
 
-/** "Pague só" / "pelo que usar" na 1ª frase falada */
-const HL = alignWordsToPhrase("pagueSo", SCENE5.headline.map((w) => w.text), 0);
-
 /**
- * A última frase da narração é uma lista de benefícios (8 frases curtas
- * seguidas), então os 9 cards entram um por palavra falada.
+ * A locução desta cena (a mais longa: 25s):
+ *  46,8s "E o melhor: você paga apenas pelo que usar, sem mensalidade obrigatória."
+ *  51,6s "Isso significa mais agilidade para tomar decisões, mais segurança
+ *         para fechar negócios e muito mais produtividade no seu dia a dia."
+ *  59,3s "Porque quem tem a informação certa, na hora certa, sempre sai na frente."
+ *  63,4s "Cadastre-se agora na ConsulTech e descubra como é ter mais velocidade,
+ *         autonomia e segurança em todas as suas consultas."
+ *
+ * O título entra em "paga/pelo", o subtítulo em "mensalidade", e o CTA
+ * exatamente em "Cadastre-se agora".
  */
-const ROW1 = [S.phrase(2), S.beat(11)];
-const ROW2 = S.spread(3, 12);
-const ROW3 = S.spread(4, 17);
-
 const B = {
   header: 0,
-  h1: HL[0],
-  h2: HL[1],
-  sub: S.phrase(1),
   arcs: S.beat(1),
-  row1: ROW1,
-  row2: ROW2,
-  row3: ROW3,
-  shieldBadge: S.beat(15),
-  boltBadge: S.beat(16),
-  seal: S.phrase(5),
-  cta: S.phrase(6),
-  ctaShine: S.phrase(7),
+  h1: S.atWord("paga", 4),
+  h2: S.atWord("pelo", 6),
+  sub: S.atWord("mensalidade", 8),
+  row1: [S.atWord("obrigatoria", 10), S.atWord("isso", 12)],
+  row2: [S.atWord("agilidade", 15), S.atWord("decisoes", 18), S.atWord("seguranca", 20)],
+  row3: [
+    S.atWord("fechar", 22),
+    S.atWord("negocios", 23),
+    S.atWord("produtividade", 26),
+    S.atWord("dia", 29),
+  ],
+  shieldBadge: S.atWord("informacao", 33),
+  boltBadge: S.atWord("hora", 35),
+  seal: S.atWord("frente", 38),
+  cta: S.atWord("cadastre", 40),
+  ctaShine: S.atWord("descubra", 44),
+  /** realces nos cards quando a narração repete os benefícios no fecho */
+  pulseVelocidade: S.atWord("velocidade", 46),
+  pulseAutonomia: S.atWord("autonomia", 48),
+  pulseSeguranca: S.atSecond(68.02), // "...autonomia e segurança em todas as suas consultas"
 };
 
 const L = {
@@ -80,6 +90,9 @@ export const scene5Cues: Cue[] = [
   cue(B.cta, "tap", 1.1),
   cue(B.ctaShine, "sparkle", 0.5, 1.2),
   cue(B.ctaShine + 6, "success", 0.5),
+  cue(B.pulseVelocidade, "popSoft", 0.7, 1.15),
+  cue(B.pulseAutonomia, "popSoft", 0.7, 1.1),
+  cue(B.pulseSeguranca, "popSoft", 0.7, 1.05),
 ];
 
 // ---------------------------------------------------------------------------
@@ -94,8 +107,13 @@ const PriceCard: React.FC<{
   fps: number;
   delay: number;
   compact?: boolean;
-}> = ({ title, sub, icon, well = false, h, w, frame, fps, delay, compact = false }) => {
+  /** frame em que a narração repete este benefício (realce) */
+  pulse?: number;
+}> = ({ title, sub, icon, well = false, h, w, frame, fps, delay, compact = false, pulse }) => {
   const iconPop = spr(frame, fps, delay + 4, "bouncy");
+  // realce: sobe, aumenta e ganha borda azul quando a palavra é dita
+  const pulseP =
+    pulse === undefined ? 0 : ip(frame, [pulse - 2, pulse + 6, pulse + 26], [0, 1, 0], EASE.out);
   return (
     <WhiteCard
       radius={22}
@@ -104,11 +122,16 @@ const PriceCard: React.FC<{
         width: w,
         height: h,
         padding: compact ? "24px 22px" : "26px 28px",
+        transform: `translateY(${-10 * pulseP}px) scale(${1 + 0.035 * pulseP})`,
+        outline: pulseP > 0.02 ? `2px solid rgba(27,92,255,${0.55 * pulseP})` : undefined,
         display: "flex",
         flexDirection: compact ? "column" : "row",
         alignItems: compact ? "flex-start" : "center",
         gap: compact ? 16 : 20,
-        boxShadow: SHADOW.cardLight,
+        boxShadow:
+          pulseP > 0.02
+            ? `${SHADOW.cardLight}, 0 0 ${46 * pulseP}px rgba(27,92,255,${0.4 * pulseP})`
+            : SHADOW.cardLight,
       }}
     >
       <div
@@ -171,7 +194,9 @@ const Row: React.FC<{
   frame: number;
   fps: number;
   compact?: boolean;
-}> = ({ items, y, h, delays, frame, fps, compact = false }) => {
+  /** realce por índice de card (undefined = sem realce) */
+  pulses?: (number | undefined)[];
+}> = ({ items, y, h, delays, frame, fps, compact = false, pulses }) => {
   const totalGap = L.grid.gap * (items.length - 1);
   const w = (L.grid.w - totalGap) / items.length;
   return (
@@ -215,6 +240,7 @@ const Row: React.FC<{
               fps={fps}
               delay={delay}
               compact={compact}
+              pulse={pulses?.[i]}
             />
           </div>
         );
@@ -373,6 +399,7 @@ export const Scene5PagueSo: React.FC<{ duration: number }> = ({ duration }) => {
         frame={frame}
         fps={fps}
         compact
+        pulses={[undefined, B.pulseAutonomia, undefined]}
       />
       <Row
         items={SCENE5.row3}
@@ -382,6 +409,7 @@ export const Scene5PagueSo: React.FC<{ duration: number }> = ({ duration }) => {
         frame={frame}
         fps={fps}
         compact
+        pulses={[undefined, undefined, B.pulseVelocidade, B.pulseSeguranca]}
       />
 
       {/* badges azuis flutuantes */}

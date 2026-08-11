@@ -20,16 +20,43 @@ npm run render     # gera out/consultech-reel.mp4
 
 ## Cenas
 
-| # | Composição | Tela de referência | Entra em | Duração |
-|---|------------|--------------------|----------|---------|
-| 1 | `scene-1-oportunidades` | 2/8 — "Quantas oportunidades você perdeu?" | 0,00 s | 16,47 s |
-| 2 | `scene-2-eoPior` | 3/8 — "E o pior..." | 16,47 s | 8,60 s |
-| 3 | `scene-3-precisaConsultar` | 5/8 — "Precisa consultar?" | 25,07 s | 17,37 s |
-| 4 | `scene-4-cemMais` | 5/8 — "100+ tipos de consultas" | 42,44 s | 16,73 s |
-| 5 | `scene-5-pagueSo` | 8/8 — "Pague só pelo que usar" | 59,15 s | 12,43 s |
+A ordem segue o **roteiro falado**, não a numeração dos slides: a locução
+apresenta "mais de 90 tipos de consultas... em segundos" *antes* de "Precisa
+consultar um veículo?", então a tela 100+ vem antes da tela Precisa consultar.
+
+| # | Composição | Tela | Entra | Dura | O que a narração diz |
+|---|---|---|---|---|---|
+| 1 | `scene-1-oportunidades` | 2/8 | 0,00 s | 14,60 s | "Você que é despachante..." + "Quantas oportunidades você já atrasou ou até perdeu?" |
+| 2 | `scene-2-eoPior` | 3/8 | 14,60 s | 7,57 s | "E o pior..." + "Cada minuto de espera pode significar um negócio perdido" |
+| 3 | `scene-4-cemMais` | 5/8 | 22,16 s | 11,53 s | "...nasceu a ConsulTech" + "mais de 90 tipos de consultas... com resultado em segundos" |
+| 4 | `scene-3-precisaConsultar` | 5/8 | 33,69 s | 12,90 s | "Precisa consultar um veículo? ... Está tudo em um só lugar." |
+| 5 | `scene-5-pagueSo` | 8/8 | 46,61 s | 25,00 s | "você paga apenas pelo que usar" + benefícios + "Cadastre-se agora" |
 
 Cada cena também existe como composição isolada no Studio, para revisar uma
 tela por vez sem esperar o vídeo inteiro.
+
+### Como cada elemento acha seu lugar
+
+Os elementos entram na **palavra que os nomeia**:
+
+| Elemento | Palavra falada | Instante |
+|---|---|---|
+| cards das fontes de dados (SPC, Serasa...) | "vários **sites** diferentes" | 11,2 s |
+| relógio | "**esperar** alguém retornar" | 12,7 s |
+| cards de alerta | "negócio **perdido**", "**prejuízo**" | 18,4 / 19,7 s |
+| painel do dashboard | "para **resolver** esse problema" | 23,0 s |
+| logo dentro do painel | "nasceu a **ConsulTech**" | 24,3 s |
+| contador "100+" | "**mais** de 90 tipos" | 28,2 s |
+| card "Veículo" | "consultar um **veículo?**" | 35,4 s |
+| card "Score de crédito" | "verificar **score** de crédito?" | 36,3 s |
+| card "CRLV-e" | "emitir o **CRLV-e?**" | 37,7 s |
+| card "Protestos" | "consultar **protestos**" | 38,4 s |
+| rodapé "Tudo em um só lugar" | "está **tudo** em um só lugar" | 41,5 s |
+| subtítulo "Sem mensalidade obrigatória" | "sem **mensalidade** obrigatória" | 49,8 s |
+| botão de CTA | "**Cadastre-se** agora" | 63,4 s |
+
+No fecho, quando a narração repete os benefícios ("mais velocidade, autonomia
+e segurança"), os cards correspondentes recebem um realce.
 
 ## Sincronia com a narração
 
@@ -60,8 +87,8 @@ dentro da frase falada por **peso silábico** e encaixados no onset de palavra
 mais próximo — "Quantas / oportunidades / você / perdeu?" entra nos frames
 6 / 18 / 46 / 62, cada um numa palavra real da locução.
 
-**Por conteúdo (com transcrição).** Salve o texto da narração em
-`narration.txt` e rode:
+**Por conteúdo (com transcrição — é o estado atual).** O texto está em
+`narration.txt`; para regerar depois de trocar a locução:
 
 ```bash
 npm run align
@@ -72,10 +99,13 @@ as palavras pelas frases detectadas por peso silábico e encaixa cada uma no
 onset mais próximo — gerando `src/config/narrationText.ts` com o instante de
 **cada palavra**. A partir daí:
 
-- `alignWordsToPhrase()` passa a usar o instante **exato** em que cada palavra
-  do título é dita (sem precisar mexer em nenhuma cena);
+- as cenas usam `S.atWord("Cadastre")` / `S.atWords([...])` para entrar no
+  instante **exato** em que a palavra é dita;
 - o comando imprime os segundos sugeridos para `SCENE_STARTS`, procurando as
   palavras-chave de cada tela na transcrição.
+
+Se a transcrição for removida, `atWord` cai no `fallbackBeat` informado e o
+vídeo continua sincronizado pelo ritmo — nada quebra.
 
 ### Conferir a sincronia
 

@@ -25,23 +25,28 @@ import { RevealText, SceneShell } from "../components/SceneShell";
 // ---------------------------------------------------------------------------
 const S = sceneSync("eoPior");
 
-/** "E o" / "pior..." entram junto com a locução da 1ª frase */
-const HL = alignWordsToPhrase("eoPior", SCENE2.headline.map((w) => w.text), 0);
-
+/**
+ * A locução desta cena:
+ *  14,8s "E o pior..."
+ *  15,1s "Cada minuto de espera pode significar um negócio perdido ou até um
+ *         prejuízo que poderia ter sido evitado."
+ *  22,0s (corte para a próxima cena, na maior pausa da narração)
+ *
+ * Cada card de alerta entra na palavra que ele representa.
+ */
 const B = {
   header: 0,
-  h1: HL[0],
-  h2: HL[1],
-  hourglass: S.beat(5),
-  exclam: S.beat(7),
-  // cada alerta entra numa frase nova da narração
-  alert1: S.phrase(1),
-  alert2: S.phrase(2),
-  alert3: S.beat(14),
-  alert4: S.phrase(3),
-  curve: S.beat(10),
-  bolt: S.beat(20),
-  pulse: S.beat(22),
+  h1: S.atWord("pior", 0) - 5,
+  h2: S.atWord("pior", 1),
+  hourglass: S.atWord("minuto", 3),
+  alert1: S.atWord("espera", 5),
+  alert2: S.atWord("significar", 7),
+  exclam: S.atWord("negocio", 8),
+  alert3: S.atWord("perdido", 10),
+  alert4: S.atWord("prejuizo", 12),
+  curve: S.atWord("poderia", 13),
+  bolt: S.atWord("evitado", 15),
+  pulse: S.atWord("evitado", 15) + 10,
 };
 
 const L = {

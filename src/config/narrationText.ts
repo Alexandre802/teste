@@ -1,92 +1,223 @@
 /**
- * Transcrição da narração alinhada ao áudio.
+ * ARQUIVO GERADO — não edite à mão.
+ * Regere com: python3 tools/align_text.py narration.txt
  *
- * Este arquivo é GERADO. Enquanto estiver vazio, o vídeo se sincroniza apenas
- * pelo RITMO da fala (frases, palavras e sílabas detectadas em speechMap.ts).
- * Com a transcrição preenchida, ele passa a se sincronizar pelo CONTEÚDO: cada
- * palavra do título entra no instante exato em que é falada.
+ * Transcrição da narração alinhada ao áudio (193 palavras).
+ * O tempo de cada palavra vem de um alinhamento forçado leve: as palavras são
+ * distribuídas pelas frases detectadas no áudio por peso silábico e encaixadas
+ * no onset de palavra mais próximo (ver tools/align_text.py).
  *
- * Para preencher:
- *   1. salve o texto da narração em narration.txt (texto puro)
- *   2. rode: npm run align
- *
- * O comando sobrescreve este arquivo e imprime, no terminal, os segundos
- * sugeridos para SCENE_STARTS (src/config/timeline.ts).
+ * Com isso as cenas podem entrar exatamente quando o assunto é falado.
  */
 
 export type SpokenWord = { text: string; start: number };
 
-/** vazio = sem transcrição; o vídeo cai no alinhamento por ritmo */
-export const WORDS: SpokenWord[] = [];
-
-const normalize = (s: string) =>
-  s
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/[^a-z0-9]/g, "");
+export const WORDS: SpokenWord[] = [
+  { text: "Você", start: 0.21 },
+  { text: "que", start: 0.21 },
+  { text: "é", start: 0.59 },
+  { text: "despachante,", start: 0.78 },
+  { text: "lojista", start: 1.04 },
+  { text: "de", start: 1.72 },
+  { text: "veículos,", start: 1.72 },
+  { text: "advogado", start: 2.56 },
+  { text: "ou", start: 2.99 },
+  { text: "trabalha", start: 2.99 },
+  { text: "com", start: 3.6 },
+  { text: "análise", start: 3.79 },
+  { text: "de", start: 4.29 },
+  { text: "crédito...", start: 4.29 },
+  { text: "me", start: 4.93 },
+  { text: "responde", start: 4.93 },
+  { text: "uma", start: 5.84 },
+  { text: "coisa.", start: 6.04 },
+  { text: "Quantas", start: 6.25 },
+  { text: "oportunidades", start: 7.15 },
+  { text: "você", start: 7.86 },
+  { text: "já", start: 8.17 },
+  { text: "atrasou", start: 8.17 },
+  { text: "ou", start: 8.63 },
+  { text: "até", start: 8.63 },
+  { text: "perdeu", start: 9.25 },
+  { text: "porque", start: 9.54 },
+  { text: "precisou", start: 9.75 },
+  { text: "buscar", start: 10.18 },
+  { text: "informações", start: 10.42 },
+  { text: "em", start: 10.99 },
+  { text: "vários", start: 10.99 },
+  { text: "sites", start: 11.2 },
+  { text: "diferentes", start: 11.73 },
+  { text: "ou", start: 12.32 },
+  { text: "esperar", start: 12.66 },
+  { text: "alguém", start: 12.89 },
+  { text: "retornar", start: 13.56 },
+  { text: "uma", start: 13.85 },
+  { text: "consulta?", start: 14.23 },
+  { text: "E", start: 14.76 },
+  { text: "o", start: 14.76 },
+  { text: "pior...", start: 14.76 },
+  { text: "Cada", start: 15.08 },
+  { text: "minuto", start: 15.76 },
+  { text: "de", start: 15.96 },
+  { text: "espera", start: 16.76 },
+  { text: "pode", start: 17.06 },
+  { text: "significar", start: 17.27 },
+  { text: "um", start: 17.85 },
+  { text: "negócio", start: 17.85 },
+  { text: "perdido", start: 18.4 },
+  { text: "ou", start: 18.87 },
+  { text: "até", start: 19.18 },
+  { text: "um", start: 19.66 },
+  { text: "prejuízo", start: 19.66 },
+  { text: "que", start: 20.3 },
+  { text: "poderia", start: 20.3 },
+  { text: "ter", start: 20.67 },
+  { text: "sido", start: 20.67 },
+  { text: "evitado.", start: 20.98 },
+  { text: "Foi", start: 21.5 },
+  { text: "para", start: 22.57 },
+  { text: "resolver", start: 22.98 },
+  { text: "esse", start: 23.41 },
+  { text: "problema", start: 23.41 },
+  { text: "que", start: 23.9 },
+  { text: "nasceu", start: 23.9 },
+  { text: "a", start: 24.33 },
+  { text: "ConsulTech.", start: 24.33 },
+  { text: "Em", start: 25.54 },
+  { text: "uma", start: 25.54 },
+  { text: "única", start: 25.9 },
+  { text: "plataforma,", start: 26.86 },
+  { text: "você", start: 27.21 },
+  { text: "tem", start: 27.43 },
+  { text: "acesso", start: 27.66 },
+  { text: "a", start: 27.95 },
+  { text: "mais", start: 28.19 },
+  { text: "de", start: 28.19 },
+  { text: "90", start: 28.47 },
+  { text: "tipos", start: 28.47 },
+  { text: "de", start: 28.82 },
+  { text: "consultas", start: 28.82 },
+  { text: "cadastrais,", start: 29.3 },
+  { text: "veiculares,", start: 30.03 },
+  { text: "financeiras", start: 30.92 },
+  { text: "e", start: 31.46 },
+  { text: "jurídicas,", start: 31.46 },
+  { text: "com", start: 32.36 },
+  { text: "resultado", start: 32.36 },
+  { text: "em", start: 33.01 },
+  { text: "segundos.", start: 33.01 },
+  { text: "Precisa", start: 33.91 },
+  { text: "consultar", start: 34.46 },
+  { text: "um", start: 34.96 },
+  { text: "veículo?", start: 35.44 },
+  { text: "Verificar", start: 35.7 },
+  { text: "score", start: 36.3 },
+  { text: "de", start: 36.3 },
+  { text: "crédito?", start: 36.99 },
+  { text: "Emitir", start: 37.21 },
+  { text: "o", start: 37.65 },
+  { text: "CRLV-e?", start: 37.65 },
+  { text: "Consultar", start: 38.07 },
+  { text: "protestos,", start: 38.36 },
+  { text: "restrições", start: 39.02 },
+  { text: "ou", start: 39.26 },
+  { text: "histórico", start: 39.6 },
+  { text: "veicular?", start: 40.28 },
+  { text: "Está", start: 41.18 },
+  { text: "tudo", start: 41.48 },
+  { text: "em", start: 41.77 },
+  { text: "um", start: 41.77 },
+  { text: "só", start: 42.0 },
+  { text: "lugar.", start: 42.83 },
+  { text: "Sem", start: 42.83 },
+  { text: "perder", start: 43.14 },
+  { text: "tempo", start: 43.14 },
+  { text: "pulando", start: 43.55 },
+  { text: "de", start: 44.4 },
+  { text: "sistema", start: 44.67 },
+  { text: "em", start: 44.86 },
+  { text: "sistema.", start: 45.23 },
+  { text: "Sem", start: 45.23 },
+  { text: "depender", start: 45.73 },
+  { text: "de", start: 45.73 },
+  { text: "terceiros.", start: 46.24 },
+  { text: "E", start: 46.77 },
+  { text: "o", start: 47.0 },
+  { text: "melhor:", start: 47.0 },
+  { text: "você", start: 47.36 },
+  { text: "paga", start: 48.18 },
+  { text: "apenas", start: 48.92 },
+  { text: "pelo", start: 49.19 },
+  { text: "que", start: 49.41 },
+  { text: "usar,", start: 49.41 },
+  { text: "sem", start: 49.77 },
+  { text: "mensalidade", start: 49.77 },
+  { text: "obrigatória.", start: 50.71 },
+  { text: "Isso", start: 51.6 },
+  { text: "significa", start: 52.56 },
+  { text: "mais", start: 53.02 },
+  { text: "agilidade", start: 53.3 },
+  { text: "para", start: 53.79 },
+  { text: "tomar", start: 54.04 },
+  { text: "decisões,", start: 54.27 },
+  { text: "mais", start: 54.63 },
+  { text: "segurança", start: 55.19 },
+  { text: "para", start: 55.86 },
+  { text: "fechar", start: 55.86 },
+  { text: "negócios", start: 56.14 },
+  { text: "e", start: 56.4 },
+  { text: "muito", start: 57.02 },
+  { text: "mais", start: 57.34 },
+  { text: "produtividade", start: 57.34 },
+  { text: "no", start: 58.39 },
+  { text: "seu", start: 58.39 },
+  { text: "dia", start: 58.58 },
+  { text: "a", start: 58.58 },
+  { text: "dia.", start: 58.85 },
+  { text: "Porque", start: 59.34 },
+  { text: "quem", start: 59.58 },
+  { text: "tem", start: 59.58 },
+  { text: "a", start: 60.03 },
+  { text: "informação", start: 60.03 },
+  { text: "certa,", start: 60.49 },
+  { text: "na", start: 60.68 },
+  { text: "hora", start: 61.11 },
+  { text: "certa,", start: 61.47 },
+  { text: "sempre", start: 62.08 },
+  { text: "sai", start: 62.27 },
+  { text: "na", start: 62.55 },
+  { text: "frente.", start: 62.55 },
+  { text: "Cadastre-se", start: 63.35 },
+  { text: "agora", start: 63.7 },
+  { text: "na", start: 64.05 },
+  { text: "ConsulTech", start: 64.41 },
+  { text: "e", start: 64.67 },
+  { text: "descubra", start: 65.57 },
+  { text: "como", start: 65.57 },
+  { text: "é", start: 65.82 },
+  { text: "ter", start: 66.11 },
+  { text: "mais", start: 66.11 },
+  { text: "velocidade,", start: 66.3 },
+  { text: "autonomia", start: 67.08 },
+  { text: "e", start: 68.02 },
+  { text: "segurança", start: 68.02 },
+  { text: "em", start: 68.68 },
+  { text: "todas", start: 68.68 },
+  { text: "as", start: 69.15 },
+  { text: "suas", start: 69.15 },
+  { text: "consultas.", start: 69.15 },
+];
 
 /** instante (s) em que uma palavra é falada; -1 se não estiver na narração */
 export const wordTime = (needle: string): number => {
-  const n = normalize(needle);
-  if (!n) return -1;
-  const hit = WORDS.find((w) => normalize(w.text).includes(n));
+  const n = needle.toLowerCase();
+  const hit = WORDS.find((w) =>
+    w.text
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]/g, "")
+      .includes(n.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "")),
+  );
   return hit ? hit.start : -1;
-};
-
-/**
- * Procura, em sequência, o instante de cada trecho de texto.
- * Usa a primeira palavra significativa de cada trecho e avança na transcrição,
- * para que "Pague só" e depois "pelo que usar" caiam nas ocorrências certas.
- *
- * Devolve null se não houver transcrição (aí o chamador usa o ritmo).
- */
-export const findSpokenSequence = (lines: string[]): number[] | null => {
-  if (WORDS.length === 0) return null;
-
-  const normWords = WORDS.map((w) => normalize(w.text));
-  const out: number[] = [];
-  let cursor = 0;
-  let anyHit = false;
-
-  for (const line of lines) {
-    const first = line.split(/\s+/).map(normalize).find((t) => t.length > 1);
-    let found = -1;
-    if (first) {
-      for (let i = cursor; i < normWords.length; i++) {
-        if (normWords[i] === first || normWords[i].startsWith(first)) {
-          found = i;
-          break;
-        }
-      }
-    }
-    if (found >= 0) {
-      out.push(WORDS[found].start);
-      cursor = found + 1;
-      anyHit = true;
-    } else {
-      out.push(-1);
-    }
-  }
-
-  if (!anyHit) return null;
-
-  // preenche os trechos não encontrados por interpolação entre os vizinhos
-  for (let i = 0; i < out.length; i++) {
-    if (out[i] >= 0) continue;
-    const prev = out.slice(0, i).filter((v) => v >= 0).pop();
-    const nextIdx = out.findIndex((v, j) => j > i && v >= 0);
-    const next = nextIdx >= 0 ? out[nextIdx] : undefined;
-    if (prev !== undefined && next !== undefined) {
-      out[i] = prev + ((next - prev) * (i - out.lastIndexOf(prev))) / (nextIdx - out.lastIndexOf(prev));
-    } else if (prev !== undefined) {
-      out[i] = prev + 0.35;
-    } else if (next !== undefined) {
-      out[i] = Math.max(0, next - 0.35);
-    } else {
-      out[i] = 0;
-    }
-  }
-
-  return out;
 };

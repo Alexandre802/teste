@@ -16,11 +16,19 @@
  *  delay nas funções de animação.
  */
 
-import { findSpokenSequence } from "../config/narrationText";
+import { WORDS } from "../config/narrationText";
 import { BEATS, PHRASES, SYLLABLES } from "../config/speechMap";
 import { FPS, SceneId, sceneById } from "../config/timeline";
 
 const toFrame = (sec: number) => Math.round(sec * FPS);
+
+/** normaliza para comparar palavras da narração (sem acento, sem pontuação) */
+const normalizeWord = (s: string) =>
+  s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]/g, "");
 
 /** pega o item i de uma lista de frames, clampando nas pontas */
 const at = (list: number[], i: number, fallback: number) => {
@@ -45,6 +53,24 @@ export type SceneSync = {
   spreadBetween: (count: number, fromBeat: number, toBeat: number) => number[];
   /** frame relativo do beat mais próximo de um instante absoluto (em segundos) */
   atSecond: (absoluteSec: number) => number;
+  /**
+   * Frame relativo do instante em que uma PALAVRA da narração é falada,
+   * procurando só dentro desta cena.
+   *
+   *   h1: S.atWord("Quantas", 6)   // entra quando a locução diz "Quantas"
+   *
+   * `fallbackBeat` é usado quando não há transcrição (ou a palavra não aparece
+   * na cena), para o vídeo continuar sincronizado pelo ritmo.
+   */
+  atWord: (needle: string, fallbackBeat?: number) => number;
+  /**
+   * Como `atWord`, mas para uma sequência: o cursor avança a cada palavra
+   * encontrada, então palavras repetidas ("você", "mais") caem na ocorrência
+   * certa.
+   */
+  atWords: (needles: string[], fallbackFromBeat?: number) => number[];
+  /** distribui `count` elementos pelos beats entre dois instantes absolutos */
+  spreadSeconds: (count: number, fromSec: number, toSec: number) => number[];
   /** quantos beats/frases/sílabas a cena contém */
   beatCount: number;
   phraseCount: number;
@@ -80,6 +106,12 @@ export const sceneSync = (id: SceneId): SceneSync => {
     .map(rel);
   const syllables = SYLLABLES.filter(inScene).map(rel);
 
+  /** palavras da transcrição que caem dentro desta cena */
+  const sceneWords = WORDS.filter((w) => {
+    const f = toFrame(w.start);
+    return f >= from - 2 && f < endFrame;
+  });
+
   const beat = (i: number) => at(beats, i, 0);
 
   return {
@@ -104,6 +136,43 @@ export const sceneSync = (id: SceneId): SceneSync => {
       return beats.reduce(
         (best, b) => (Math.abs(b - target) < Math.abs(best - target) ? b : best),
         beats[0],
+      );
+    },
+
+    atWord: (needle, fallbackBeat = 0) => {
+      const n = normalizeWord(needle);
+      const hit = sceneWords.find((w) => normalizeWord(w.text).startsWith(n));
+      if (!hit) return at(beats, fallbackBeat, 0);
+      return Math.max(0, toFrame(hit.start) - from);
+    },
+
+    atWords: (needles, fallbackFromBeat = 0) => {
+      let cursor = 0;
+      return needles.map((needle, k) => {
+        const n = normalizeWord(needle);
+        const idx = sceneWords.findIndex(
+          (w, i) => i >= cursor && normalizeWord(w.text).startsWith(n),
+        );
+        if (idx < 0) return at(beats, fallbackFromBeat + k, 0);
+        cursor = idx + 1;
+        return Math.max(0, toFrame(sceneWords[idx].start) - from);
+      });
+    },
+
+    spreadSeconds: (count, fromSec, toSec) => {
+      if (count <= 1) return [Math.max(0, toFrame(fromSec) - from)];
+      const window = beats.filter(
+        (b) => b >= toFrame(fromSec) - from - 2 && b <= toFrame(toSec) - from + 2,
+      );
+      if (window.length === 0) {
+        const a = toFrame(fromSec) - from;
+        const b = toFrame(toSec) - from;
+        return Array.from({ length: count }, (_, k) =>
+          Math.max(0, Math.round(a + ((b - a) * k) / (count - 1))),
+        );
+      }
+      return Array.from({ length: count }, (_, k) =>
+        window[Math.min(window.length - 1, Math.round(((window.length - 1) * k) / (count - 1)))],
       );
     },
 
@@ -198,18 +267,8 @@ export const alignWordsToPhrase = (
   const from = slot.from;
   const endFrame = from + slot.duration;
 
-  // 1) Se existe transcrição alinhada, usa o instante EXATO de cada palavra.
-  const spoken = findSpokenSequence(words);
-  if (spoken) {
-    const usable = spoken.every(
-      (sec) => toFrame(sec) >= from - FPS && toFrame(sec) < endFrame + FPS,
-    );
-    if (usable) {
-      return spoken.map((sec) => Math.max(0, toFrame(sec) - from));
-    }
-  }
-
-  // 2) Sem transcrição: distribui por peso silábico dentro da janela de fala.
+  // Distribui por peso silábico dentro da janela de fala.
+  // (Com transcrição, prefira `S.atWords([...])`: usa o instante exato.)
   const inScene = (sec: number) => {
     const f = toFrame(sec);
     return f >= from - 2 && f < endFrame;

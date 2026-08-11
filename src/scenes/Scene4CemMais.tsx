@@ -42,43 +42,58 @@ import {
 import { RevealText, SceneShell } from "../components/SceneShell";
 
 // ---------------------------------------------------------------------------
-// BEATS — ancorados na fala (ver src/lib/sync.ts)
+// BEATS — ancorados nas palavras da narração (ver src/lib/sync.ts)
 const S = sceneSync("cemMais");
 
-/** as 4 linhas do título, alinhadas às 2 primeiras frases faladas */
-const HL = alignWordsToPhrase("cemMais", SCENE4.headlineSpoken, 0, 1);
+/**
+ * A locução desta cena:
+ *  22,6s "...para resolver esse problema que nasceu a ConsulTech."
+ *  25,5s "Em uma única plataforma, você tem acesso a mais de 90 tipos de
+ *         consultas cadastrais, veiculares, financeiras e jurídicas,
+ *         com resultado em segundos."
+ *
+ * O painel do dashboard entra em "resolver", o logo dentro dele em
+ * "ConsulTech", o número em "mais (de 90)" e "em segundos." no fecho.
+ */
+const HL = S.atWords(["mais", "tipos", "consultas", "segundos"], 18);
 
-/** os 7 tipos de consulta entram um por palavra falada (enumeração) */
-const LIST = S.spread(7, 14);
+/** os 7 tipos de consulta entram durante a enumeração das categorias */
+const LIST = S.spreadSeconds(7, 28.82, 31.46);
 
 const B = {
   header: 0,
+  // o painel entra em "resolver esse problema" e o logo dentro dele em "ConsulTech"
+  panel: S.atWord("resolver", 1),
+  panelLogo: S.atWord("consultech", 5),
+  // o painel vai se preenchendo em "Em uma única plataforma"
+  stat1: S.atWord("uma", 8),
+  stat2: S.atWord("unica", 9),
+  stat3: S.atWord("plataforma", 10),
+  search: S.atWord("tem", 12),
+  typing: S.atWord("tem", 12) + 5,
+  boltBadge: S.atWord("acesso", 13),
+  arrow: S.atWord("acesso", 13) + 12,
+  // "mais de 90 tipos de consultas"
   hundred: HL[0],
   count: HL[0] + 2,
   plus: HL[1] - 4,
   h2: HL[1],
   h3: HL[2],
-  h4: HL[3],
-  boltBadge: S.beat(9),
-  arrow: S.beat(10),
-  search: S.beat(11),
-  typing: S.beat(11) + 5,
+  // "...cadastrais, veiculares, financeiras e jurídicas" — gráficos e lista
   list: LIST,
-  panel: S.phrase(5),
-  stat1: S.beat(22),
-  stat2: S.beat(23),
-  stat3: S.beat(24),
-  area: S.beat(25),
-  donut: S.beat(28),
-  legend: S.beat(30),
-  chip1: S.beat(32),
-  chip2: S.beat(33),
-  chip3: S.beat(34),
-  activity: S.beat(36),
-  activityStep: 12,
-  chartBadge: S.beat(40),
-  asterisk: S.beat(42),
-  shine: S.beat(44),
+  area: S.atWord("cadastrais", 21),
+  donut: S.atWord("veiculares", 24),
+  legend: S.atWord("financeiras", 26),
+  activity: S.atWord("juridicas", 28),
+  activityStep: 10,
+  // "com resultado em segundos."
+  chip1: S.atWord("resultado", 31),
+  chip2: S.atWord("resultado", 31) + 8,
+  chip3: S.atWord("resultado", 31) + 16,
+  h4: HL[3],
+  chartBadge: HL[3] + 6,
+  asterisk: HL[3] + 11,
+  shine: HL[3] + 16,
 };
 
 const L = {
@@ -472,7 +487,7 @@ export const Scene4CemMais: React.FC<{ duration: number }> = ({ duration }) => {
         }}
       >
         <DarkPanel style={{ width: L.panel.w, height: L.panel.h, padding: 28 }} radius={28}>
-          <div style={{ opacity: ip(frame, [B.panel + 6, B.panel + 18], [0, 1]) }}>
+          <div style={{ opacity: ip(frame, [B.panelLogo, B.panelLogo + 12], [0, 1]) }}>
             <DashboardLogo size={34} />
           </div>
 

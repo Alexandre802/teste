@@ -41,15 +41,27 @@ export type SceneId =
 
 /**
  * Início de cada cena, em segundos de narração.
- * (as pausas detectadas na locução estão em speechMap.ts — os cortes abaixo
- * caem exatamente dentro delas)
+ *
+ * A ORDEM segue o roteiro falado (ver narration.txt / narrationText.ts), não a
+ * numeração dos slides — a locução apresenta "mais de 90 tipos de consultas...
+ * em segundos" ANTES de "Precisa consultar um veículo?", então a tela 100+ vem
+ * antes da tela Precisa consultar.
+ *
+ * Cada corte cai numa pausa real da locução (speechMap.ts), com uma exceção
+ * proposital: o corte para "E o pior..." é seco em cima da palavra, porque é
+ * onde a narração vira o tom.
  */
 export const SCENE_STARTS: { id: SceneId; start: number; label: string }[] = [
+  // "Você que é despachante..." + "Quantas oportunidades você já atrasou ou perdeu?"
   { id: "oportunidades", start: 0.0, label: "2/8 — Quantas oportunidades você perdeu?" },
-  { id: "eoPior", start: 16.47, label: "3/8 — E o pior..." },
-  { id: "precisaConsultar", start: 25.07, label: "5/8 — Precisa consultar?" },
-  { id: "cemMais", start: 42.44, label: "5/8 — 100+ tipos de consultas" },
-  { id: "pagueSo", start: 59.15, label: "8/8 — Pague só pelo que usar" },
+  // "E o pior..." (falado em 14,76s) + "Cada minuto de espera..."
+  { id: "eoPior", start: 14.6, label: "3/8 — E o pior..." },
+  // "...nasceu a ConsulTech" + "mais de 90 tipos de consultas... em segundos"
+  { id: "cemMais", start: 22.16, label: "5/8 — 100+ tipos de consultas" },
+  // "Precisa consultar um veículo? ... Está tudo em um só lugar."
+  { id: "precisaConsultar", start: 33.69, label: "5/8 — Precisa consultar?" },
+  // "E o melhor: você paga apenas pelo que usar..." + CTA "Cadastre-se agora"
+  { id: "pagueSo", start: 46.61, label: "8/8 — Pague só pelo que usar" },
 ];
 
 export const sec = (s: number) => Math.round(s * FPS);

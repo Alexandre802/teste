@@ -25,38 +25,41 @@ import { RevealText, SceneShell } from "../components/SceneShell";
 // ---------------------------------------------------------------------------
 const S = sceneSync("oportunidades");
 
-/** as 4 palavras do título entram junto com a locução da 1ª frase */
-const HL = alignWordsToPhrase(
-  "oportunidades",
-  SCENE1.headline.map((w) => w.text),
-  0,
-);
-
-/** os 13 elementos flutuantes: um por palavra falada, do beat 8 ao 46 */
-const EL = S.spreadBetween(13, 8, 46);
+/**
+ * A locução desta cena:
+ *   0,2s  "Você que é despachante, lojista de veículos, advogado ou trabalha
+ *          com análise de crédito... me responde uma coisa."
+ *   6,3s  "Quantas oportunidades você já atrasou ou até perdeu porque precisou
+ *          buscar informações em vários sites diferentes ou esperar alguém
+ *          retornar uma consulta?"
+ *
+ * Os elementos entram na palavra que os nomeia: os cards das fontes de dados em
+ * "vários sites diferentes", o relógio em "esperar".
+ */
+const HL = S.atWords(["Quantas", "oportunidades", "você", "perdeu"], 12);
 
 const B = {
   header: 0,
+  chipFast: S.atWord("despachante", 1),
+  avatar: S.atWord("lojista", 3),
+  spc: S.atWord("veiculos", 5),
+  squares: S.atWord("advogado", 7),
+  dots: S.atWord("analise", 11),
+  search: S.atWord("responde", 14),
+  typing: S.atWord("responde", 14) + 5,
   h1: HL[0],
   h2: HL[1],
   h3: HL[2],
   h4: HL[3],
-  clock: S.phrase(1),
-  spc: EL[0],
-  avatar: EL[1],
-  chipFast: EL[2],
-  search: EL[3],
-  typing: EL[3] + 5,
-  chipTrust: EL[4],
-  serasa: EL[5],
-  squares: EL[6],
-  boavista: EL[7],
-  dots: EL[8],
-  receita: EL[9],
-  chipAlert: EL[10],
-  arrow: EL[11],
-  asterisk: EL[12],
-  shine: S.beat(47),
+  serasa: S.atWord("buscar", 28),
+  boavista: S.atWord("informacoes", 29),
+  receita: S.atWord("sites", 32),
+  chipTrust: S.atWord("diferentes", 35),
+  clock: S.atWord("esperar", 38),
+  chipAlert: S.atWord("alguem", 39),
+  arrow: S.atWord("retornar", 41),
+  asterisk: S.atWord("consulta", 44),
+  shine: S.beat(46),
 };
 
 // ---------------------------------------------------------------------------
