@@ -1,5 +1,6 @@
 import React from 'react';
 import {AbsoluteFill, interpolate, useCurrentFrame} from 'remotion';
+import {barPulse, beatPulse, beatStrength} from '../beat';
 import {C, FONT, GRAD} from '../theme';
 import {HEIGHT, START, TOTAL_DURATION, WIDTH} from '../timing';
 
@@ -60,6 +61,11 @@ export const HudFrame: React.FC = () => {
 	});
 	const progress = frame / TOTAL_DURATION;
 
+	/* The frame itself breathes with the track. */
+	const strength = beatStrength(frame);
+	const pulse = beatPulse(frame, 5) * strength;
+	const accent = barPulse(frame, 5) * strength;
+
 	/* The closing scene shows the URL full size — don't print it twice. */
 	const captionOpacity = interpolate(frame, [START.cta - 20, START.cta], [1, 0], {
 		extrapolateLeft: 'clamp',
@@ -71,10 +77,10 @@ export const HudFrame: React.FC = () => {
 
 	return (
 		<AbsoluteFill style={{pointerEvents: 'none'}}>
-			<Bracket corner="tl" progress={enter} />
-			<Bracket corner="tr" progress={enter} />
-			<Bracket corner="bl" progress={enter} />
-			<Bracket corner="br" progress={enter} />
+			<Bracket corner="tl" progress={enter + accent * 0.5} />
+			<Bracket corner="tr" progress={enter + accent * 0.5} />
+			<Bracket corner="bl" progress={enter + accent * 0.5} />
+			<Bracket corner="br" progress={enter + accent * 0.5} />
 
 			{/* Vertical rails with travelling ticks. */}
 			{[36, WIDTH - 38].map((x, side) => (
@@ -132,7 +138,7 @@ export const HudFrame: React.FC = () => {
 						height: '100%',
 						width: `${progress * 100}%`,
 						backgroundImage: GRAD.brand,
-						boxShadow: `0 0 14px ${C.blue}`,
+						boxShadow: `0 0 ${14 + pulse * 22}px ${C.blue}`,
 					}}
 				/>
 			</div>

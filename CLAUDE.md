@@ -64,3 +64,23 @@ A 70s vertical (1080×1920) ad cut to a supplied voiceover.
   `delayRender()` in `theme.ts`. Do not switch to a CDN webfont — a network
   fetch at render time is non-deterministic and silently falls back.
 - Everything on screen is drawn (SVG/DOM). No bitmap assets from the brand deck.
+
+### Mix levels
+
+`src/ConsulTech/mix.ts` states the balance in dB below the narration:
+effects in the -12…-18 dB band, music in -24…-30 dB. Set cue volumes from
+those constants, never as raw linear numbers — the linear values hide the
+relationship the client signed off on.
+
+### Beat grid
+
+`src/ConsulTech/beat.ts` exposes the bed's 134.6 BPM grid so the picture can
+pulse with the music. Keep it in sync with `bpm` in `tools/make-audio.py`;
+if one changes, change both.
+
+### Third-party reference audio
+
+Do not lift music or effects out of a reference video into this ad. Beyond
+the licensing exposure, reference edits carry a continuous bed, so no effect
+can be isolated cleanly. Match the measurable characteristics instead —
+tempo, spectral tilt, energy curve — and re-synthesise.

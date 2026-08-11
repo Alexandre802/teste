@@ -1,5 +1,6 @@
 import React from 'react';
 import {AbsoluteFill, interpolate, random, useCurrentFrame} from 'remotion';
+import {beatPulse, beatStrength} from '../beat';
 import {C} from '../theme';
 import {HEIGHT, START, TOTAL_DURATION, WIDTH} from '../timing';
 
@@ -38,16 +39,18 @@ export const RingField: React.FC<{opacity: number}> = ({opacity}) => {
 				{[0, 1, 2, 3, 4].map((i) => {
 					const base = 200 + i * 165;
 					const pulse = Math.sin(frame * 0.028 - i * 0.7);
+					/* Each ring kicks outward on the beat, the outer ones lagging. */
+					const kick = beatPulse(frame - i * 2, 4) * beatStrength(frame);
 					return (
 						<circle
 							key={i}
 							cx={WIDTH / 2}
 							cy={HEIGHT / 2}
-							r={base + pulse * 26}
+							r={base + pulse * 26 + kick * 34}
 							stroke={i % 2 ? C.cyan : C.blue}
 							strokeWidth={i === 0 ? 2.2 : 1.3}
 							fill="none"
-							opacity={0.16 + 0.1 * (1 - i / 5) + pulse * 0.05}
+							opacity={0.16 + 0.1 * (1 - i / 5) + pulse * 0.05 + kick * 0.18}
 							strokeDasharray={i % 2 ? '3 16' : undefined}
 						/>
 					);
@@ -96,7 +99,7 @@ export const DotMatrix: React.FC<{opacity: number; color?: string}> = ({
 			const y = gapY * (cy + 1);
 			/* Ripple radiating from the centre. */
 			const dist = Math.hypot(x - WIDTH / 2, y - HEIGHT / 2) / 400;
-			const wave = Math.sin(frame * 0.09 - dist * 2.1);
+			const wave = Math.sin(frame * 0.09 - dist * 2.1) + beatPulse(frame, 6) * 0.5;
 			dots.push(
 				<circle
 					key={`${cx}-${cy}`}

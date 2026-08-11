@@ -203,7 +203,7 @@ def bass(freq, dur, gain=1.0):
     sig = saw(freq, n)
     sub = sine(freq / 2, n)
     mixed = [sig[i] * 0.5 + sub[i] * 0.6 for i in range(n)]
-    mixed = lowpass(mixed, 260)
+    mixed = lowpass(mixed, 210)
     e = env_ad(n, 0.006, 9)
     return [mixed[i] * e[i] * gain for i in range(n)]
 
@@ -243,7 +243,7 @@ def build_music():
     left = buf(total)
     right = buf(total)
 
-    bpm = 124.0
+    bpm = 134.6
     beat = 60.0 / bpm
     bar = beat * 4
 
@@ -294,21 +294,22 @@ def build_music():
             if t > total:
                 break
             amp = 0.62 if i % 2 == 0 else 0.34
-            bl = bass(root, beat * 0.46, gain=amp * (0.5 + 0.5 * e))
+            bl = bass(root, beat * 0.46, gain=amp * (0.5 + 0.5 * e) * 1.5)
             add(left, bl, t)
             add(right, bl, t)
 
         # drums only once the ad has "dropped"
         if t0 >= T_BIRTH - bar * 0.5:
             for i in (0, 2):
-                add(left, kick(0.95), t0 + i * beat)
-                add(right, kick(0.95), t0 + i * beat)
+                k = kick(1.15)
+                add(left, k, t0 + i * beat)
+                add(right, k, t0 + i * beat)
             for i in (1, 3):
                 c = clap(0.4 * e)
                 add(left, c, t0 + i * beat)
                 add(right, c, t0 + i * beat + 0.006)
             for i in range(8):
-                h = hat(0.5 * e, open_=(i == 7))
+                h = hat(0.30 * e, open_=(i == 7))
                 add(left, h, t0 + i * beat / 2)
                 add(right, h, t0 + i * beat / 2 + 0.004)
 
