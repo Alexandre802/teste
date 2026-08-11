@@ -13,6 +13,7 @@ import {Camera, type CameraMove} from './components/Camera';
 import {CircuitBackdrop} from './components/CircuitBackdrop';
 import {HudFrame} from './components/HudFrame';
 import {LogoBadge} from './components/Logo';
+import {MASTER_GAIN} from './mix';
 import {SoundDesign, type Stem} from './Sound';
 import {C} from './theme';
 import {DUR, START} from './timing';
@@ -181,7 +182,7 @@ export const ConsulTechAd: React.FC<{stem?: Stem}> = ({stem = 'all'}) => {
 	return (
 		<AbsoluteFill style={{backgroundColor: C.bg}}>
 			{stem === 'all' || stem === 'voice' ? (
-				<Audio src={staticFile('audio/narration.mp3')} />
+				<Audio src={staticFile('audio/narration.mp3')} volume={MASTER_GAIN} />
 			) : null}
 			<SoundDesign stem={stem} />
 

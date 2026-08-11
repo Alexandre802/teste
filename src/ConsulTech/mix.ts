@@ -81,6 +81,18 @@ const SFX_TRIM_DB = -9.0;
 const MUSIC_TRIM_DB = -1.5;
 
 /**
+ * Master gain applied to every layer, including the narration.
+ *
+ * Getting the *balance* right leaves the programme quiet in absolute terms —
+ * at unity the mix peaks around -8.7 dBFS, roughly 10 dB under what a feed of
+ * other ads sits at, so it plays noticeably soft. Lifting all three layers by
+ * the same amount fixes the loudness without touching the balance; +7.5 dB
+ * puts the peak near -1.2 dBFS with headroom to spare.
+ */
+export const MASTER_DB = 7.5;
+export const MASTER_GAIN = Math.pow(10, MASTER_DB / 20);
+
+/**
  * Linear gain that lands `asset` at `offset` dB below the narration.
  * Falls back to a conservative -20 dB if an asset has not been measured, so a
  * missing entry is quiet rather than deafening.
@@ -92,14 +104,14 @@ export const gainFor = (asset: string, offset: number) => {
 	}
 
 	const targetDb = NARRATION_DBFS - offset;
-	return dbToLinear(targetDb - assetDb + SFX_TRIM_DB);
+	return dbToLinear(targetDb - assetDb + SFX_TRIM_DB + MASTER_DB);
 };
 
 /** Same, for the music bed, whose offset changes across the ad. */
 export const musicGain = (offset: number) => {
 	const assetDb = ASSET_DBFS.music ?? -20;
 	const targetDb = NARRATION_DBFS - offset;
-	return dbToLinear(targetDb - assetDb + MUSIC_TRIM_DB);
+	return dbToLinear(targetDb - assetDb + MUSIC_TRIM_DB + MASTER_DB);
 };
 
 /** The level a cue will actually sit at, for verification/logging. */
