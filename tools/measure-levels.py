@@ -62,6 +62,27 @@ def rms_db(samples):
     return 20 * math.log10(r / 32768) if r else -99.0
 
 
+def loudest_window_db(samples, sr, window=0.30, hop=0.05):
+    """
+    RMS of the loudest `window` seconds.
+
+    For a one-shot effect this is the number that matters. Whole-file RMS
+    averages the attack together with a long decay tail, so a 2s impact whose
+    energy all sits in the first 400ms measures ~10 dB quieter than it sounds —
+    which is exactly how the first calibration ended up leaving effects level
+    with the voice instead of well under it.
+    """
+    w = int(sr * window)
+    if len(samples) <= w:
+        return rms_db(samples)
+
+    step = max(1, int(sr * hop))
+    best = -99.0
+    for i in range(0, len(samples) - w, step):
+        best = max(best, rms_db(samples[i:i + w]))
+    return best
+
+
 def speech_rms_db(samples, sr):
     """RMS over the speaking parts only, ignoring the pauses between phrases."""
     win = int(sr * 0.05)
@@ -84,8 +105,8 @@ def main():
 
         for path in sorted(glob.glob(os.path.join(AUDIO, 'sfx', '*.mp3'))):
             name = os.path.splitext(os.path.basename(path))[0]
-            samples, _ = decode(path, tmp)
-            levels[name] = round(rms_db(samples), 1)
+            samples, sfx_sr = decode(path, tmp)
+            levels[name] = round(loudest_window_db(samples, sfx_sr), 1)
 
     narration_db = round(narration_db, 1)
 
@@ -99,6 +120,10 @@ def main():
  * `mix.ts` uses these to work out the gain each file needs to land at its
  * target level relative to the voice. Without them a single gain cannot honour
  * the spec, because the assets do not share a starting level.
+ *
+ * Effects are measured over their loudest 300ms rather than whole-file: a
+ * one-shot's decay tail would otherwise drag its average far below how loud it
+ * actually sounds. Music, being continuous, is a whole-file average.
  */
 
 /** RMS of the narration over its speaking parts, excluding pauses. */

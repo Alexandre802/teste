@@ -7,6 +7,10 @@
  * `mix.ts` uses these to work out the gain each file needs to land at its
  * target level relative to the voice. Without them a single gain cannot honour
  * the spec, because the assets do not share a starting level.
+ *
+ * Effects are measured over their loudest 300ms rather than whole-file: a
+ * one-shot's decay tail would otherwise drag its average far below how loud it
+ * actually sounds. Music, being continuous, is a whole-file average.
  */
 
 /** RMS of the narration over its speaking parts, excluding pauses. */
@@ -16,26 +20,26 @@ export const NARRATION_DBFS = -23.3;
 export const ASSET_DBFS: Record<string, number> = {
 	'beep': -12.7,
 	'beep-low': -13.1,
-	'boom': -15.4,
-	'chime': -20.0,
-	'digital-sweep': -13.2,
-	'glitch': -12.8,
-	'hit-soft': -14.6,
-	'impact-clean': -16.4,
-	'impact-sub': -19.0,
-	'low-whoosh': -11.1,
+	'boom': -9.4,
+	'chime': -11.5,
+	'digital-sweep': -10.8,
+	'glitch': -12.7,
+	'hit-soft': -12.4,
+	'impact-clean': -10.3,
+	'impact-sub': -11.6,
+	'low-whoosh': -8.0,
 	'music': -20.8,
 	'pop': -12.7,
 	'pop-high': -12.0,
-	'rise-clean': -12.2,
-	'riser': -16.7,
-	'shimmer': -15.8,
-	'stamp': -18.5,
-	'swipe': -18.5,
+	'rise-clean': -6.9,
+	'riser': -11.4,
+	'shimmer': -11.7,
+	'stamp': -17.0,
+	'swipe': -18.2,
 	'text-whoosh': -15.9,
 	'tick': -24.2,
 	'ui-click': -21.3,
-	'whoosh': -15.1,
-	'whoosh-soft': -15.9,
-	'whoosh-stereo': -16.9,
+	'whoosh': -12.9,
+	'whoosh-soft': -14.6,
+	'whoosh-stereo': -14.4,
 };

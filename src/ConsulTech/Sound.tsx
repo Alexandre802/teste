@@ -110,8 +110,10 @@ const CUES: Cue[] = [
 	 * 06 — the brand assembles. The hero moment of the whole ad.
 	 * ---------------------------------------------------------------- */
 	{at: S.birth - 50, name: 'rise-clean', offset: V.low},
-	{at: S.birth, name: 'impact-clean', offset: V.hero},
-	{at: S.birth + 1, name: 'impact-sub', offset: V.hero},
+	/* Two impacts land together here — each 3 dB down so the pair sums to the
+	   hero target instead of overshooting it. */
+	{at: S.birth, name: 'impact-clean', offset: V.heroStacked},
+	{at: S.birth + 1, name: 'impact-sub', offset: V.heroStacked},
 	{at: S.birth + 8, name: 'shimmer', offset: V.shimmer},
 	{at: S.birth + 38, name: 'text-whoosh', offset: V.textIn},
 

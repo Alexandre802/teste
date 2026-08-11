@@ -44,6 +44,12 @@ export const OFFSET = {
 	beep: 18,
 	/** Small UI elements: plate characters, sidebar rows. */
 	ui: 18,
+	/**
+	 * For a hero moment built from two simultaneous one-shots. Two equal
+	 * sources sum to +3 dB, so each is set 3 dB lower and the pair lands on
+	 * the `hero` target rather than 3 dB over it.
+	 */
+	heroStacked: 15,
 } as const;
 
 /** Music sits a further octave of level down, per the spec. */
