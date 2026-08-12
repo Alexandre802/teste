@@ -13,7 +13,11 @@ npm install
 npm run studio      # editor visual do Remotion
 npm run render      # gera out/waatzo-reel.mp4
 npm run sfx         # regera os efeitos sonoros em public/sfx/
+npm run fonts       # regera src/lib/interFonts.ts a partir de public/fonts
 ```
+
+O arquivo pronto está versionado em `video/waatzo-reel.mp4`
+(1080x1920, 30 fps, 83 s, H.264 + AAC).
 
 > Neste ambiente o Chromium do sistema é usado via `remotion.config.ts`
 > (`setBrowserExecutable`). Em outra máquina, apague essa linha para o

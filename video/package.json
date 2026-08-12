@@ -7,7 +7,8 @@
     "studio": "remotion studio src/index.ts",
     "render": "remotion render src/index.ts WaatzoReel out/waatzo-reel.mp4",
     "still": "remotion still src/index.ts",
-    "sfx": "python3 tools/make_sfx.py"
+    "sfx": "python3 tools/make_sfx.py",
+    "fonts": "python3 tools/embed_fonts.py"
   },
   "keywords": [],
   "author": "",
