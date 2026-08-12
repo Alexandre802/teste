@@ -35,7 +35,11 @@ frase. Esses frames estão em `SCENES` (campo `at`), em `src/timeline.ts` —
 python3 tools/find_cuts.py    # relista as pausas do áudio
 ```
 
-São 13 blocos sobre as 10 artes. Os três últimos são retomadas: o trecho
+São 14 blocos. O `APP` é um take de demonstração do aplicativo, remontado a
+partir das quatro capturas de tela (Início, Conversas, Interesses, Agenda) —
+ele divide com o `S04` a janela de 13,43 s a 20,30 s.
+
+Os demais blocos usam as 10 artes. Os três últimos são retomadas: o trecho
 final da copy volta a assuntos já ilustrados ("ele confirma agendamentos…",
 "é como ter uma funcionária…", "ninguém respondeu a tempo"), e retomar a arte
 correspondente com outro enquadramento é melhor do que deixar uma cena parada
@@ -46,7 +50,8 @@ por 18 segundos.
 | S01 | A maioria dos profissionais… | 0,00 s |
 | S02 | Perde porque o concorrente respondeu primeiro | 4,65 s |
 | S03 | Você atende clientes o dia inteiro… | 7,68 s |
-| S04 | …outras pessoas estão mandando mensagem | 13,43 s |
+| APP | Enquanto você está fazendo um corte, um procedimento… | 13,43 s |
+| S04 | …outras pessoas estão mandando mensagem | 17,90 s |
 | S05 | Elas chamam o próximo salão… | 20,30 s |
 | S06 | Foi exatamente para resolver isso que nasceu o Waatzo | 28,65 s |
 | S07 | …respondendo clientes, agendando horários | 35,90 s |
@@ -102,6 +107,8 @@ src/
   lib/fonts.ts         Inter embutida em base64 (sem rede)
   components/          Backdrop, Camera, Logo, Text, Ui, Icons, Sfx, SceneShell
   scenes/Scene01..10   uma cena por arte de referência
+  scenes/SceneApp      walkthrough do aplicativo (cursor + câmera)
+  components/app/      kit de UI do app: AppKit, Screens, Cursor
 public/
   fonts/               Inter (woff2, pesos 400–900)
   photos/              recortes fotográficos das artes
