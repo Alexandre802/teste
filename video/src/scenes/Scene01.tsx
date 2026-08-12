@@ -187,14 +187,16 @@ export const Scene01: React.FC = () => {
         <div
           style={{
             position: 'absolute',
-            left: 712,
-            top: 826,
-            width: 320,
-            height: 652,
+            left: 700,
+            top: 800,
+            width: 352,
+            height: 726,
             opacity: photo.opacity * 0.98,
             transform: `${photo.transform} translateY(${photoDrift}px)`,
-            maskImage: 'radial-gradient(120% 100% at 60% 40%, #000 55%, transparent 100%)',
-            WebkitMaskImage: 'radial-gradient(120% 100% at 60% 40%, #000 55%, transparent 100%)',
+            maskImage:
+              'radial-gradient(82% 66% at 50% 34%, #000 24%, rgba(0,0,0,0.62) 60%, rgba(0,0,0,0) 100%)',
+            WebkitMaskImage:
+              'radial-gradient(82% 66% at 50% 34%, #000 24%, rgba(0,0,0,0.62) 60%, rgba(0,0,0,0) 100%)',
           }}
         >
           <Img
