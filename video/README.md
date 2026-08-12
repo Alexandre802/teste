@@ -35,32 +35,28 @@ frase. Esses frames estão em `SCENES` (campo `at`), em `src/timeline.ts` —
 python3 tools/find_cuts.py    # relista as pausas do áudio
 ```
 
-São 14 blocos. O `APP` é um take de demonstração do aplicativo, remontado a
-partir das quatro capturas de tela (Início, Conversas, Interesses, Agenda) —
-ele divide com o `S04` a janela de 13,43 s a 20,30 s.
+São 13 blocos e **cada arte aparece uma única vez** — não há cena reprisada.
+O trecho final da copy, que antes obrigava a repetir artes, ganhou duas cenas
+próprias no mesmo sistema visual: `S11` (a lista de capacidades) e `S12` (o
+fecho argumentativo). O `APP` é o take de demonstração do aplicativo,
+remontado a partir das quatro capturas de tela, e ocupa exatamente a frase que
+apresenta o produto.
 
-Os demais blocos usam as 10 artes. Os três últimos são retomadas: o trecho
-final da copy volta a assuntos já ilustrados ("ele confirma agendamentos…",
-"é como ter uma funcionária…", "ninguém respondeu a tempo"), e retomar a arte
-correspondente com outro enquadramento é melhor do que deixar uma cena parada
-por 18 segundos.
-
-| bloco | fala | entra em |
-| --- | --- | --- |
-| S01 | A maioria dos profissionais… | 0,00 s |
-| S02 | Perde porque o concorrente respondeu primeiro | 4,65 s |
-| S03 | Você atende clientes o dia inteiro… | 7,68 s |
-| APP | Enquanto você está fazendo um corte, um procedimento… | 13,43 s |
-| S04 | …outras pessoas estão mandando mensagem | 17,90 s |
-| S05 | Elas chamam o próximo salão… | 20,30 s |
-| S06 | Foi exatamente para resolver isso que nasceu o Waatzo | 28,65 s |
-| S07 | …respondendo clientes, agendando horários | 35,90 s |
-| S08a | enviando lembretes e recuperando quem sumiu | 41,23 s |
-| S09 | Tudo automaticamente, 24 horas por dia | 44,69 s |
-| S08b | Ele confirma agendamentos, reduz faltas… | 51,64 s |
-| S06b | É como ter uma funcionária que nunca atrasa… | 62,50 s |
-| S02b | …ninguém respondeu a tempo | 69,09 s |
-| S10 | Teste grátis por 14 dias | 77,07 s |
+| bloco | fala | entra em | dur |
+| --- | --- | --- | --- |
+| S01 | A maioria dos profissionais… | 0,00 s | 4,7 s |
+| S02 | Perde porque o concorrente respondeu primeiro | 4,65 s | 3,0 s |
+| S03 | Você atende clientes o dia inteiro… | 7,68 s | 5,8 s |
+| S04 | Enquanto você está fazendo um corte… mandando mensagem | 13,43 s | 6,9 s |
+| S05 | Elas chamam o próximo salão… | 20,30 s | 8,4 s |
+| **APP** | **Foi exatamente para resolver isso que nasceu o Waatzo…** | **28,65 s** | **7,2 s** |
+| S07 | …respondendo clientes, agendando horários | 35,90 s | 5,3 s |
+| S08 | enviando lembretes e recuperando quem sumiu | 41,23 s | 3,5 s |
+| S09 | Tudo automaticamente, 24 horas por dia | 44,69 s | 6,9 s |
+| S11 | Ele confirma agendamentos, reduz faltas… | 51,64 s | 10,9 s |
+| S06 | É como ter uma funcionária que nunca atrasa… | 62,50 s | 6,6 s |
+| S12 | …ninguém respondeu a tempo | 69,09 s | 8,0 s |
+| S10 | Teste grátis por 14 dias | 77,07 s | 8,6 s |
 
 Cada bloco declara `designDur`: o ritmo para o qual a coreografia foi
 desenhada. Se a fala correspondente for mais curta, a cena **acelera** em vez
@@ -91,8 +87,8 @@ Além das entradas escalonadas, há três camadas de movimento contínuo:
 | Animação interna de uma cena | `src/scenes/SceneNN.tsx` |
 | Timbre dos efeitos sonoros | `tools/make_sfx.py` |
 
-Cada bloco também é uma composição isolada no Studio (`S01`, `S08a`, `S08b`,
-`S06b`, `S02b`…), o que permite revisar uma parte sem renderizar o vídeo todo.
+Cada bloco também é uma composição isolada no Studio (`S01`, `APP`, `S11`,
+`S12`…), o que permite revisar uma parte sem renderizar o vídeo todo.
 
 ## Estrutura
 
@@ -107,6 +103,7 @@ src/
   lib/fonts.ts         Inter embutida em base64 (sem rede)
   components/          Backdrop, Camera, Logo, Text, Ui, Icons, Sfx, SceneShell
   scenes/Scene01..10   uma cena por arte de referência
+  scenes/Scene11..12   cenas próprias do trecho final da copy
   scenes/SceneApp      walkthrough do aplicativo (cursor + câmera)
   components/app/      kit de UI do app: AppKit, Screens, Cursor
 public/

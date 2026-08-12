@@ -10,6 +10,8 @@ import { Scene08 } from './Scene08';
 import { Scene09 } from './Scene09';
 import { Scene10 } from './Scene10';
 import { SceneApp } from './SceneApp';
+import { Scene11 } from './Scene11';
+import { Scene12 } from './Scene12';
 
 /** Ordem das cenas — casa com SCENES em timeline.ts. */
 export const SCENE_COMPONENTS: React.FC[] = [
@@ -25,4 +27,8 @@ export const SCENE_COMPONENTS: React.FC[] = [
   Scene10,
   /** 10 — take de demonstração do aplicativo (entra dentro da janela do S04) */
   SceneApp,
+  /** 11 — lista de capacidades ("ele faz tudo sozinho") */
+  Scene11,
+  /** 12 — fecho argumentativo em tipografia */
+  Scene12,
 ];

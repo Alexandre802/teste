@@ -120,6 +120,14 @@ export const CheckIcon = wrap('0 0 100 100', (c, sw) => (
   />
 ));
 
+export const ChatIcon = wrap('0 0 100 100', (c, sw) => (
+  <g fill="none" stroke={c} strokeWidth={sw} strokeLinejoin="round" strokeLinecap="round">
+    <path d="M 14 22 L 86 22 L 86 68 L 44 68 L 26 84 L 26 68 L 14 68 Z" />
+    <path d="M 32 38 L 68 38" />
+    <path d="M 32 52 L 56 52" />
+  </g>
+));
+
 export const CalendarIcon = wrap('0 0 100 100', (c, sw) => (
   <g stroke={c} strokeWidth={sw} fill="none">
     <rect x="14" y="22" width="72" height="66" rx="12" />
@@ -286,6 +294,7 @@ export const ICONS = {
   person: PersonIcon,
   check: CheckIcon,
   calendar: CalendarIcon,
+  chat: ChatIcon,
   clock: ClockIcon,
   robot: RobotIcon,
   store: StoreIcon,

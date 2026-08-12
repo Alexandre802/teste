@@ -69,8 +69,9 @@ export const Headline: React.FC<HeadlineProps> = ({
             marginTop: li === 0 ? 0 : fontSize * (lineHeight - 1),
           }}
         >
-          {line.map((seg, si) =>
-            seg.t.split(' ').map((w, wi) => {
+          {line.map((seg, si) => {
+            const parts = seg.t.split(' ');
+            return parts.map((w, wi) => {
               const d = delay + li * lineStagger + wordIndex * stagger;
               wordIndex += 1;
               const prog = s(frame, {
@@ -97,11 +98,13 @@ export const Headline: React.FC<HeadlineProps> = ({
                   }}
                 >
                   {w}
-                  {' '}
+                  {/* espaco so ENTRE palavras: no fim da linha ele
+                      desalinharia o texto centralizado */}
+                  {wi < parts.length - 1 || si < line.length - 1 ? ' ' : ''}
                 </span>
               );
-            }),
-          )}
+            });
+          })}
         </div>
       ))}
     </div>

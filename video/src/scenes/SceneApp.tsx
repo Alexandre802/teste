@@ -34,30 +34,43 @@ const navX = (i: number) => DEV.left + (DEV.width / 6) * (i + 0.5);
 const NAV_Y = DEV.top + DEV.height - NAV_H / 2 - 14;
 
 /** Frame em que cada tela assume (frames de projeto). */
-const SCREEN_AT = [0, 30, 54, 80];
+const SCREEN_AT = [0, 54, 102, 152];
 const SCREENS = [HomeScreen, ConversasScreen, InteressesScreen, AgendaScreen];
-const CLICKS = [30, 54, 80];
+const CLICKS = [54, 102, 152];
 
-/** Percurso do cursor, em coordenadas do quadro. */
+/**
+ * Percurso do cursor, em coordenadas do quadro.
+ *
+ * O ritmo é deliberadamente lento: o cursor chega ao alvo, PARA nele por uns
+ * 10 frames e só então segue. É a pausa que dá tempo de ler o que ele aponta.
+ */
 const CURSOR: CursorKey[] = [
   { at: 0, x: 1020, y: 1800 },
-  { at: 9, x: 313, y: 817 },      // "8 Novos interessados"
-  { at: 17, x: 767, y: 817 },     // "37 Conversas abertas"
-  { at: 24, x: 340, y: 1017 },    // "Interessados recentes"
-  { at: 30, x: navX(1), y: NAV_Y },
-  { at: 40, x: 430, y: 687 },     // campo de busca
-  { at: 47, x: 330, y: 799 },     // abas
-  { at: 51, x: 440, y: 927 },    // lista de conversas
-  { at: 54, x: navX(2), y: NAV_Y },
-  { at: 64, x: 350, y: 757 },     // tag "agendamento" (após a rolagem)
-  { at: 73, x: 540, y: 986 },     // botão "Ver conversa"
-  { at: 77, x: 660, y: 1056 },    // "Convertido"
-  { at: 80, x: navX(3), y: NAV_Y },
-  { at: 91, x: 880, y: 672 },     // status "Confirmado"
-  { at: 101, x: 330, y: 782 },    // serviço e data
-  { at: 110, x: 300, y: 857 },    // "Abrir conversa"
-  { at: 122, x: 860, y: 1420 },
-  { at: 134, x: 1000, y: 1760 },
+  { at: 14, x: 313, y: 817 },     // "8 Novos interessados"
+  { at: 26, x: 313, y: 817 },
+  { at: 34, x: 767, y: 817 },     // "37 Conversas abertas"
+  { at: 44, x: 767, y: 817 },
+  { at: 50, x: 340, y: 1017 },    // "Interessados recentes"
+  { at: 54, x: navX(1), y: NAV_Y },
+
+  { at: 68, x: 430, y: 687 },     // campo de busca
+  { at: 78, x: 430, y: 687 },
+  { at: 86, x: 330, y: 799 },     // abas
+  { at: 94, x: 440, y: 927 },     // lista de conversas
+  { at: 102, x: navX(2), y: NAV_Y },
+
+  { at: 120, x: 350, y: 757 },    // tag "agendamento"
+  { at: 130, x: 350, y: 757 },
+  { at: 138, x: 540, y: 986 },    // botão "Ver conversa"
+  { at: 146, x: 660, y: 1056 },   // "Convertido"
+  { at: 152, x: navX(3), y: NAV_Y },
+
+  { at: 168, x: 880, y: 672 },    // status "Confirmado"
+  { at: 178, x: 880, y: 672 },
+  { at: 186, x: 330, y: 782 },    // serviço e data
+  { at: 196, x: 300, y: 857 },    // "Abrir conversa"
+  { at: 206, x: 860, y: 1420 },
+  { at: 217, x: 1010, y: 1780 },
 ];
 
 /**
@@ -66,19 +79,22 @@ const CURSOR: CursorKey[] = [
  */
 const CAM: CameraMove[] = [
   { at: 0, scale: 1.0, y: 960 },
-  { at: 10, scale: 1.24, y: 820 },
-  { at: 24, scale: 1.22, y: 1000 },
-  { at: 32, scale: 1.14, y: 1000 },
-  { at: 42, scale: 1.24, y: 790 },
-  { at: 50, scale: 1.2, y: 920 },
+  { at: 18, scale: 1.24, y: 820 },
+  { at: 46, scale: 1.22, y: 1000 },
   { at: 56, scale: 1.14, y: 1000 },
-  { at: 65, scale: 1.24, y: 790 },
-  { at: 75, scale: 1.24, y: 1000 },
-  { at: 82, scale: 1.14, y: 1000 },
-  { at: 92, scale: 1.24, y: 790 },
-  { at: 106, scale: 1.2, y: 900 },
-  { at: 120, scale: 1.06, y: 960 },
-  { at: 134, scale: 1.0, y: 960 },
+
+  { at: 72, scale: 1.24, y: 790 },
+  { at: 94, scale: 1.2, y: 940 },
+  { at: 104, scale: 1.14, y: 1000 },
+
+  { at: 122, scale: 1.24, y: 790 },
+  { at: 140, scale: 1.24, y: 1000 },
+  { at: 154, scale: 1.14, y: 1000 },
+
+  { at: 170, scale: 1.24, y: 790 },
+  { at: 192, scale: 1.2, y: 900 },
+  { at: 204, scale: 1.06, y: 960 },
+  { at: 217, scale: 1.0, y: 960 },
 ];
 
 const TRANSITION = 7;
@@ -100,8 +116,8 @@ export const SceneApp: React.FC = () => {
   const deviceIn = s(frame, { config: SPRING.pop, durationInFrames: 16 });
   const drift = float(frame, 5, 150);
 
-  const brand = s(frame, { delay: 106, config: SPRING.pop });
-  const scrim = iv(frame, [104, 115], [0, 0.92]);
+  const brand = s(frame, { delay: 182, config: SPRING.pop });
+  const scrim = iv(frame, [180, 192], [0, 0.92]);
 
   return (
     <AbsoluteFill style={{ background: COLORS.pageBg, overflow: 'hidden' }}>
@@ -178,42 +194,44 @@ export const SceneApp: React.FC = () => {
         style={{
           alignItems: 'center',
           justifyContent: 'center',
-          opacity: iv(frame, [105, 113], [0, 1]),
+          opacity: iv(frame, [181, 190], [0, 1]),
           transform: `scale(${(0.84 + 0.16 * brand).toFixed(4)})`,
         }}
       >
-        <Logo size={124} delay={106} fontSize={104} gap={28} />
+        <Logo size={124} delay={182} fontSize={104} gap={28} />
       </AbsoluteFill>
 
       {/* --------------------------------------------------------- efeitos */}
       <Sfx name="whoosh_short" at={0} gain={0.45} />
-      <Sfx name="soft_pop" at={10} gain={0.7} />
-      <Sfx name="tick" at={18} gain={0.5} />
-      <Sfx name="tick" at={24} gain={0.5} />
-      <Sfx name="soft_pop" at={26} gain={0.6} />
-
-      <Sfx name="digital_click" at={30} gain={0.75} />
-      <Sfx name="tap" at={30} gain={0.5} />
-      <Sfx name="whoosh_short" at={32} gain={0.5} />
-      <Sfx name="soft_pop" at={41} gain={0.6} />
-      <Sfx name="tick" at={47} gain={0.5} />
+      <Sfx name="soft_pop" at={16} gain={0.7} />
+      <Sfx name="tick" at={26} gain={0.5} />
+      <Sfx name="tick" at={38} gain={0.5} />
+      <Sfx name="soft_pop" at={50} gain={0.6} />
 
       <Sfx name="digital_click" at={54} gain={0.75} />
       <Sfx name="tap" at={54} gain={0.5} />
-      <Sfx name="whoosh_short" at={56} gain={0.5} />
-      <Sfx name="bubble_pop" at={65} gain={0.5} />
-      <Sfx name="pop_ui" at={74} gain={0.5} />
+      <Sfx name="whoosh_short" at={57} gain={0.5} />
+      <Sfx name="soft_pop" at={70} gain={0.6} />
+      <Sfx name="tick" at={86} gain={0.5} />
+      <Sfx name="soft_pop" at={94} gain={0.45} />
 
-      <Sfx name="digital_click" at={80} gain={0.75} />
-      <Sfx name="tap" at={80} gain={0.5} />
-      <Sfx name="whoosh_short" at={82} gain={0.5} />
-      <Sfx name="notification_pop" at={92} gain={0.5} />
-      <Sfx name="soft_pop" at={102} gain={0.5} />
-      <Sfx name="tick" at={110} gain={0.45} />
+      <Sfx name="digital_click" at={102} gain={0.75} />
+      <Sfx name="tap" at={102} gain={0.5} />
+      <Sfx name="whoosh_short" at={105} gain={0.5} />
+      <Sfx name="bubble_pop" at={122} gain={0.5} />
+      <Sfx name="pop_ui" at={138} gain={0.5} />
+      <Sfx name="tick" at={146} gain={0.45} />
 
-      <Sfx name="whoosh_transition" at={104} gain={0.4} />
-      <Sfx name="logo_sting" at={106} gain={0.4} />
-      <Sfx name="sparkle" at={110} gain={0.4} />
+      <Sfx name="digital_click" at={152} gain={0.75} />
+      <Sfx name="tap" at={152} gain={0.5} />
+      <Sfx name="whoosh_short" at={155} gain={0.5} />
+      <Sfx name="notification_pop" at={168} gain={0.5} />
+      <Sfx name="soft_pop" at={186} gain={0.5} />
+      <Sfx name="tick" at={196} gain={0.45} />
+
+      <Sfx name="whoosh_transition" at={180} gain={0.4} />
+      <Sfx name="logo_sting" at={182} gain={0.45} />
+      <Sfx name="sparkle" at={186} gain={0.4} />
     </AbsoluteFill>
   );
 };

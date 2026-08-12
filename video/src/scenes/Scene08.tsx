@@ -27,10 +27,12 @@ const LAYOUT_FULL: CardCfg[] = [
   { left: 206, top: 1428, width: 748, delay: 40 },
 ];
 
-/** Bloco curto (3,5 s): só o título e os dois primeiros cartões. */
+/** Bloco curto (3,5 s): os quatro cartões entrando em sequência rápida. */
 const LAYOUT_COMPACT: CardCfg[] = [
-  { left: 98, top: 644, width: 830, delay: 34 },
-  { left: 143, top: 908, width: 830, delay: 56 },
+  { left: 98, top: 644, width: 830, delay: 22 },
+  { left: 143, top: 908, width: 830, delay: 32 },
+  { left: 103, top: 1180, width: 856, delay: 42 },
+  { left: 206, top: 1428, width: 748, delay: 52 },
 ];
 
 /** Centro de cada cartão, para a câmera mirar. */
@@ -42,7 +44,7 @@ export const Scene08: React.FC = () => {
   const compact = variant === 1;
 
   const layout = compact ? LAYOUT_COMPACT : LAYOUT_FULL;
-  const cards = compact ? T.cards.slice(0, 2) : T.cards;
+  const cards = T.cards;
 
   // Passagem de câmera: aproxima de um cartão por vez e depois abre o plano.
   const moves: CameraMove[] = compact
@@ -234,11 +236,14 @@ export const Scene08: React.FC = () => {
             <Sfx name="pop_ui" at={2} />
             <Sfx name="whoosh_short" at={4} />
             <Sfx name="whoosh_short" at={16} gain={0.9} />
-            <Sfx name="swipe_fast" at={32} />
-            <Sfx name="notification_pop" at={34} />
-            <Sfx name="swipe_fast" at={54} gain={0.9} />
-            <Sfx name="notification_pop" at={56} gain={0.9} />
-            <Sfx name="tick" at={70} gain={0.6} />
+            <Sfx name="swipe_fast" at={20} />
+            <Sfx name="notification_pop" at={22} />
+            <Sfx name="swipe_fast" at={30} gain={0.9} />
+            <Sfx name="notification_pop" at={32} gain={0.9} />
+            <Sfx name="swipe_fast" at={40} gain={0.85} />
+            <Sfx name="pop_ui" at={42} gain={0.8} />
+            <Sfx name="swipe_fast" at={50} gain={0.85} />
+            <Sfx name="success_chime" at={54} gain={0.7} />
           </>
         ) : (
           <>

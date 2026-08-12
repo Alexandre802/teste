@@ -86,22 +86,13 @@ export const SCENES: SceneConfig[] = [
     vo: 'Você atende clientes o dia inteiro, ou passa o dia inteiro correndo atrás deles no WhatsApp.',
   },
   {
-    id: 'APP',
-    scene: 10,
-    at: 403,
-    hold: 8,
-    designDur: 134,
-    transition: 'swipeUp',
-    vo: 'Enquanto você está fazendo um corte, um procedimento ou atendendo uma cliente,',
-  },
-  {
     id: 'S04',
     scene: 3,
-    at: 537,
+    at: 403,
     hold: 10,
-    designDur: 90,
+    designDur: 236,
     transition: 'zoomOut',
-    vo: 'outras pessoas estão mandando mensagem.',
+    vo: 'Enquanto você está fazendo um corte, um procedimento ou atendendo uma cliente, outras pessoas estão mandando mensagem.',
   },
   {
     id: 'S05',
@@ -113,12 +104,15 @@ export const SCENES: SceneConfig[] = [
     vo: 'E sabe o que acontece quando elas ficam esperando? Elas chamam o próximo salão, a próxima clínica, a próxima barbearia.',
   },
   {
-    id: 'S06',
-    scene: 5,
+    // A demonstração do aplicativo entra exatamente na frase que apresenta o
+    // produto — 7,2 s, tempo suficiente para o cursor percorrer as quatro
+    // seções sem correr.
+    id: 'APP',
+    scene: 10,
     at: 860,
     hold: 10,
-    designDur: 262,
-    transition: 'glitch',
+    designDur: 217,
+    transition: 'swipeUp',
     vo: 'Foi exatamente para resolver isso que nasceu o Waatzo. Uma inteligência artificial que trabalha',
   },
   {
@@ -131,7 +125,7 @@ export const SCENES: SceneConfig[] = [
     vo: 'dentro do seu próprio WhatsApp, respondendo clientes, agendando horários,',
   },
   {
-    id: 'S08a',
+    id: 'S08',
     scene: 7,
     variant: 1,
     at: 1237,
@@ -150,9 +144,10 @@ export const SCENES: SceneConfig[] = [
     vo: 'Tudo automaticamente, 24 horas por dia. Enquanto você está focado em quem já chegou, o Waatzo cuida de quem ainda vai chegar.',
   },
   {
-    id: 'S08b',
-    scene: 7,
-    variant: 2,
+    // Cena própria para a lista de capacidades — antes esta janela reprisava
+    // a arte dos lembretes.
+    id: 'S11',
+    scene: 11,
     at: 1549,
     hold: 10,
     designDur: 326,
@@ -160,7 +155,7 @@ export const SCENES: SceneConfig[] = [
     vo: 'Ele confirma agendamentos, reduz faltas com lembretes automáticos, faz follow-up de clientes que desapareceram e até responde objeções de preço, sem precisar instalar outro aplicativo ou mudar sua rotina.',
   },
   {
-    id: 'S06b',
+    id: 'S06',
     scene: 5,
     variant: 1,
     at: 1875,
@@ -170,9 +165,10 @@ export const SCENES: SceneConfig[] = [
     vo: 'É como ter uma funcionária que nunca atrasa, nunca esquece uma mensagem e nunca deixa um cliente esperando.',
   },
   {
-    id: 'S02b',
-    scene: 1,
-    variant: 1,
+    // Fecho argumentativo em tipografia — antes esta janela reprisava a arte
+    // da comparação com o concorrente.
+    id: 'S12',
+    scene: 12,
     at: 2073,
     hold: 10,
     designDur: 239,
@@ -337,6 +333,31 @@ export const TEXTS = {
       { icon: 'person', text: 'Sentimos sua falta. Quer agendar novamente?', button: 'Agendar novamente' },
       { icon: 'check', text: 'Lembrete enviado', sub: 'Tudo certo! ✅' },
     ] as ReminderCard[],
+  },
+
+  /** Lista de capacidades — cobre "Ele confirma agendamentos, reduz faltas…" */
+  s11: {
+    lines: [
+      [{ t: 'Ele faz tudo', c: 'dark' }],
+      [{ t: 'sozinho', c: 'blue' }],
+    ],
+    features: [
+      { icon: 'calendar' as const, title: 'Confirma agendamentos' },
+      { icon: 'bell' as const, title: 'Reduz faltas com lembretes' },
+      { icon: 'person' as const, title: 'Faz follow-up de quem sumiu' },
+      { icon: 'chat' as const, title: 'Responde objeções de preço' },
+    ],
+    footer: 'Sem instalar outro aplicativo · sem mudar sua rotina',
+  },
+
+  /** Fecho argumentativo — "o problema não é falta de clientes…" */
+  s12: {
+    lines: [
+      [{ t: 'O problema não é', c: 'dark' }],
+      [{ t: 'falta de clientes', c: 'blue' }],
+      [{ t: 'é perder oportunidades', c: 'dark' }],
+      [{ t: 'por não responder a tempo', c: 'blue' }],
+    ],
   },
 
   s09: {
