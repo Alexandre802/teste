@@ -1,71 +1,88 @@
 import React from "react";
 import { BRAND } from "../config/copy";
-import { C, FW, SHADOW } from "../config/theme";
+import { C, FW } from "../config/theme";
 import { fontFamily } from "../lib/fonts";
 
-/** Ícone hexagonal da marca (cubo com fita branca). */
+/**
+ * Ícone da marca: anel hexagonal vazado formado por duas fitas que se dobram
+ * (uma cobre o topo e o lado esquerdo, a outra o lado direito e a base), com
+ * duas frestas diagonais entre elas e o centro hexagonal aberto.
+ *
+ * Geometria em viewBox 100 × 115,5 — hexágono regular de pontas em cima/embaixo
+ * e lados verticais, como no logo oficial.
+ */
 export const LogoMark: React.FC<{
   size?: number;
   style?: React.CSSProperties;
   glow?: number;
+  /** versão monocromática (ex.: branco sobre o círculo azul do selo) */
   mono?: string;
 }> = ({ size = 64, style, glow = 0.55, mono }) => {
   const id = React.useId().replace(/[^a-zA-Z0-9]/g, "");
+
+  /**
+   * O anel é (hexágono externo − hexágono interno), cortado em dois pontos
+   * opostos por frestas radiais. Cada fita termina numa dobra (faceta mais
+   * clara no topo, mais escura na base), que é o que dá o efeito 3D do logo.
+   */
+  // fita A — do corte de cima, passando pelo topo e descendo toda a esquerda
+  const bandA =
+    "M73.44 13.54 L50 0 L0 28.87 L0 86.6 L23.44 100.14 L36.94 76.75 L27 71.01 L27 44.46 L50 31.18 L59.94 36.92 Z";
+  // fita B — do mesmo corte, descendo a direita e passando pela base
+  const bandB =
+    "M76.56 15.34 L100 28.87 L100 86.6 L50 115.47 L26.56 101.94 L40.06 78.55 L50 84.29 L73 71.01 L73 44.46 L63.06 38.72 Z";
+  // dobras nas pontas das fitas
+  const foldA = "M73.44 13.54 L63.04 7.54 L49.54 30.92 L59.94 36.92 Z";
+  const foldB = "M26.56 101.94 L36.96 107.94 L50.46 84.55 L40.06 78.55 Z";
+
   return (
     <svg
       width={size}
-      height={size * 1.06}
-      viewBox="0 0 100 106"
+      height={size * 1.155}
+      viewBox="0 0 100 115.5"
       style={{ display: "block", overflow: "visible", ...style }}
     >
       <defs>
-        <linearGradient id={`g-${id}`} x1="8" y1="4" x2="92" y2="100" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor="#5AAcFF" />
-          <stop offset="0.38" stopColor="#2E6BFF" />
-          <stop offset="0.68" stopColor="#1B5CFF" />
-          <stop offset="1" stopColor="#0A34C4" />
+        {/* dobra do topo — faceta mais clara */}
+        <linearGradient id={`t-${id}`} x1="50" y1="4" x2="70" y2="38" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#63ADFF" />
+          <stop offset="1" stopColor="#3B8FFF" />
         </linearGradient>
-        <linearGradient id={`f-${id}`} x1="20" y1="20" x2="80" y2="86" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor="#FFFFFF" />
-          <stop offset="1" stopColor="#DCE8FF" />
+        {/* fita A — topo + esquerda */}
+        <linearGradient id={`l-${id}`} x1="56" y1="2" x2="10" y2="98" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#3D93FF" />
+          <stop offset="0.55" stopColor="#2A7CF7" />
+          <stop offset="1" stopColor="#1B6BEE" />
         </linearGradient>
-        <filter id={`b-${id}`} x="-60%" y="-60%" width="220%" height="220%">
+        {/* fita B — direita + base */}
+        <linearGradient id={`r-${id}`} x1="98" y1="22" x2="44" y2="114" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#2A80F8" />
+          <stop offset="0.6" stopColor="#1560E4" />
+          <stop offset="1" stopColor="#0C4ACC" />
+        </linearGradient>
+        {/* dobra da base — faceta mais escura */}
+        <linearGradient id={`b2-${id}`} x1="50" y1="80" x2="28" y2="108" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#1053D6" />
+          <stop offset="1" stopColor="#0A3FB8" />
+        </linearGradient>
+        <filter id={`gl-${id}`} x="-60%" y="-60%" width="220%" height="220%">
           <feGaussianBlur stdDeviation="7" />
         </filter>
       </defs>
 
       {glow > 0 && (
         <path
-          d="M50 2 92 26v54L50 104 8 80V26z"
+          d="M50 0 100 28.87v57.73L50 115.47 0 86.6V28.87z"
           fill={C.blue}
-          opacity={glow * 0.55}
-          filter={`url(#b-${id})`}
+          opacity={glow * 0.5}
+          filter={`url(#gl-${id})`}
         />
       )}
 
-      {/* hexágono */}
-      <path
-        d="M50 3.6 90.5 27v52L50 102.4 9.5 79V27z"
-        fill={mono ?? `url(#g-${id})`}
-        stroke={mono ? "none" : "rgba(255,255,255,0.22)"}
-        strokeWidth={1.4}
-      />
-      {/* faceta superior mais clara */}
-      {!mono && (
-        <path d="M50 3.6 90.5 27 50 50.6 9.5 27z" fill="#FFFFFF" opacity={0.16} />
-      )}
-
-      {/* fita branca (C dobrado) */}
-      <path
-        d="M63.5 34.5 40.2 47.9c-4 2.3-4 8 0 10.3l10.4 6-11.6 6.7c-3.4 2-7.7-.5-7.7-4.4V45.9c0-2.6 1.4-5 3.6-6.3l17.2-9.9c2.2-1.3 5-1.3 7.2 0z"
-        fill={mono ? "rgba(255,255,255,0.55)" : `url(#f-${id})`}
-        opacity={1}
-      />
-      <path
-        d="M67.6 40.9c3.4-2 7.7.5 7.7 4.4v20.6c0 2.6-1.4 5-3.6 6.3l-17.2 9.9c-2.2 1.3-5 1.3-7.2 0l-11.2-6.5 23.3-13.4c4-2.3 4-8 0-10.3l-10.4-6z"
-        fill={mono ? "#FFFFFF" : `url(#f-${id})`}
-        opacity={mono ? 1 : 0.92}
-      />
+      <path d={bandA} fill={mono ?? `url(#l-${id})`} opacity={mono ? 0.92 : 1} />
+      <path d={bandB} fill={mono ?? `url(#r-${id})`} opacity={mono ? 1 : 1} />
+      <path d={foldA} fill={mono ?? `url(#t-${id})`} opacity={mono ? 0.72 : 1} />
+      <path d={foldB} fill={mono ?? `url(#b2-${id})`} opacity={mono ? 0.72 : 1} />
     </svg>
   );
 };
@@ -98,48 +115,15 @@ export const Logo: React.FC<{
   </div>
 );
 
-/** Pílula "5/8" do canto superior direito. */
-export const PageBadge: React.FC<{
-  label: string;
-  dark?: boolean;
-  style?: React.CSSProperties;
-  size?: number;
-}> = ({ label, dark = false, style, size = 1 }) => (
-  <div
-    style={{
-      fontFamily,
-      fontWeight: FW.medium,
-      fontSize: 34 * size,
-      color: dark ? C.ink : C.white,
-      border: `2px solid ${dark ? "rgba(27,92,255,0.55)" : "rgba(120,160,255,0.55)"}`,
-      background: dark ? C.white : "rgba(11,30,80,0.35)",
-      borderRadius: 999,
-      padding: `${13 * size}px ${34 * size}px`,
-      lineHeight: 1,
-      boxShadow: dark ? SHADOW.cardLightSoft : "0 0 26px rgba(27,92,255,0.25)",
-      ...style,
-    }}
-  >
-    {label}
-  </div>
-);
-
-/** Header padrão das telas (logo à esquerda, paginação à direita). */
+/** Header padrão das telas: só o logo (sem contador de páginas). */
 export const SlideHeader: React.FC<{
-  badge: string;
   dark?: boolean;
   logoStyle?: React.CSSProperties;
-  badgeStyle?: React.CSSProperties;
   logoSize?: number;
-}> = ({ badge, dark = false, logoStyle, badgeStyle, logoSize = 70 }) => (
-  <>
-    <div style={{ position: "absolute", left: 56, top: 78, ...logoStyle }}>
-      <Logo size={logoSize} dark={dark} />
-    </div>
-    <div style={{ position: "absolute", right: 62, top: 86, ...badgeStyle }}>
-      <PageBadge label={badge} dark={dark} />
-    </div>
-  </>
+}> = ({ dark = false, logoStyle, logoSize = 70 }) => (
+  <div style={{ position: "absolute", left: 56, top: 78, ...logoStyle }}>
+    <Logo size={logoSize} dark={dark} />
+  </div>
 );
 
 /** Mini-logo usado dentro do painel de dashboard. */

@@ -10,7 +10,6 @@ export const BRAND = {
 };
 
 export const SCENE1 = {
-  badge: "2/8",
   headline: [
     { text: "Quantas", color: "white" as const },
     { text: "oportunidades", color: "blue" as const },
@@ -27,7 +26,6 @@ export const SCENE1 = {
 };
 
 export const SCENE2 = {
-  badge: "3/8",
   headline: [
     { text: "E o", color: "white" as const },
     { text: "pior...", color: "blue" as const },
@@ -41,7 +39,6 @@ export const SCENE2 = {
 };
 
 export const SCENE3 = {
-  badge: "5/8",
   headline: [
     { text: "Precisa", color: "white" as const },
     { text: "consultar?", color: "blue" as const },
@@ -66,7 +63,6 @@ export const SCENE3 = {
 };
 
 export const SCENE4 = {
-  badge: "5/8",
   headline: {
     big: "100+",
     line2: "tipos de",
@@ -121,7 +117,6 @@ export const SCENE4 = {
 };
 
 export const SCENE5 = {
-  badge: "8/8",
   headline: [
     { text: "Pague só", color: "ink" as const },
     { text: "pelo que usar", color: "blue" as const },

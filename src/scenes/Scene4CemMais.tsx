@@ -257,7 +257,7 @@ export const Scene4CemMais: React.FC<{ duration: number }> = ({ duration }) => {
       <SfxTrack cues={scene4Cues} />
 
       <div style={{ opacity: ip(frame, [B.header, B.header + 12], [0, 1]) }}>
-        <SlideHeader badge={SCENE4.badge} />
+        <SlideHeader />
       </div>
 
       {/* "100+" com contador */}

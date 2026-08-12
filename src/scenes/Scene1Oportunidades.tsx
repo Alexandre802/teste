@@ -284,7 +284,7 @@ export const Scene1Oportunidades: React.FC<{ duration: number }> = ({ duration }
 
       {/* header */}
       <div style={{ opacity: ip(frame, [B.header, B.header + 12], [0, 1]) }}>
-        <SlideHeader badge={SCENE1.badge} />
+        <SlideHeader />
       </div>
 
       {/* relógio */}

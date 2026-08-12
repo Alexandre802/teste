@@ -313,7 +313,7 @@ export const Scene5PagueSo: React.FC<{ duration: number }> = ({ duration }) => {
       <SfxTrack cues={scene5Cues} />
 
       <div style={{ opacity: ip(frame, [B.header, B.header + 12], [0, 1]) }}>
-        <SlideHeader badge={SCENE5.badge} dark />
+        <SlideHeader dark />
       </div>
 
       {/* headline centralizada */}

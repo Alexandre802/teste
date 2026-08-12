@@ -190,7 +190,7 @@ export const Scene2EoPior: React.FC<{ duration: number }> = ({ duration }) => {
       <SfxTrack cues={scene2Cues} />
 
       <div style={{ opacity: ip(frame, [B.header, B.header + 12], [0, 1]) }}>
-        <SlideHeader badge={SCENE2.badge} />
+        <SlideHeader />
       </div>
 
       {/* ampulheta */}

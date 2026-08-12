@@ -181,7 +181,7 @@ export const Scene3PrecisaConsultar: React.FC<{ duration: number }> = ({ duratio
       <SfxTrack cues={scene3Cues} />
 
       <div style={{ opacity: ip(frame, [B.header, B.header + 12], [0, 1]) }}>
-        <SlideHeader badge={SCENE3.badge} />
+        <SlideHeader />
       </div>
 
       {/* headline */}
