@@ -1,6 +1,7 @@
 import React from 'react';
 import { Audio, Sequence, staticFile } from 'remotion';
 import { MIX, SFX_MASTER } from '../timeline';
+import { useTimeScale } from '../lib/timing';
 
 export type SfxName =
   | 'whoosh_short'
@@ -39,8 +40,11 @@ type Props = {
  */
 export const Sfx: React.FC<Props> = ({ name, at, gain = 1, trim = 0 }) => {
   const volume = (MIX[name] ?? 0.3) * gain * SFX_MASTER;
+  // Dentro de uma cena, `at` está em frames de projeto: converte para frames
+  // reais com a mesma escala usada pela animação.
+  const scale = useTimeScale();
   return (
-    <Sequence from={Math.max(0, Math.round(at))} layout="none">
+    <Sequence from={Math.max(0, Math.round(at * scale))} layout="none">
       <Audio src={staticFile(`sfx/${name}.wav`)} volume={volume} trimBefore={trim} />
     </Sequence>
   );

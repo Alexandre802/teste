@@ -5,10 +5,11 @@
   "main": "index.js",
   "scripts": {
     "studio": "remotion studio src/index.ts",
-    "render": "remotion render src/index.ts WaatzoReel out/waatzo-reel.mp4",
+    "render": "remotion render src/index.ts WaatzoReel out/waatzo-reel.mp4 --concurrency=3 --crf=18",
     "still": "remotion still src/index.ts",
     "sfx": "python3 tools/make_sfx.py",
-    "fonts": "python3 tools/embed_fonts.py"
+    "fonts": "python3 tools/embed_fonts.py",
+    "web": "node tools/encode-web.mjs"
   },
   "keywords": [],
   "author": "",

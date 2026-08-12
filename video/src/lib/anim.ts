@@ -15,13 +15,13 @@ export const EASE = {
 
 export const SPRING = {
   /** Mola macia, sem overshoot perceptível. */
-  soft: { damping: 200, stiffness: 110, mass: 0.9 },
+  soft: { damping: 200, stiffness: 150, mass: 0.8 },
   /** Entrada com pequeno overshoot. */
-  pop: { damping: 14, stiffness: 190, mass: 0.7 },
+  pop: { damping: 13, stiffness: 260, mass: 0.6 },
   /** Overshoot marcado, para pops de ícone. */
-  bouncy: { damping: 10, stiffness: 220, mass: 0.6 },
+  bouncy: { damping: 9.5, stiffness: 300, mass: 0.55 },
   /** Rápida e seca. */
-  snap: { damping: 26, stiffness: 340, mass: 0.7 },
+  snap: { damping: 26, stiffness: 420, mass: 0.65 },
 };
 
 type SpringOpts = {

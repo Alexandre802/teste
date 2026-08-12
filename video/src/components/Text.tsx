@@ -1,7 +1,8 @@
 import React from 'react';
-import { useCurrentFrame } from 'remotion';
+
 import { COLORS, FONT } from '../theme';
 import { EASE, enter, iv, s, SPRING } from '../lib/anim';
+import { useSceneFrame } from '../lib/timing';
 
 export type Segment = { t: string; c?: string };
 export type Line = readonly Segment[];
@@ -43,7 +44,7 @@ export const Headline: React.FC<HeadlineProps> = ({
   mode = 'mask',
   style,
 }) => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   let wordIndex = 0;
 
   return (
@@ -117,7 +118,7 @@ export const Subtitle: React.FC<{
   align?: 'left' | 'center';
   style?: React.CSSProperties;
 }> = ({ children, fontSize, delay = 0, color = COLORS.muted, weight = FONT.medium, align = 'left', style }) => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const e = enter(frame, { delay, y: 18, config: SPRING.soft, fade: 10 });
   return (
     <div
@@ -147,7 +148,7 @@ export const RichLine: React.FC<{
   align?: 'left' | 'center';
   style?: React.CSSProperties;
 }> = ({ segments, fontSize, weight = FONT.bold, delay = 0, align = 'center', style }) => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const e = enter(frame, { delay, y: 20, config: SPRING.soft, fade: 10 });
   return (
     <div

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Img, staticFile, useCurrentFrame } from 'remotion';
+import { Img, staticFile } from 'remotion';
+import { Camera } from '../components/Camera';
 import { Backdrop, CardClip } from '../components/Backdrop';
 import { Logo } from '../components/Logo';
 import { Headline } from '../components/Text';
@@ -9,6 +10,7 @@ import { Sfx } from '../components/Sfx';
 import { COLORS, FONT, SHADOW } from '../theme';
 import { enter, float, iv, p, pulse, s, SPRING } from '../lib/anim';
 import { TEXTS } from '../timeline';
+import { useSceneFrame } from '../lib/timing';
 
 const T = TEXTS.s05;
 const INSET: [number, number] = [50, 58];
@@ -25,7 +27,7 @@ const StackedCard: React.FC<{
   rotate?: number;
   driftPhase?: number;
 }> = ({ width, height, delay, children, radius = 26, rotate = 0, driftPhase = 0 }) => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const e = enter(frame, { delay, y: 40, scale: 0.82, rotate, config: SPRING.pop, fade: 8 });
   const dy = float(frame, 5, 130, driftPhase);
   return (
@@ -68,12 +70,22 @@ const StackedCard: React.FC<{
   );
 };
 
+/** Da cliente para as opções de concorrentes, acompanhando a seta. */
+const CAM = [
+  { at: 0, scale: 1.0, y: 960 },
+  { at: 70, scale: 1.22, x: 450, y: 1080 },
+  { at: 130, scale: 1.18, x: 560, y: 1060 },
+  { at: 190, scale: 1.24, x: 645, y: 1100 },
+  { at: 262, scale: 1.02, y: 980 },
+];
+
 export const Scene05: React.FC = () => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const arrow = p(frame, 96, 132);
   const headScale = s(frame, { delay: 128, config: SPRING.bouncy });
 
   return (
+    <Camera moves={CAM} drift={5}>
     <Backdrop
       inset={INSET}
       blobs={[
@@ -257,5 +269,6 @@ export const Scene05: React.FC = () => {
       <Sfx name="impact" at={128} gain={0.5} />
       <Sfx name="sub_boom" at={160} gain={0.4} />
     </Backdrop>
+    </Camera>
   );
 };

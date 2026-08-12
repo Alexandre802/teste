@@ -1,5 +1,6 @@
 import React from 'react';
-import { Img, staticFile, useCurrentFrame } from 'remotion';
+import { Img, staticFile } from 'remotion';
+import { Camera } from '../components/Camera';
 import { Backdrop, CardClip } from '../components/Backdrop';
 import { Logo } from '../components/Logo';
 import { Headline } from '../components/Text';
@@ -8,18 +9,27 @@ import { Sfx } from '../components/Sfx';
 import { COLORS } from '../theme';
 import { enter, float, SPRING } from '../lib/anim';
 import { TEXTS } from '../timeline';
+import { useSceneFrame } from '../lib/timing';
 
 const T = TEXTS.s03;
 const INSET: [number, number] = [50, 58];
 
+/** Aproximação lenta seguindo a enxurrada de mensagens. */
+const CAM = [
+  { at: 0, scale: 1.0, y: 960 },
+  { at: 90, scale: 1.1, y: 1030 },
+  { at: 218, scale: 1.2, y: 1110 },
+];
+
 export const Scene03: React.FC = () => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   // Foto entra com leve zoom-out e segue em parallax lento (efeito Ken Burns)
   const photo = enter(frame, { delay: 6, scale: 1.1, config: SPRING.soft, fade: 18 });
   const drift = float(frame, 12, 210);
   const slowZoom = 1 + (frame / 218) * 0.05;
 
   return (
+    <Camera moves={CAM} drift={6}>
     <Backdrop
       inset={INSET}
       blobs={[
@@ -97,5 +107,6 @@ export const Scene03: React.FC = () => {
       ))}
       <Sfx name="sub_boom" at={126} gain={0.45} />
     </Backdrop>
+    </Camera>
   );
 };

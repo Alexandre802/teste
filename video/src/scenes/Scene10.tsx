@@ -1,5 +1,6 @@
 import React from 'react';
-import { useCurrentFrame } from 'remotion';
+
+import { Camera } from '../components/Camera';
 import { Backdrop, CardClip } from '../components/Backdrop';
 import { Logo } from '../components/Logo';
 import { Headline, RichLine } from '../components/Text';
@@ -9,12 +10,22 @@ import { Sfx, SfxSeries } from '../components/Sfx';
 import { COLORS, FONT, SHADOW } from '../theme';
 import { enter, float, iv, pulse, s, SPRING } from '../lib/anim';
 import { TEXTS } from '../timeline';
+import { useSceneFrame } from '../lib/timing';
 
 const T = TEXTS.s10;
 const INSET: [number, number] = [50, 58];
 
+/** Percorre o painel e termina fechando no botão. */
+const CAM = [
+  { at: 0, scale: 1.02, y: 940 },
+  { at: 90, scale: 1.16, y: 1060 },
+  { at: 170, scale: 1.32, y: 1180 },
+  { at: 240, scale: 1.4, y: 1230 },
+  { at: 280, scale: 1.0, y: 960 },
+];
+
 export const Scene10: React.FC = () => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const bell = Math.sin(frame / 3.4) * Math.max(0, 1 - Math.max(0, frame - 70) / 40) * 9;
   const bannerIn = enter(frame, { delay: 74, x: -30, scale: 0.96, config: SPRING.pop, fade: 8 });
   const toggle = s(frame, { delay: 86, config: SPRING.bouncy });
@@ -23,6 +34,7 @@ export const Scene10: React.FC = () => {
   const ctaGlow = 0.3 + 0.3 * Math.max(0, Math.sin((frame - 176) / 13));
 
   return (
+    <Camera moves={CAM} drift={5}>
     <Backdrop
       inset={INSET}
       blobs={[
@@ -336,5 +348,6 @@ export const Scene10: React.FC = () => {
       <Sfx name="sparkle" at={186} gain={0.8} />
       <Sfx name="success_chime" at={196} gain={0.7} />
     </Backdrop>
+    </Camera>
   );
 };

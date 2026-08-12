@@ -1,5 +1,6 @@
 import React from 'react';
-import { useCurrentFrame } from 'remotion';
+
+import { Camera } from '../components/Camera';
 import { Backdrop } from '../components/Backdrop';
 import { Logo } from '../components/Logo';
 import { Headline } from '../components/Text';
@@ -7,6 +8,7 @@ import { Sfx } from '../components/Sfx';
 import { COLORS } from '../theme';
 import { float, iv } from '../lib/anim';
 import { TEXTS } from '../timeline';
+import { useSceneFrame } from '../lib/timing';
 
 const T = TEXTS.s04;
 
@@ -14,13 +16,22 @@ const T = TEXTS.s04;
  * Cena tipográfica. Sem cards: o peso está no ritmo das palavras, no
  * respiro dos blobs e na leve deriva das decorações.
  */
+/** Respiração: afasta enquanto as palavras entram, depois aproxima. */
+const CAM = [
+  { at: 0, scale: 1.12, y: 1030 },
+  { at: 70, scale: 1.0, y: 960 },
+  { at: 150, scale: 1.05, y: 990 },
+  { at: 236, scale: 1.14, y: 1040 },
+];
+
 export const Scene04: React.FC = () => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const logoDrift = float(frame, 8, 150);
   // Zoom lento no bloco de texto — dá sensação de aproximação
   const zoom = iv(frame, [0, 236], [1, 1.06]);
 
   return (
+    <Camera moves={CAM} drift={8}>
     <Backdrop
       card={false}
       blobs={[
@@ -83,5 +94,6 @@ export const Scene04: React.FC = () => {
       <Sfx name="glitch" at={150} gain={0.35} />
       <Sfx name="riser" at={198} gain={0.55} />
     </Backdrop>
+    </Camera>
   );
 };

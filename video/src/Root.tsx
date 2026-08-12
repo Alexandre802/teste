@@ -1,9 +1,10 @@
 import React from 'react';
 import { AbsoluteFill, Composition } from 'remotion';
 import { WaatzoVideo } from './Video';
-import { SCENES, FPS, HEIGHT, TOTAL_FRAMES, WIDTH } from './timeline';
+import { SCENES, SCENE_SCALE, SCENE_SPANS, FPS, HEIGHT, TOTAL_FRAMES, WIDTH } from './timeline';
 import { SCENE_COMPONENTS } from './scenes';
 import { SceneShell } from './components/SceneShell';
+import { SceneTiming } from './lib/timing';
 import { COLORS } from './theme';
 import { loadFonts } from './lib/fonts';
 
@@ -20,19 +21,22 @@ export const RemotionRoot: React.FC = () => (
       height={HEIGHT}
     />
 
-    {/* Cada cena isolada — facilita ajustar timing e revisar uma parte só. */}
+    {/* Cada bloco isolado — facilita ajustar timing e revisar uma parte só. */}
     {SCENES.map((scene, i) => {
-      const Comp = SCENE_COMPONENTS[i];
+      const Comp = SCENE_COMPONENTS[scene.scene];
+      const { dur } = SCENE_SPANS[i];
       const Solo: React.FC = () => (
         <AbsoluteFill style={{ background: COLORS.pageBg }}>
-          <SceneShell
-            enterLen={Math.max(10, scene.overlap)}
-            exitLen={0}
-            dur={scene.dur}
-            transition={scene.transition}
-          >
-            <Comp />
-          </SceneShell>
+          <SceneTiming scale={SCENE_SCALE[i]} variant={scene.variant ?? 0}>
+            <SceneShell
+              enterLen={12}
+              exitLen={0}
+              dur={dur}
+              transition={scene.transition}
+            >
+              <Comp />
+            </SceneShell>
+          </SceneTiming>
         </AbsoluteFill>
       );
       return (
@@ -40,7 +44,7 @@ export const RemotionRoot: React.FC = () => (
           key={scene.id}
           id={scene.id}
           component={Solo}
-          durationInFrames={scene.dur}
+          durationInFrames={dur}
           fps={FPS}
           width={WIDTH}
           height={HEIGHT}

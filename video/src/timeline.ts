@@ -26,99 +26,178 @@ export type TransitionKind =
 
 export type SceneConfig = {
   id: string;
-  /** Duração da cena em frames (inclui o trecho sobreposto pela transição). */
-  dur: number;
-  /** Frames em que esta cena começa antes do fim da anterior. */
-  overlap: number;
-  /** Como esta cena entra. */
+  /** Índice do componente em SCENE_COMPONENTS. */
+  scene: number;
+  /** Variante visual da cena (retomadas usam o mesmo layout com outra leitura). */
+  variant?: number;
+  /**
+   * Frame absoluto em que a fala correspondente COMEÇA na narração.
+   * Vem da detecção de pausas do áudio de referência — é o que garante que
+   * cada troca de tela caia exatamente na virada da frase.
+   */
+  at: number;
+  /** Frames que a cena continua visível depois que a próxima entra. */
+  hold: number;
+  /**
+   * Duração para a qual a coreografia interna foi desenhada. A cena roda em
+   * tempo escalonado (dur/designDur), então encurtar um bloco acelera as
+   * animações internas em vez de cortá-las pela metade.
+   */
+  designDur: number;
   transition: TransitionKind;
-  /** Trecho da narração que esta cena representa (referência de ritmo). */
+  /** Trecho exato da narração coberto por este bloco. */
   vo: string;
 };
 
+/**
+ * Decupagem sincronizada com a narração (85,708 s).
+ *
+ * Os tempos vieram da análise de energia do áudio de referência: todas as
+ * viradas caem no centro de uma pausa real da locução. As três retomadas
+ * (S08 v2, S06 v1, S02 v1) cobrem o trecho final da copy, que retoma
+ * assuntos já ilustrados — em vez de deixar uma cena parada por 18 s.
+ */
 export const SCENES: SceneConfig[] = [
   {
     id: 'S01',
-    dur: 172,
-    overlap: 0,
+    scene: 0,
+    at: 0,
+    hold: 10,
+    designDur: 172,
     transition: 'slideUp',
     vo: 'A maioria dos profissionais da beleza não perde clientes por falta de qualidade.',
   },
   {
     id: 'S02',
-    dur: 168,
-    overlap: 10,
+    scene: 1,
+    at: 140,
+    hold: 8,
+    designDur: 150,
     transition: 'pushLeft',
     vo: 'Perde porque o concorrente respondeu primeiro.',
   },
   {
     id: 'S03',
-    dur: 218,
-    overlap: 10,
+    scene: 2,
+    at: 230,
+    hold: 10,
+    designDur: 218,
     transition: 'punchIn',
     vo: 'Você atende clientes o dia inteiro, ou passa o dia inteiro correndo atrás deles no WhatsApp.',
   },
   {
     id: 'S04',
-    dur: 236,
-    overlap: 12,
+    scene: 3,
+    at: 403,
+    hold: 10,
+    designDur: 236,
     transition: 'zoomOut',
     vo: 'Enquanto você está fazendo um corte, um procedimento ou atendendo uma cliente, outras pessoas estão mandando mensagem.',
   },
   {
     id: 'S05',
-    dur: 262,
-    overlap: 12,
+    scene: 4,
+    at: 609,
+    hold: 10,
+    designDur: 262,
     transition: 'slideDown',
     vo: 'E sabe o que acontece quando elas ficam esperando? Elas chamam o próximo salão, a próxima clínica, a próxima barbearia.',
   },
   {
     id: 'S06',
-    dur: 278,
-    overlap: 12,
+    scene: 5,
+    at: 860,
+    hold: 10,
+    designDur: 262,
     transition: 'glitch',
-    vo: 'Foi exatamente para resolver isso que nasceu o Waatzo. Uma inteligência artificial que trabalha dentro do seu próprio WhatsApp,',
+    vo: 'Foi exatamente para resolver isso que nasceu o Waatzo. Uma inteligência artificial que trabalha',
   },
   {
     id: 'S07',
-    dur: 252,
-    overlap: 12,
+    scene: 6,
+    at: 1077,
+    hold: 8,
+    designDur: 230,
     transition: 'swipeUp',
-    vo: 'respondendo clientes, agendando horários,',
+    vo: 'dentro do seu próprio WhatsApp, respondendo clientes, agendando horários,',
   },
   {
-    id: 'S08',
-    dur: 372,
-    overlap: 12,
+    id: 'S08a',
+    scene: 7,
+    variant: 1,
+    at: 1237,
+    hold: 8,
+    designDur: 104,
     transition: 'pushLeft',
-    vo: 'enviando lembretes e recuperando quem sumiu. Ele confirma agendamentos, reduz faltas com lembretes automáticos, faz follow-up de clientes que desapareceram e até responde objeções de preço.',
+    vo: 'enviando lembretes e recuperando quem sumiu.',
   },
   {
     id: 'S09',
-    dur: 330,
-    overlap: 12,
+    scene: 8,
+    at: 1341,
+    hold: 10,
+    designDur: 250,
     transition: 'spin',
-    vo: 'Tudo automaticamente, 24 horas por dia. É como ter uma funcionária que nunca atrasa, nunca esquece uma mensagem e nunca deixa um cliente esperando.',
+    vo: 'Tudo automaticamente, 24 horas por dia. Enquanto você está focado em quem já chegou, o Waatzo cuida de quem ainda vai chegar.',
+  },
+  {
+    id: 'S08b',
+    scene: 7,
+    variant: 2,
+    at: 1549,
+    hold: 10,
+    designDur: 326,
+    transition: 'punchIn',
+    vo: 'Ele confirma agendamentos, reduz faltas com lembretes automáticos, faz follow-up de clientes que desapareceram e até responde objeções de preço, sem precisar instalar outro aplicativo ou mudar sua rotina.',
+  },
+  {
+    id: 'S06b',
+    scene: 5,
+    variant: 1,
+    at: 1875,
+    hold: 10,
+    designDur: 198,
+    transition: 'zoomOut',
+    vo: 'É como ter uma funcionária que nunca atrasa, nunca esquece uma mensagem e nunca deixa um cliente esperando.',
+  },
+  {
+    id: 'S02b',
+    scene: 1,
+    variant: 1,
+    at: 2073,
+    hold: 10,
+    designDur: 239,
+    transition: 'slideUp',
+    vo: 'Porque no fim das contas, o problema não é falta de clientes, é perder oportunidades simplesmente porque ninguém respondeu a tempo.',
   },
   {
     id: 'S10',
-    dur: 306,
-    overlap: 12,
+    scene: 9,
+    at: 2312,
+    hold: 0,
+    designDur: 280,
     transition: 'punchIn',
-    vo: 'Teste o Waatzo gratuitamente por 14 dias e descubra como é ter o seu WhatsApp trabalhando por você.',
+    vo: 'Teste o Waatzo gratuitamente por 14 dias e descubra como é ter o seu WhatsApp trabalhando por você, mesmo quando suas mãos estão ocupadas.',
   },
 ];
 
-/** Frame inicial de cada cena, já descontando as sobreposições. */
-export const SCENE_STARTS: number[] = SCENES.reduce<number[]>((acc, s, i) => {
-  if (i === 0) return [0];
-  const prevStart = acc[i - 1];
-  acc.push(prevStart + SCENES[i - 1].dur - s.overlap);
-  return acc;
-}, []);
+/** Duração da narração de referência, em frames — o vídeo tem exatamente isso. */
+export const TOTAL_FRAMES = 2571;
 
-export const TOTAL_FRAMES =
-  SCENE_STARTS[SCENES.length - 1] + SCENES[SCENES.length - 1].dur;
+/** Início e duração (já com o hold da transição) de cada bloco. */
+export const SCENE_SPANS = SCENES.map((sc, i) => {
+  const nextAt = SCENES[i + 1]?.at ?? TOTAL_FRAMES;
+  return {
+    start: sc.at,
+    /** Frames em que este bloco é o principal (até a próxima fala). */
+    span: nextAt - sc.at,
+    /** Duração renderizada, incluindo o rabicho por cima da próxima cena. */
+    dur: nextAt - sc.at + sc.hold,
+  };
+});
+
+/** Escala de tempo da coreografia interna de cada bloco. */
+export const SCENE_SCALE = SCENES.map((sc, i) => SCENE_SPANS[i].span / sc.designDur);
 
 // ---------------------------------------------------------------------------
 // TEXTOS — extraídos das imagens de referência. Preservam a arte original.

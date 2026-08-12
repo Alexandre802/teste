@@ -1,6 +1,7 @@
 import React from 'react';
-import { useCurrentFrame } from 'remotion';
+
 import { Backdrop } from '../components/Backdrop';
+import { Camera, CameraMove } from '../components/Camera';
 import { Logo } from '../components/Logo';
 import { Headline } from '../components/Text';
 import { Card, Avatar } from '../components/Ui';
@@ -9,6 +10,7 @@ import { Sfx } from '../components/Sfx';
 import { COLORS, FONT, SHADOW } from '../theme';
 import { enter, iv, pulse, s, SPRING, typewriter } from '../lib/anim';
 import { TEXTS } from '../timeline';
+import { useSceneFrame, useVariant } from '../lib/timing';
 
 const T = TEXTS.s02;
 
@@ -18,7 +20,7 @@ const Head: React.FC<{
   icon: 'person' | 'store';
   delay: number;
 }> = ({ name, status, icon, delay }) => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const dot = s(frame, { delay: delay + 8, config: SPRING.bouncy });
   const blink = 0.75 + 0.25 * Math.sin((frame - delay) / 9);
   return (
@@ -87,7 +89,7 @@ const Msg: React.FC<{
   typing?: boolean;
   checks?: boolean;
 }> = ({ text, time, delay, background = '#F4F4F8', typing = true, checks = false }) => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const e = enter(frame, { delay, y: 14, scale: 0.96, config: SPRING.pop, fade: 7 });
   const shown = typing ? typewriter(text, frame, delay + 4, 1.5) : text;
   const checkProg = s(frame, { delay: delay + 22, config: SPRING.soft });
@@ -139,12 +141,41 @@ const Msg: React.FC<{
   );
 };
 
+/**
+ * Duas leituras da mesma arte:
+ *  v0 — a comparação sendo construída (início do vídeo);
+ *  v1 — retomada no fecho ("ninguém respondeu a tempo"), com a câmera indo de
+ *       um cartão ao outro e o selo "Não respondido" batendo.
+ */
+const D0 = { logo: 2, title: 10, cardA: 34, headA: 38, msgA: 46, chip: 68, cardB: 86, headB: 90, msgB: 96, reply: 112 };
+const D1 = { logo: 0, title: 0, cardA: 4, headA: 6, msgA: 8, chip: 22, cardB: 12, headB: 14, msgB: 16, reply: 26 };
+
 export const Scene02: React.FC = () => {
-  const frame = useCurrentFrame();
-  const chipBeat = pulse(frame, 74, 0.1, 26) + pulse(frame, 104, 0.07, 22);
-  const chipIn = enter(frame, { delay: 68, scale: 0.8, config: SPRING.bouncy, fade: 8 });
+  const frame = useSceneFrame();
+  const variant = useVariant();
+  const back = variant === 1;
+  const D = back ? D1 : D0;
+
+  const chipBeat = back
+    ? pulse(frame, 40, 0.14, 30) + pulse(frame, 78, 0.12, 26) + pulse(frame, 116, 0.1, 24)
+    : pulse(frame, D.chip + 6, 0.1, 26) + pulse(frame, D.chip + 36, 0.07, 22);
+  const chipIn = enter(frame, { delay: D.chip, scale: 0.8, config: SPRING.bouncy, fade: 8 });
+
+  const moves: CameraMove[] = back
+    ? [
+        { at: 0, scale: 1.0, y: 960 },
+        { at: 46, scale: 1.22, x: 540, y: 880 },
+        { at: 120, scale: 1.3, x: 540, y: 1180 },
+        { at: 200, scale: 1.05, y: 1000 },
+      ]
+    : [
+        { at: 0, scale: 1.0, y: 960 },
+        { at: 80, scale: 1.12, y: 1030 },
+        { at: 150, scale: 1.2, y: 1100 },
+      ];
 
   return (
+    <Camera moves={moves} drift={back ? 4 : 6}>
     <Backdrop
       card={false}
       blobs={[
@@ -168,7 +199,7 @@ export const Scene02: React.FC = () => {
           justifyContent: 'center',
         }}
       >
-        <Logo size={96} delay={2} fontSize={80} gap={24} />
+        <Logo size={96} delay={D.logo} fontSize={80} gap={24} />
       </div>
 
       {/* Título centralizado */}
@@ -178,18 +209,18 @@ export const Scene02: React.FC = () => {
           fontSize={84}
           lineHeight={1.14}
           align="center"
-          delay={10}
-          stagger={3.4}
-          lineStagger={6}
+          delay={D.title}
+          stagger={back ? 2 : 3.4}
+          lineStagger={back ? 3 : 6}
         />
       </div>
 
       {/* Cartão do cliente sem resposta */}
       <div style={{ position: 'absolute', left: 190, top: 654, width: 700 }}>
-        <Card delay={34} radius={34} y={40} scale={0.9} style={{ padding: '34px 34px 30px' }}>
-          <Head name={T.cardA.name} status={T.cardA.status} icon="person" delay={38} />
+        <Card delay={D.cardA} radius={34} y={40} scale={0.9} style={{ padding: '34px 34px 30px' }}>
+          <Head name={T.cardA.name} status={T.cardA.status} icon="person" delay={D.headA} />
           <div style={{ height: 26 }} />
-          <Msg text={T.cardA.message} time={T.cardA.time} delay={46} />
+          <Msg text={T.cardA.message} time={T.cardA.time} delay={D.msgA} typing={!back} />
           <div style={{ height: 22 }} />
           <div
             style={{
@@ -233,15 +264,15 @@ export const Scene02: React.FC = () => {
 
       {/* Cartão do concorrente que respondeu */}
       <div style={{ position: 'absolute', left: 190, top: 1216, width: 700 }}>
-        <Card delay={86} radius={34} y={46} scale={0.9} style={{ padding: '34px 34px 30px' }}>
-          <Head name={T.cardB.name} status={T.cardB.status} icon="store" delay={90} />
+        <Card delay={D.cardB} radius={34} y={46} scale={0.9} style={{ padding: '34px 34px 30px' }}>
+          <Head name={T.cardB.name} status={T.cardB.status} icon="store" delay={D.headB} />
           <div style={{ height: 26 }} />
-          <Msg text={T.cardB.message} time={T.cardB.time} delay={96} typing={false} />
+          <Msg text={T.cardB.message} time={T.cardB.time} delay={D.msgB} typing={false} />
           <div style={{ height: 20 }} />
           <Msg
             text={T.cardB.reply}
             time={T.cardB.replyTime}
-            delay={112}
+            delay={D.reply}
             background={COLORS.lavender}
             checks
           />
@@ -249,22 +280,38 @@ export const Scene02: React.FC = () => {
       </div>
 
       {/* --------------------------------------------------------- efeitos */}
-      <Sfx name="pop_ui" at={4} />
-      <Sfx name="whoosh_short" at={10} />
-      <Sfx name="whoosh_short" at={22} gain={0.8} />
-      <Sfx name="impact" at={34} gain={0.55} />
-      <Sfx name="soft_pop" at={38} />
-      <Sfx name="digital_click" at={46} />
-      <Sfx name="tick" at={54} gain={0.8} />
-      <Sfx name="tick" at={62} gain={0.8} />
-      <Sfx name="notification_pop" at={68} gain={0.7} />
-      <Sfx name="tick" at={80} gain={0.6} />
-      <Sfx name="whoosh_short" at={86} gain={1.1} />
-      <Sfx name="soft_pop" at={90} />
-      <Sfx name="digital_click" at={96} />
-      <Sfx name="pop_ui" at={112} />
-      <Sfx name="success_chime" at={126} gain={0.8} />
-      <Sfx name="sparkle" at={130} gain={0.5} />
+      {back ? (
+        <>
+          <Sfx name="whoosh_short" at={0} gain={0.8} />
+          <Sfx name="soft_pop" at={6} />
+          <Sfx name="soft_pop" at={14} gain={0.9} />
+          <Sfx name="notification_pop" at={22} gain={0.8} />
+          <Sfx name="whoosh_short" at={40} gain={0.5} />
+          <Sfx name="impact" at={46} gain={0.5} />
+          <Sfx name="tick" at={78} gain={0.6} />
+          <Sfx name="whoosh_short" at={112} gain={0.5} />
+          <Sfx name="success_chime" at={126} gain={0.6} />
+          <Sfx name="sub_boom" at={150} gain={0.45} />
+          <Sfx name="riser" at={200} gain={0.5} />
+        </>
+      ) : (
+        <>
+          <Sfx name="pop_ui" at={2} />
+          <Sfx name="whoosh_short" at={8} />
+          <Sfx name="whoosh_short" at={18} gain={0.8} />
+          <Sfx name="impact" at={34} gain={0.55} />
+          <Sfx name="soft_pop" at={38} />
+          <Sfx name="digital_click" at={46} />
+          <Sfx name="tick" at={56} gain={0.8} />
+          <Sfx name="notification_pop" at={68} gain={0.7} />
+          <Sfx name="whoosh_short" at={86} gain={1.1} />
+          <Sfx name="soft_pop" at={90} />
+          <Sfx name="digital_click" at={96} />
+          <Sfx name="pop_ui" at={112} />
+          <Sfx name="success_chime" at={126} gain={0.8} />
+        </>
+      )}
     </Backdrop>
+    </Camera>
   );
 };

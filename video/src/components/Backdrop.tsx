@@ -1,7 +1,8 @@
 import React from 'react';
-import { AbsoluteFill, useCurrentFrame } from 'remotion';
+import { AbsoluteFill } from 'remotion';
 import { COLORS, SHADOW } from '../theme';
 import { enter, float, iv, s, SPRING } from '../lib/anim';
+import { useSceneFrame } from '../lib/timing';
 
 /**
  * Leque decorativo (as "explosões" pêssego e lavanda das artes).
@@ -118,7 +119,7 @@ export const Backdrop: React.FC<BackdropProps> = ({
   radius = 58,
   children,
 }) => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const cardIn = enter(frame, { delay: cardDelay, scale: 0.965, config: SPRING.soft, fade: 10 });
 
   return (

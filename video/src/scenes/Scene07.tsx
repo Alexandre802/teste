@@ -1,5 +1,6 @@
 import React from 'react';
-import { useCurrentFrame } from 'remotion';
+
+import { Camera } from '../components/Camera';
 import { Backdrop, CardClip } from '../components/Backdrop';
 import { Logo } from '../components/Logo';
 import { Card, SkeletonLine, TypingDots } from '../components/Ui';
@@ -8,6 +9,7 @@ import { Sfx } from '../components/Sfx';
 import { COLORS, FONT, SHADOW } from '../theme';
 import { enter, float, iv, pulse, s, SPRING, typewriter } from '../lib/anim';
 import { TEXTS } from '../timeline';
+import { useSceneFrame } from '../lib/timing';
 
 const T = TEXTS.s07;
 const INSET: [number, number] = [50, 58];
@@ -19,7 +21,7 @@ const FeatureChip: React.FC<{
   width: number;
   top: number;
 }> = ({ parts, delay, width, top }) => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const e = enter(frame, { delay, x: -60, scale: 0.9, config: SPRING.pop, fade: 8 });
   const dy = float(frame, 4, 130, delay * 3);
   return (
@@ -68,7 +70,7 @@ const ClientMessage: React.FC<{
   width: number;
   typing?: boolean;
 }> = ({ name, text, time, delay, left, top, width, typing = true }) => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const shown = typing ? typewriter(text, frame, delay + 6, 1.4) : text;
   return (
     <div style={{ position: 'absolute', left, top }}>
@@ -132,8 +134,17 @@ const ClientMessage: React.FC<{
   );
 };
 
+/** Desce das pílulas para o agendamento e fecha na confirmação. */
+const CAM = [
+  { at: 0, scale: 1.04, y: 900 },
+  { at: 70, scale: 1.12, y: 1010 },
+  { at: 140, scale: 1.3, y: 1150 },
+  { at: 200, scale: 1.4, y: 1220 },
+  { at: 230, scale: 1.14, y: 1060 },
+];
+
 export const Scene07: React.FC = () => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const slotIn = s(frame, { delay: 150, config: SPRING.bouncy });
   const slotBeat = pulse(frame, 152, 0.1, 22);
   const checkIn = s(frame, { delay: 164, config: SPRING.bouncy });
@@ -141,6 +152,7 @@ export const Scene07: React.FC = () => {
   const confirmIn = s(frame, { delay: 186, config: SPRING.pop });
 
   return (
+    <Camera moves={CAM} drift={4}>
     <Backdrop
       inset={INSET}
       blobs={[
@@ -338,5 +350,6 @@ export const Scene07: React.FC = () => {
       <Sfx name="success_chime" at={186} />
       <Sfx name="sparkle" at={190} gain={0.6} />
     </Backdrop>
+    </Camera>
   );
 };

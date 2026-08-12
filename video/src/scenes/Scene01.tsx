@@ -1,5 +1,6 @@
 import React from 'react';
-import { AbsoluteFill, Img, interpolate, staticFile, useCurrentFrame } from 'remotion';
+import { AbsoluteFill, Img, interpolate, staticFile } from 'remotion';
+import { Camera } from '../components/Camera';
 import { Backdrop, CardClip } from '../components/Backdrop';
 import { Logo } from '../components/Logo';
 import { Headline } from '../components/Text';
@@ -25,13 +26,14 @@ import { Sfx } from '../components/Sfx';
 import { COLORS, FONT, SHADOW } from '../theme';
 import { enter, float, iv, s, SPRING } from '../lib/anim';
 import { TEXTS } from '../timeline';
+import { useSceneFrame } from '../lib/timing';
 
 const T = TEXTS.s01;
 const INSET: [number, number] = [26, 48];
 
 /** Cabeçalho do WhatsApp dentro do telefone. */
 const ChatHeader: React.FC<{ delay: number }> = ({ delay }) => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const e = enter(frame, { delay, y: -18, config: SPRING.soft, fade: 8 });
   return (
     <div
@@ -101,7 +103,7 @@ const VideoBadge: React.FC = () => (
 
 /** Barra de digitação com cursor piscando. */
 const ChatInput: React.FC<{ delay: number }> = ({ delay }) => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const e = enter(frame, { delay, y: 30, config: SPRING.pop, fade: 8 });
   const caret = Math.floor((frame - delay) / 9) % 2 === 0;
   const micBeat = 1 + Math.max(0, Math.sin((frame - delay) / 14)) * 0.06;
@@ -165,12 +167,21 @@ const ChatInput: React.FC<{ delay: number }> = ({ delay }) => {
   );
 };
 
+/** A câmera desce do título para a conversa no telefone. */
+const CAM = [
+  { at: 0, scale: 1.0, y: 960 },
+  { at: 60, scale: 1.08, y: 1020 },
+  { at: 130, scale: 1.18, y: 1090 },
+  { at: 172, scale: 1.26, y: 1140 },
+];
+
 export const Scene01: React.FC = () => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const photo = enter(frame, { delay: 26, scale: 1.12, config: SPRING.soft, fade: 16 });
   const photoDrift = float(frame, 10, 190);
 
   return (
+    <Camera moves={CAM} drift={5}>
     <Backdrop
       inset={INSET}
       radius={54}
@@ -387,5 +398,6 @@ export const Scene01: React.FC = () => {
       <Sfx name="tick" at={142} />
       <Sfx name="tick" at={148} />
     </Backdrop>
+    </Camera>
   );
 };

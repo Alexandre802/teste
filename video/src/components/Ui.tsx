@@ -1,8 +1,9 @@
 import React from 'react';
-import { Img, staticFile, useCurrentFrame } from 'remotion';
+import { Img, staticFile } from 'remotion';
 import { COLORS, FONT, SHADOW } from '../theme';
 import { EASE, enter, float, iv, pulse, s, SPRING } from '../lib/anim';
 import { DoubleCheck, WhatsappIcon } from './Icons';
+import { useSceneFrame } from '../lib/timing';
 
 // ------------------------------------------------------------------- Card ---
 
@@ -38,7 +39,7 @@ export const Card: React.FC<{
   drift = 0,
   driftPhase = 0,
 }) => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const e = enter(frame, { delay, x, y, scale, rotate, config, fade: 8 });
   const dy = drift ? float(frame, drift, 120, driftPhase) : 0;
   return (
@@ -79,7 +80,7 @@ export const Avatar: React.FC<{
   delay = 0,
   fontSize,
 }) => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const g = s(frame, { delay, config: SPRING.bouncy });
   const badgeG = s(frame, { delay: delay + 5, config: SPRING.bouncy });
   return (
@@ -162,7 +163,7 @@ export const SkeletonLine: React.FC<{
   radius?: number;
   shine?: boolean;
 }> = ({ width, height = 14, delay = 0, color = COLORS.lavender, radius, shine = true }) => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const g = s(frame, { delay, config: SPRING.soft });
   const shinePos = ((frame - delay) % 90) / 90;
   return (
@@ -222,7 +223,7 @@ export const ChatBubble: React.FC<{
   padding = '18px 22px 14px',
   style,
 }) => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const e = enter(frame, {
     delay,
     y: 16,
@@ -296,7 +297,7 @@ export const TypingDots: React.FC<{
   color?: string;
   background?: string;
 }> = ({ delay = 0, size = 18, color = COLORS.primary, background = COLORS.lavender }) => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const e = enter(frame, { delay, scale: 0.6, y: 10, config: SPRING.pop, fade: 6 });
   return (
     <div
@@ -362,7 +363,7 @@ export const NotificationCard: React.FC<{
   drift = 4,
   driftPhase = 0,
 }) => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const badgeG = s(frame, { delay: delay + 8, config: SPRING.bouncy });
   const badgeBeat = pulse(frame, delay + 8, 0.16, 20);
   return (
@@ -486,7 +487,7 @@ export const PhoneFrame: React.FC<{
   drift = 5,
   buttons = true,
 }) => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const e = enter(frame, { delay, y, scale, config: SPRING.soft, fade: 10 });
   const dy = float(frame, drift, 150);
   return (
@@ -595,7 +596,7 @@ export const Chip: React.FC<{
   style,
   from = 'none',
 }) => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const e = enter(frame, {
     delay,
     scale: 0.82,
@@ -670,7 +671,7 @@ export const Counter: React.FC<{
   color?: string;
   duration?: number;
 }> = ({ value, delay = 0, fontSize, color = COLORS.dark, duration = 40 }) => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const n = Math.round(
     iv(frame, [delay, delay + duration], [0, value], EASE.out),
   );

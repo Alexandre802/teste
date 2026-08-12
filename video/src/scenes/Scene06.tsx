@@ -1,6 +1,7 @@
 import React from 'react';
-import { useCurrentFrame } from 'remotion';
+
 import { Backdrop, CardClip } from '../components/Backdrop';
+import { Camera, CameraMove } from '../components/Camera';
 import { Logo } from '../components/Logo';
 import { Headline, Subtitle } from '../components/Text';
 import { Card, PhoneFrame, SkeletonLine } from '../components/Ui';
@@ -9,19 +10,47 @@ import { Sfx } from '../components/Sfx';
 import { COLORS, FONT, SHADOW } from '../theme';
 import { enter, float, iv, pulse, s, SPRING } from '../lib/anim';
 import { TEXTS } from '../timeline';
+import { useSceneFrame, useVariant } from '../lib/timing';
 
 const T = TEXTS.s06;
 const INSET: [number, number] = [50, 58];
 
+/**
+ * v0 — o lançamento ("nasceu o Waatzo");
+ * v1 — retomada em "é como ter uma funcionária que nunca atrasa": tudo já está
+ *      em cena e a câmera entra no aparelho e no robô confirmando.
+ */
+const D0 = { logo: 2, l1: 12, l2: 22, sub: 40, phone: 48, icon: 34, bot: 92, botIcon: 98, sk1: 104, sk2: 110, check: 108 };
+const D1 = { logo: 0, l1: 0, l2: 3, sub: 8, phone: 2, icon: 8, bot: 16, botIcon: 20, sk1: 26, sk2: 32, check: 40 };
+
 export const Scene06: React.FC = () => {
-  const frame = useCurrentFrame();
-  const logoIn = s(frame, { delay: 34, config: SPRING.bouncy });
+  const frame = useSceneFrame();
+  const variant = useVariant();
+  const back = variant === 1;
+  const D = back ? D1 : D0;
+  const logoIn = s(frame, { delay: D.icon, config: SPRING.bouncy });
   const glow = 0.35 + 0.25 * Math.sin(frame / 16);
-  const checkProg = s(frame, { delay: 108, config: SPRING.bouncy });
-  const checkBeat = pulse(frame, 110, 0.18, 24);
+  const checkProg = s(frame, { delay: D.check, config: SPRING.bouncy });
+  const checkBeat = pulse(frame, D.check + 2, 0.18, 24) + (back ? pulse(frame, 120, 0.12, 26) : 0);
   const botFloat = float(frame, 7, 120);
 
+  const moves: CameraMove[] = back
+    ? [
+        // Retomada: fica no aparelho e no robô — o título de lançamento fica
+        // fora de quadro, porque a frase agora é outra.
+        { at: 0, scale: 1.26, x: 546, y: 1100 },
+        { at: 90, scale: 1.34, x: 546, y: 1180 },
+        { at: 198, scale: 1.14, x: 540, y: 1020 },
+      ]
+    : [
+        { at: 0, scale: 1.12, y: 880 },
+        { at: 60, scale: 1.0, y: 960 },
+        { at: 150, scale: 1.14, y: 1060 },
+        { at: 262, scale: 1.24, y: 1130 },
+      ];
+
   return (
+    <Camera moves={moves} drift={back ? 4 : 6}>
     <Backdrop
       inset={INSET}
       blobs={[
@@ -43,7 +72,7 @@ export const Scene06: React.FC = () => {
             justifyContent: 'center',
           }}
         >
-          <Logo size={100} delay={2} fontSize={86} gap={24} />
+          <Logo size={100} delay={D.logo} fontSize={86} gap={24} />
         </div>
 
         {/* "Nasceu o Waatzo" */}
@@ -52,7 +81,7 @@ export const Scene06: React.FC = () => {
             lines={[[{ t: T.line1, c: 'dark' }]]}
             fontSize={116}
             align="center"
-            delay={12}
+            delay={D.l1}
             stagger={4}
           />
         </div>
@@ -61,7 +90,7 @@ export const Scene06: React.FC = () => {
             lines={[[{ t: T.line2, c: 'blue' }]]}
             fontSize={170}
             align="center"
-            delay={22}
+            delay={D.l2}
             stagger={4}
             mode="pop"
             letterSpacing="-0.045em"
@@ -69,14 +98,14 @@ export const Scene06: React.FC = () => {
         </div>
 
         <div style={{ position: 'absolute', top: 786, left: 0, right: 0 }}>
-          <Subtitle fontSize={50} delay={40} align="center" color={COLORS.muted}>
+          <Subtitle fontSize={50} delay={D.sub} align="center" color={COLORS.muted}>
             {T.subtitle}
           </Subtitle>
         </div>
 
         {/* Telefone com o app aberto */}
         <div style={{ position: 'absolute', left: 246, top: 924 }}>
-          <PhoneFrame width={620} height={980} delay={48} borderWidth={22} radius={76} y={110}>
+          <PhoneFrame width={620} height={980} delay={D.phone} borderWidth={22} radius={76} y={110}>
             <div
               style={{
                 position: 'absolute',
@@ -128,7 +157,7 @@ export const Scene06: React.FC = () => {
             transform: `translateY(${botFloat}px)`,
           }}
         >
-          <Card delay={92} radius={38} y={44} scale={0.88} style={{ width: 712, padding: 34 }}>
+          <Card delay={D.bot} radius={38} y={44} scale={0.88} style={{ width: 712, padding: 34 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 30 }}>
               <div
                 style={{
@@ -139,7 +168,7 @@ export const Scene06: React.FC = () => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  transform: `scale(${s(frame, { delay: 98, config: SPRING.bouncy })})`,
+                  transform: `scale(${s(frame, { delay: D.botIcon, config: SPRING.bouncy })})`,
                 }}
               >
                 <RobotIcon size={88} color={COLORS.white} accent={COLORS.primary} />
@@ -153,14 +182,14 @@ export const Scene06: React.FC = () => {
                     color: COLORS.dark,
                     letterSpacing: '-0.025em',
                     marginBottom: 18,
-                    opacity: iv(frame, [100, 110], [0, 1]),
+                    opacity: iv(frame, [D.botIcon + 2, D.botIcon + 12], [0, 1]),
                   }}
                 >
                   {T.botName}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                  <SkeletonLine width={300} height={20} delay={104} />
-                  <SkeletonLine width={210} height={20} delay={110} />
+                  <SkeletonLine width={300} height={20} delay={D.sk1} />
+                  <SkeletonLine width={210} height={20} delay={D.sk2} />
                 </div>
               </div>
               <div
@@ -184,22 +213,40 @@ export const Scene06: React.FC = () => {
       </CardClip>
 
       {/* --------------------------------------------------------- efeitos */}
-      <Sfx name="pop_ui" at={4} />
-      <Sfx name="whoosh_short" at={12} />
-      <Sfx name="reverse_whoosh" at={12} gain={0.7} />
-      <Sfx name="impact" at={24} gain={0.8} />
-      <Sfx name="bass_hit" at={24} gain={0.7} />
-      <Sfx name="sparkle" at={28} gain={0.8} />
-      <Sfx name="soft_pop" at={40} />
-      <Sfx name="whoosh_transition" at={46} gain={0.7} />
-      <Sfx name="digital_click" at={34} />
-      <Sfx name="sub_boom" at={36} gain={0.5} />
-      <Sfx name="pop_ui" at={92} />
-      <Sfx name="soft_pop" at={98} />
-      <Sfx name="tick" at={104} gain={0.7} />
-      <Sfx name="tick" at={110} gain={0.7} />
-      <Sfx name="success_chime" at={108} />
-      <Sfx name="sparkle" at={112} gain={0.6} />
+      {back ? (
+        <>
+          <Sfx name="whoosh_short" at={0} gain={0.8} />
+          <Sfx name="soft_pop" at={8} />
+          <Sfx name="pop_ui" at={16} />
+          <Sfx name="tick" at={26} gain={0.6} />
+          <Sfx name="tick" at={32} gain={0.6} />
+          <Sfx name="whoosh_short" at={48} gain={0.5} />
+          <Sfx name="sparkle" at={56} gain={0.6} />
+          <Sfx name="whoosh_short" at={112} gain={0.5} />
+          <Sfx name="success_chime" at={120} gain={0.7} />
+          <Sfx name="sub_boom" at={150} gain={0.4} />
+          <Sfx name="whoosh_transition" at={186} gain={0.5} />
+        </>
+      ) : (
+        <>
+          <Sfx name="pop_ui" at={2} />
+          <Sfx name="whoosh_short" at={10} />
+          <Sfx name="reverse_whoosh" at={10} gain={0.7} />
+          <Sfx name="impact" at={22} gain={0.8} />
+          <Sfx name="bass_hit" at={22} gain={0.7} />
+          <Sfx name="sparkle" at={26} gain={0.8} />
+          <Sfx name="soft_pop" at={40} />
+          <Sfx name="whoosh_transition" at={46} gain={0.7} />
+          <Sfx name="digital_click" at={34} />
+          <Sfx name="sub_boom" at={36} gain={0.5} />
+          <Sfx name="pop_ui" at={92} />
+          <Sfx name="soft_pop" at={98} />
+          <Sfx name="tick" at={104} gain={0.7} />
+          <Sfx name="success_chime" at={108} />
+          <Sfx name="sparkle" at={112} gain={0.6} />
+        </>
+      )}
     </Backdrop>
+    </Camera>
   );
 };

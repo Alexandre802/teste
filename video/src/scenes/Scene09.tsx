@@ -1,5 +1,6 @@
 import React from 'react';
-import { useCurrentFrame } from 'remotion';
+
+import { Camera } from '../components/Camera';
 import { Backdrop, CardClip } from '../components/Backdrop';
 import { Logo } from '../components/Logo';
 import { Headline } from '../components/Text';
@@ -7,6 +8,7 @@ import { Sfx, SfxSeries } from '../components/Sfx';
 import { COLORS, FONT } from '../theme';
 import { float, iv, p, pulse, s, SPRING } from '../lib/anim';
 import { TEXTS } from '../timeline';
+import { useSceneFrame } from '../lib/timing';
 
 const T = TEXTS.s09;
 const INSET: [number, number] = [50, 58];
@@ -111,8 +113,16 @@ const SmallClock: React.FC<{
   );
 };
 
+/** Entra no relógio enquanto ele se desenha e depois abre o plano. */
+const CAM = [
+  { at: 0, scale: 1.05, y: 940 },
+  { at: 80, scale: 1.3, x: 524, y: 1150 },
+  { at: 170, scale: 1.14, y: 1080 },
+  { at: 250, scale: 1.0, y: 960 },
+];
+
 export const Scene09: React.FC = () => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const CX = 524;
   const CY = 1246;
   const R = 186;
@@ -127,6 +137,7 @@ export const Scene09: React.FC = () => {
   const bigDrift = float(frame, 8, 170);
 
   return (
+    <Camera moves={CAM} drift={6}>
     <Backdrop
       inset={INSET}
       blobs={[
@@ -251,5 +262,6 @@ export const Scene09: React.FC = () => {
       <SfxSeries name="tick" from={150} count={8} every={18} gain={0.28} />
       <Sfx name="sub_boom" at={230} gain={0.4} />
     </Backdrop>
+    </Camera>
   );
 };

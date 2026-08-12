@@ -1,7 +1,8 @@
 import React from 'react';
-import { useCurrentFrame } from 'remotion';
+
 import { COLORS, FONT } from '../theme';
 import { enter, iv, pulse, s, SPRING } from '../lib/anim';
+import { useSceneFrame } from '../lib/timing';
 
 /** Raio do ícone quadrado, proporcional ao tamanho (como na arte). */
 const RADIUS_RATIO = 0.29;
@@ -33,7 +34,7 @@ export const Logo: React.FC<{
   fontSize?: number;
   gap?: number;
 }> = ({ size = 86, delay = 0, word = true, fontSize, gap = 20 }) => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const box = enter(frame, { delay, scale: 0.4, rotate: -14, config: SPRING.bouncy, fade: 6 });
   const boltProg = s(frame, { delay: delay + 4, config: SPRING.bouncy });
   const beat = pulse(frame, delay + 10, 0.08, 22);
@@ -99,7 +100,7 @@ export const LogoQuiet: React.FC<{ size?: number; delay?: number }> = ({
   size = 78,
   delay = 0,
 }) => {
-  const frame = useCurrentFrame();
+  const frame = useSceneFrame();
   const o = iv(frame, [delay, delay + 12], [0, 1]);
   return (
     <div style={{ opacity: o }}>
