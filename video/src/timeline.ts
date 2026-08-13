@@ -144,9 +144,9 @@ export const SCENES: SceneConfig[] = [
     vo: 'Tudo automaticamente, 24 horas por dia. Enquanto você está focado em quem já chegou, o Waatzo cuida de quem ainda vai chegar.',
   },
   {
-    // Cena própria para a lista de capacidades — antes esta janela reprisava
-    // a arte dos lembretes.
-    id: 'S11',
+    // A conversa dentro do WhatsApp: cada mensagem chega numa marca da
+    // narração, que aqui fala em confirmar agendamento e responder preço.
+    id: 'CHAT',
     scene: 11,
     at: 1549,
     hold: 10,
@@ -335,19 +335,32 @@ export const TEXTS = {
     ] as ReminderCard[],
   },
 
-  /** Lista de capacidades — cobre "Ele confirma agendamentos, reduz faltas…" */
-  s11: {
-    lines: [
-      [{ t: 'Ele faz tudo', c: 'dark' }],
-      [{ t: 'sozinho', c: 'blue' }],
+  /**
+   * Conversa real dentro do WhatsApp, transcrita da captura de referência.
+   * Cobre "Ele confirma agendamentos… e até responde objeções de preço".
+   */
+  s13: {
+    contact: 'Studio Ana Martins',
+    messages: [
+      { from: 'cliente', text: 'Oi! Tem horário essa semana para limpeza de pele?', time: '15:42' },
+      {
+        from: 'ia',
+        text: 'Oi! 😊 Temos sim! A limpeza de pele custa R$120 e dura 1h. Qual dia fica melhor para você?',
+        time: '15:42',
+      },
+      { from: 'cliente', text: 'Sexta à tarde!', time: '15:43' },
+      {
+        from: 'ia',
+        text: 'Tenho sexta às 16h disponível. Posso confirmar para você? 😊',
+        time: '15:43',
+      },
+      { from: 'cliente', text: 'Sim!', time: '15:44' },
+      {
+        from: 'ia',
+        text: 'Prontinho, Aline! ✅ Limpeza de pele confirmada para sexta às 16h. Te esperamos! 😊',
+        time: '15:44',
+      },
     ],
-    features: [
-      { icon: 'calendar' as const, title: 'Confirma agendamentos' },
-      { icon: 'bell' as const, title: 'Reduz faltas com lembretes' },
-      { icon: 'person' as const, title: 'Faz follow-up de quem sumiu' },
-      { icon: 'chat' as const, title: 'Responde objeções de preço' },
-    ],
-    footer: 'Sem instalar outro aplicativo · sem mudar sua rotina',
   },
 
   /** Fecho argumentativo — "o problema não é falta de clientes…" */

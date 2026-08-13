@@ -36,11 +36,10 @@ python3 tools/find_cuts.py    # relista as pausas do áudio
 ```
 
 São 13 blocos e **cada arte aparece uma única vez** — não há cena reprisada.
-O trecho final da copy, que antes obrigava a repetir artes, ganhou duas cenas
-próprias no mesmo sistema visual: `S11` (a lista de capacidades) e `S12` (o
-fecho argumentativo). O `APP` é o take de demonstração do aplicativo,
-remontado a partir das quatro capturas de tela, e ocupa exatamente a frase que
-apresenta o produto.
+Dois blocos vêm de capturas de tela e não das 10 artes: `APP` (o walkthrough
+do aplicativo) e `CHAT` (a conversa dentro do WhatsApp, mensagem a mensagem).
+O `S12` é a única cena inteiramente criada aqui — tipografia no mesmo sistema
+visual, para o fecho argumentativo da copy.
 
 | bloco | fala | entra em | dur |
 | --- | --- | --- | --- |
@@ -53,7 +52,7 @@ apresenta o produto.
 | S07 | …respondendo clientes, agendando horários | 35,90 s | 5,3 s |
 | S08 | enviando lembretes e recuperando quem sumiu | 41,23 s | 3,5 s |
 | S09 | Tudo automaticamente, 24 horas por dia | 44,69 s | 6,9 s |
-| S11 | Ele confirma agendamentos, reduz faltas… | 51,64 s | 10,9 s |
+| **CHAT** | **Ele confirma agendamentos… responde objeções de preço** | **51,64 s** | **10,9 s** |
 | S06 | É como ter uma funcionária que nunca atrasa… | 62,50 s | 6,6 s |
 | S12 | …ninguém respondeu a tempo | 69,09 s | 8,0 s |
 | S10 | Teste grátis por 14 dias | 77,07 s | 8,6 s |
@@ -87,8 +86,13 @@ Além das entradas escalonadas, há três camadas de movimento contínuo:
 | Animação interna de uma cena | `src/scenes/SceneNN.tsx` |
 | Timbre dos efeitos sonoros | `tools/make_sfx.py` |
 
-Cada bloco também é uma composição isolada no Studio (`S01`, `APP`, `S11`,
+Cada bloco também é uma composição isolada no Studio (`S01`, `APP`, `CHAT`,
 `S12`…), o que permite revisar uma parte sem renderizar o vídeo todo.
+
+O roteiro da conversa fica em `MSG`, dentro de `SceneChat.tsx`: cada entrada
+diz em que frame a mensagem chega e em que frame o "digitando…" aparece antes
+dela. As marcas foram tiradas das pausas reais da locução nesse trecho
+(52,2 s · 54,2 s · 56,7 s · 58,9 s).
 
 ## Estrutura
 
@@ -103,8 +107,9 @@ src/
   lib/fonts.ts         Inter embutida em base64 (sem rede)
   components/          Backdrop, Camera, Logo, Text, Ui, Icons, Sfx, SceneShell
   scenes/Scene01..10   uma cena por arte de referência
-  scenes/Scene11..12   cenas próprias do trecho final da copy
+  scenes/Scene12       fecho argumentativo em tipografia
   scenes/SceneApp      walkthrough do aplicativo (cursor + câmera)
+  scenes/SceneChat     a conversa no WhatsApp, mensagem a mensagem
   components/app/      kit de UI do app: AppKit, Screens, Cursor
 public/
   fonts/               Inter (woff2, pesos 400–900)
