@@ -33,9 +33,42 @@ export type LayerAnim = {
   glow?: string;
   /** brilho que atravessa o elemento */
   sweepAt?: number;
-  /** revela de baixo para cima, como uma cortina */
-  wipe?: boolean;
+  /** repete o brilho a cada N frames (luz correndo pelos fios) */
+  sweepLoop?: number;
+  /**
+   * Revela o elemento progressivamente, como se estivesse sendo desenhado.
+   * 'right' varre da esquerda para a direita — é o que faz uma linha de
+   * gráfico "crescer" usando os pixels da própria arte.
+   */
+  wipe?: 'up' | 'down' | 'left' | 'right';
+  wipeDur?: number;
+  /** deslocamento radial na entrada (a partir do centro da tela) */
+  radial?: number;
+  /** deriva contínua com tombo — para elementos soltos, como as cédulas */
+  orbit?: { rx?: number; ry?: number; spin?: number; speed?: number };
+  /** o número sobe para o lugar como um contador assentando */
+  roll?: boolean;
+  rollDur?: number;
+  /** rotação contínua, em graus por frame */
+  spin?: number;
   zIndex?: number;
+};
+
+/** Recorte progressivo na direção pedida — o elemento "se desenha". */
+const wipeInset = (
+  frame: number,
+  delay: number,
+  dur: number,
+  dir: 'up' | 'down' | 'left' | 'right',
+) => {
+  const q = (1 - prog(frame, delay, dur, EASE.inOut)) * 100;
+  return dir === 'right'
+    ? `inset(0 ${q}% 0 0)`
+    : dir === 'left'
+      ? `inset(0 0 0 ${q}%)`
+      : dir === 'up'
+        ? `inset(${q}% 0 0 0)`
+        : `inset(0 0 ${q}% 0)`;
 };
 
 const Layer: React.FC<{
@@ -58,7 +91,14 @@ const Layer: React.FC<{
     phase = 0,
     glow,
     sweepAt,
-    wipe = false,
+    sweepLoop,
+    wipe,
+    wipeDur = 26,
+    radial = 0,
+    orbit,
+    roll = false,
+    rollDur = 22,
+    spin = 0,
     zIndex,
   } = anim;
 
@@ -80,14 +120,39 @@ const Layer: React.FC<{
               : '';
 
   const drift = float ? Math.sin(frame * 0.021 + phase) * float : 0;
+
+  // deriva contínua com tombo (cédulas voando)
+  const sp = orbit?.speed ?? 0.012;
+  const ox = orbit ? Math.sin(frame * sp + phase) * (orbit.rx ?? 20) : 0;
+  const oy = orbit ? Math.cos(frame * sp * 0.78 + phase) * (orbit.ry ?? 14) : 0;
+  const tumble = orbit ? Math.sin(frame * sp * 0.62 + phase) * (orbit.spin ?? 6) : 0;
+
+  // entrada radial: o elemento chega de fora, na direção do centro da tela
+  const cx = geom.x + geom.w / 2;
+  const cy = geom.y + geom.h / 2;
+  const len = Math.hypot(cx - 540, cy - 960) || 1;
+  const rx = radial ? ((cx - 540) / len) * radial * (1 - s) : 0;
+  const ry = radial ? ((cy - 960) / len) * radial * (1 - s) : 0;
   const scaleIn = from === 'scale' ? '' : `scale(${0.965 + s * 0.035})`;
   const glowP = glow ? prog(frame, delay + 14, 26) : 0;
   const pulse = glow ? 0.7 + 0.3 * Math.sin(frame * 0.055 + phase) : 0;
 
+  // rolagem do número: sobe de baixo, esticado e borrado, e assenta
+  const rp = prog(frame, delay, rollDur, EASE.out);
+  const rpf = prog(frame, delay, rollDur * 0.5, EASE.out);
+
   const sweep =
     sweepAt === undefined
       ? null
-      : tween(frame, [sweepAt, sweepAt + 34], [-40, 140], EASE.inOut);
+      : sweepLoop
+        ? // brilho que volta a passar a cada ciclo
+          tween(
+            Math.max(0, frame - sweepAt) % sweepLoop,
+            [0, Math.min(38, sweepLoop)],
+            [-40, 140],
+            EASE.inOut,
+          )
+        : tween(frame, [sweepAt, sweepAt + 34], [-40, 140], EASE.inOut);
 
   return (
     <div
@@ -98,7 +163,8 @@ const Layer: React.FC<{
         width: geom.w,
         height: geom.h,
         opacity: p,
-        transform: `${move} ${scaleIn} translateY(${drift}px) rotate(${(1 - s) * rotate}deg)`,
+        transform: `${move} ${scaleIn} translate3d(${ox + rx}px, ${drift + oy + ry}px, 0) rotate(${(1 - s) * rotate + tumble + frame * spin}deg)`,
+        overflow: roll ? 'hidden' : undefined,
         filter: p < 0.999 && blur ? `blur(${(1 - p) * blur}px)` : undefined,
         zIndex,
         willChange: 'transform, filter',
@@ -122,9 +188,11 @@ const Layer: React.FC<{
           inset: 0,
           width: '100%',
           height: '100%',
-          clipPath: wipe
-            ? `inset(${(1 - prog(frame, delay, 20, EASE.out)) * 100}% 0 0 0)`
+          clipPath: wipe ? wipeInset(frame, delay, wipeDur, wipe) : undefined,
+          transform: roll
+            ? `translateY(${(1 - rp) * 118}%) scaleY(${1 + (1 - rpf) * 0.5})`
             : undefined,
+          filter: roll && rpf < 0.999 ? `blur(${(1 - rpf) * 7}px)` : undefined,
         }}
       />
       {sweep !== null && (
