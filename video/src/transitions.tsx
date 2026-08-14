@@ -8,7 +8,25 @@ import type { TransitionKind } from "./config/scenes";
 
 /* ------------------------------------------------------------------ wipe -- */
 
+/**
+ * ATENÇÃO ao escrever uma presentation nova:
+ *
+ * O Remotion mantém a cena embrulhada na presentation durante TODA a
+ * sequência, não apenas durante o cruzamento — `presentationProgress` fica
+ * travado em 0 antes da transição e em 1 depois dela. Logo, a presentation
+ * precisa deixar a cena 100% visível nos extremos certos:
+ *
+ *   - `entering` em p = 1  -> totalmente visível
+ *   - `exiting`  em p = 0  -> totalmente visível
+ *
+ * Errar isso não quebra o cruzamento (que continua parecendo correto no
+ * meio): apaga o corpo inteiro das cenas vizinhas.
+ */
+
 type WipeProps = { color: string };
+
+/** Inclinação da diagonal, em % da altura. */
+const WIPE_SKEW = 22;
 
 const WipeGreenComp: FC<TransitionPresentationComponentProps<WipeProps>> = ({
   children,
@@ -17,26 +35,30 @@ const WipeGreenComp: FC<TransitionPresentationComponentProps<WipeProps>> = ({
   passedProps,
 }) => {
   const entering = dir === "entering";
-  // A cortina verde cruza a tela na diagonal revelando a cena nova.
-  const edge = entering ? p * 145 - 25 : p * 145 - 25;
-  const clip = entering
-    ? `polygon(0% ${edge + 22}%, 100% ${edge - 22}%, 100% 200%, 0% 200%)`
-    : `polygon(0% -100%, 100% -100%, 100% ${edge - 22}%, 0% ${edge + 22}%)`;
 
+  // A cortina desce: em p = 0 está acima da tela, em p = 1 já passou por ela.
+  const edge = interpolate(p, [0, 1], [-WIPE_SKEW - 4, 100 + WIPE_SKEW + 4]);
+  const top = `polygon(0% -100%, 100% -100%, 100% ${(edge - WIPE_SKEW).toFixed(2)}%, 0% ${(
+    edge + WIPE_SKEW
+  ).toFixed(2)}%)`;
+  const bottom = `polygon(0% ${(edge + WIPE_SKEW).toFixed(2)}%, 100% ${(edge - WIPE_SKEW).toFixed(
+    2,
+  )}%, 100% 200%, 0% 200%)`;
+
+  // A cena nova é revelada acima da diagonal; a antiga permanece abaixo dela.
   return (
-    <AbsoluteFill style={{ clipPath: clip }}>
+    <AbsoluteFill style={{ clipPath: entering ? top : bottom }}>
       {children}
       {entering ? (
-        // faixa verde colada na borda da cortina, acompanhando o avanço dela
+        // faixa verde colada na borda de ataque da cortina
         <AbsoluteFill
           style={{
-            background: `linear-gradient(180deg, ${passedProps.color} ${Math.max(0, edge - 26).toFixed(
-              1,
-            )}%, ${hexA(passedProps.color, 0.55)} ${(edge + 6).toFixed(1)}%, ${hexA(
-              passedProps.color,
-              0,
-            )} ${(edge + 30).toFixed(1)}%)`,
-            opacity: interpolate(p, [0, 0.75, 1], [1, 0.9, 0]),
+            background: `linear-gradient(180deg, ${hexA(passedProps.color, 0)} ${(edge - 36).toFixed(
+              2,
+            )}%, ${hexA(passedProps.color, 0.7)} ${(edge - 8).toFixed(2)}%, ${
+              passedProps.color
+            } ${(edge + 4).toFixed(2)}%)`,
+            opacity: interpolate(p, [0, 0.72, 1], [1, 0.95, 0]),
           }}
         />
       ) : null}

@@ -1,4 +1,4 @@
-import type { CSSProperties, FC } from "react";
+import { useId, type CSSProperties, type FC } from "react";
 import { interpolate } from "remotion";
 import { COLORS, FONT } from "../config/theme";
 import { useSpringIn } from "./anim";
@@ -22,7 +22,9 @@ export const Logo: FC<{
 }> = ({ size = 62, color, delay = 0, showWordmark = true, style, onDark = false }) => {
   const ink = color ?? (onDark ? COLORS.onDark : COLORS.ink);
   const markW = size * 0.98;
-  const gid = onDark ? "logo-grad-dark" : "logo-grad-light";
+  // id único por instância: durante uma transição duas cenas ficam montadas ao
+  // mesmo tempo e ids de <defs> são globais no documento.
+  const gid = `logo-grad-${useId().replace(/:/g, "")}`;
 
   const word = useSpringIn(delay + 5, SPRING.smooth);
 
