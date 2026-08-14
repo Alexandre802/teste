@@ -3,4 +3,5 @@ node_modules/
 out/stills/
 out/qa/
 out/*-master.mp4
+out/*-preview.mp4
 *.log

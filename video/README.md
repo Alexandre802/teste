@@ -137,6 +137,17 @@ síntese e rode `python3 tools/make_sfx.py`.
 Para regerar:
 
 ```bash
-npm run build     # master CRF 17 em out/
-# depois transcodifique para entrega, se quiser um arquivo menor
+npm run build     # master CRF 17 em out/monttra-reel.mp4
 ```
+
+Para uma versão leve (~20 MB, útil para WhatsApp ou revisão rápida):
+
+```bash
+npx remotion ffmpeg -i out/monttra-reel.mp4 \
+  -c:v libx264 -preset slow -b:v 2100k -maxrate 2600k -bufsize 4200k \
+  -profile:v main -pix_fmt yuv420p -c:a aac -b:a 128k -movflags +faststart \
+  -y out/monttra-reel-preview.mp4
+```
+
+Os arquivos derivados (`out/*-preview.mp4`, `out/*-master.mp4`, quadros de
+inspeção) ficam fora do versionamento — só o entregável final é versionado.
