@@ -68,6 +68,7 @@ src/
     Charts.tsx         linhas que se desenham, barras 3D, seta luminosa
     Icons.tsx          ícones em SVG
     Fx.tsx             flash, glitch, speed lines, faíscas, corte vermelho
+    Plate.tsx          camadas recortadas das artes + fundo (plate)
     Sfx.tsx            biblioteca e disparo dos efeitos sonoros
   scenes/              S01…S14
 public/
@@ -78,47 +79,63 @@ public/
 tools/
   make_sfx.py          gera public/sfx/
   extract_assets.py    gera public/cutouts/
+  decompose.py         recorta as artes em plate + camadas (public/plates/)
 ```
 
 ---
 
 ## As 14 cenas
 
-A ordem alterna deliberadamente **texto → balões/gráficos → texto → …**,
-para o vídeo nunca ficar dois blocos seguidos no mesmo registro.
+Cada cena está ancorada em uma frase da narração (`../referencias/audio`,
+67,0s). As fronteiras vieram das pausas reais do áudio, medidas por análise
+de envelope — por isso as cenas de texto são curtas e as de interface são
+longas: é o próprio roteiro que dita o ritmo.
 
-| # | Tipo | Cena | Referência |
-| --- | --- | --- | --- |
-| 1 | texto | "Método não dá resultado. Mas sabe por quê?" | `55933092…` |
-| 2 | gráfico | Receitas × Despesas × Resultado | `5F0A4926…` |
-| 3 | texto | "Não é necessariamente por causa do método." | `5B1C2A21…` |
-| 4 | gráfico | "Acompanhe por período" | `5E1A6311…` |
-| 5 | texto | "Você até pode estar fazendo dinheiro..." | `13D31795…` |
-| 6 | gráfico | "Tudo em um só lugar" | `E58E53D7…` |
-| 7 | texto | "Mas não consegue enxergar…" | `9D589EAF…` |
-| 8 | gráfico | Mockup do app — "Veja o lucro real" | `133BCCC2…` |
-| 9 | texto | "Quanto entrou? saiu? sobrou?" | `FD6718AA…` |
-| 10 | gráfico | "Resultado da operação" (surebets) | `E0DC9E01…` |
-| 11 | texto | "Quanto vai fechar na próxima semana?" | `DD7785A5…` |
-| 12 | gráfico | "Previsão da semana" (IA, calendário, meta) | `934F3467…` |
-| 13 | texto | "Foi pensando nisso que nasceu a Monttra" | `81318C44…` |
-| 14 | CTA | "Teste grátis por 3 dias" | — |
+| # | Tipo | Início | Dur | Cena | Arte |
+| --- | --- | --- | --- | --- | --- |
+| 1 | texto | 0,00 | 2,63 | "Método não dá resultado. Mas sabe por quê?" | `55933092…` |
+| 2 | texto | 2,63 | 2,39 | "Não é necessariamente por causa do método." | `5B1C2A21…` |
+| 3 | interface | 5,02 | 8,97 | Receitas × Despesas × Resultado | `5F0A4926…` |
+| 4 | texto | 13,99 | 1,77 | "Você até pode estar fazendo dinheiro..." | `13D31795…` |
+| 5 | texto | 15,76 | 3,24 | "Mas não consegue enxergar…" | `9D589EAF…` |
+| 6 | texto | 19,00 | 2,56 | "Quanto entrou? saiu? sobrou?" | `FD6718AA…` |
+| 7 | interface | 21,56 | 4,54 | "Tudo em um só lugar" | `E58E53D7…` |
+| 8 | texto | 26,10 | 4,70 | "Quanto vai fechar na próxima semana?" | `DD7785A5…` |
+| 9 | texto | 30,80 | 2,39 | "Foi pensando nisso que nasceu a Monttra" | `81318C44…` |
+| 10 | interface | 33,19 | 7,41 | Mockup do app — "Veja o lucro real" | `133BCCC2…` |
+| 11 | interface | 40,60 | 5,82 | "Acompanhe por período" | `5E1A6311…` |
+| 12 | interface | 46,42 | 7,26 | "Resultado da operação" (surebets) | `E0DC9E01…` |
+| 13 | interface | 53,68 | 7,06 | "Previsão da semana" (IA, calendário, meta) | `934F3467…` |
+| 14 | CTA | 60,74 | 6,26 | "Teste grátis por 3 dias" | — |
 
 ---
 
-## Sobre a reconstrução
+## Como as cenas de interface são montadas
 
-As artes de referência têm 941×1672 — abaixo de Full HD. Em vez de fazer upscale
-das imagens, cada cena foi **redesenhada em vetor/DOM na resolução nativa de
-1080×1920**: tipografia, cards, chips, gráficos, calendário, números, ícones,
-conectores e barras 3D são elementos independentes, animáveis um a um. O
-resultado é nítido de verdade, não interpolado.
+As seis telas de produto usam **os pixels das artes originais**, não uma
+reconstrução. `tools/decompose.py` recorta cada elemento (cards, chips, abas,
+calendário, aparelho…) da arte e gera o *plate*: a mesma arte com aqueles
+elementos removidos, com o buraco preenchido por extensão das bordas.
 
-Duas exceções, recortadas das artes em 2× e usadas como camadas: o robô do
-"Assistente IA" e a malha de pontos do rodapé da cena escura (`public/cutouts/`).
+No Remotion o plate entra como fundo e cada recorte volta para a sua posição
+exata, animado de forma independente. Parado, o quadro é idêntico à arte —
+verificável recompondo plate + camadas e comparando com o original.
 
-Posições, proporções e cores foram medidas diretamente sobre as artes originais
-para preservar o layout e a identidade.
+Dois cuidados que o script resolve:
+
+- o recorte leva junto a **sombra projetada** de cada elemento (margem de 30px
+  com máscara dilatada e suavizada); sem isso a sombra ficava no plate e
+  aparecia como um retângulo claro atrás do elemento;
+- o plate **não pode ter movimento próprio** — qualquer transformação nele
+  desalinharia as camadas. O avanço de câmera fica em `<Scene>`, que move
+  fundo e camadas juntos, e é bem discreto (2%) para não cortar as bordas
+  da arte.
+
+Tudo é reamostrado em 2× com LANCZOS, então o render em 1080×1920 reduz a
+partir de 1882×3344 em vez de ampliar os 941×1672 originais.
+
+As cenas tipográficas continuam sendo vetor/DOM na resolução nativa, com
+posições, proporções e cores medidas sobre as artes.
 
 ## Animação
 
@@ -151,8 +168,8 @@ síntese e rode `python3 tools/make_sfx.py`.
 
 ## Entrega
 
-`out/monttra-reel.mp4` — 1080×1920, 60fps, 68,6s, H.264 High (CRF 20, faststart),
-áudio AAC 192kbps estéreo a 48kHz com ~1,6 dB de headroom. ~40 MB.
+`out/monttra-reel.mp4` — 1080×1920, 60fps, 67,0s, H.264 High (CRF 20, faststart),
+áudio AAC 192kbps estéreo a 48kHz com ~1,6 dB de headroom. ~33 MB.
 
 Para regerar:
 

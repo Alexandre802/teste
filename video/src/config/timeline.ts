@@ -9,45 +9,49 @@ export const FPS = 60;
 export const WIDTH = 1080;
 export const HEIGHT = 1920;
 
-/** Duracao de cada cena, em segundos. */
+/**
+ * Duracao de cada cena, em segundos.
+ *
+ * Os valores nao sao arbitrarios: cada cena esta ancorada em uma frase da
+ * narracao (referencias/audio, 67,0s). As fronteiras foram medidas nas
+ * pausas reais do audio, entao as cenas de texto ficam curtas (a frase e
+ * curta) e as cenas de interface ficam longas (a descricao e longa) — o
+ * ritmo rapido/devagar sai do proprio roteiro.
+ */
 export const SCENE_SECONDS = {
-  s01Hook: 4.6, // T — "Metodo nao da resultado. Mas sabe por que?"
-  s03Caos: 5.2, // G — ganhos e gastos espalhados
-  s02Nao: 4.0, // T — "Nao e necessariamente por causa do metodo."
-  s10Periodo: 5.4, // G — "Acompanhe por periodo"
-  s04Dinheiro: 3.6, // T — "Voce ate pode estar fazendo dinheiro..."
-  s11TudoUm: 5.2, // G — "Tudo em um so lugar"
-  s05Enxergar: 4.4, // T — "mas nao consegue enxergar..."
-  s09Phone: 5.8, // G — mockup "Veja o lucro real"
-  s06Quanto: 4.6, // T — "Quanto entrou? saiu? sobrou?"
-  s12Operacao: 5.6, // G — "Resultado da operacao"
-  s07Prever: 4.4, // T — "Quanto vai fechar na proxima semana?"
-  s13Previsao: 5.8, // G — "Previsao da semana"
-  s08Nasceu: 4.4, // T — "Foi pensando nisso que nasceu a Monttra"
-  s14Cta: 5.6, // CTA final
+  s01Hook: 2.63, //  0.00 "Metodo nao da resultado. Mas sabe por que?"
+  s02Nao: 2.39, //  2.63 "Nao e necessariamente por causa do metodo."
+  s03Caos: 8.97, //  5.02 "...ganhos e gastos espalhados em anotacoes, planilhas..."
+  s04Dinheiro: 1.77, // 13.99 "voce ate pode estar fazendo dinheiro..."
+  s05Enxergar: 3.24, // 15.76 "mas nao consegue enxergar quanto esta ganhando."
+  s06Quanto: 2.56, // 19.00 "quanto entrou, quanto saiu..."
+  s11TudoUm: 4.54, // 21.56 "...e quanto realmente sobrou pra voce esse mes?"
+  s07Prever: 4.70, // 26.10 "E mais importante: quanto vai fechar na proxima semana?"
+  s08Nasceu: 2.39, // 30.80 "Foi pensando nisso que nasceu a Monttra."
+  s09Phone: 7.41, // 33.19 "Uma plataforma criada para quem trabalha com metodos..."
+  s10Periodo: 5.82, // 40.60 "Voce acompanha tudo que entrou e saiu por dia, semana..."
+  s12Operacao: 7.26, // 46.42 "Registra suas surebets em uma calculadora inteligente..."
+  s13Previsao: 7.06, // 53.68 "E ainda define metas para saber onde quer chegar."
+  s14Cta: 6.26, // 60.74 "...parar de trabalhar no escuro? Teste gratis por 3 dias."
 } as const;
 
 export type SceneId = keyof typeof SCENE_SECONDS;
 
-/**
- * Alternancia deliberada: cena de texto -> cena de baloes/graficos ->
- * cena de texto -> ... Cada bloco de argumento e seguido pela tela do
- * produto que o ilustra.
- */
+/** A ordem segue a narracao; cada texto e seguido da tela que o ilustra. */
 export const SCENE_ORDER: SceneId[] = [
   's01Hook',
-  's03Caos',
   's02Nao',
-  's10Periodo',
+  's03Caos',
   's04Dinheiro',
-  's11TudoUm',
   's05Enxergar',
-  's09Phone',
   's06Quanto',
-  's12Operacao',
+  's11TudoUm',
   's07Prever',
-  's13Previsao',
   's08Nasceu',
+  's09Phone',
+  's10Periodo',
+  's12Operacao',
+  's13Previsao',
   's14Cta',
 ];
 
