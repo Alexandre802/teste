@@ -1,0 +1,7 @@
+node_modules/
+.remotion/
+
+# Stills de conferência gerados durante o desenvolvimento
+out/*.png
+
+# O MP4 final é versionado (out/monttra-reel.mp4)
