@@ -27,10 +27,16 @@ const WipeGreenComp: FC<TransitionPresentationComponentProps<WipeProps>> = ({
     <AbsoluteFill style={{ clipPath: clip }}>
       {children}
       {entering ? (
+        // faixa verde colada na borda da cortina, acompanhando o avanço dela
         <AbsoluteFill
           style={{
-            background: `linear-gradient(180deg, ${passedProps.color} 0%, ${hexA(passedProps.color, 0)} 26%)`,
-            opacity: interpolate(p, [0, 0.55, 1], [1, 0.7, 0]),
+            background: `linear-gradient(180deg, ${passedProps.color} ${Math.max(0, edge - 26).toFixed(
+              1,
+            )}%, ${hexA(passedProps.color, 0.55)} ${(edge + 6).toFixed(1)}%, ${hexA(
+              passedProps.color,
+              0,
+            )} ${(edge + 30).toFixed(1)}%)`,
+            opacity: interpolate(p, [0, 0.75, 1], [1, 0.9, 0]),
           }}
         />
       ) : null}

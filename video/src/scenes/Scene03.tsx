@@ -20,7 +20,7 @@ export const Scene03: FC<{ cfg: SceneConfig }> = ({ cfg }) => (
         x={116}
         y={520}
         w={846}
-        enter={{ delay: 10, y: 70, scale: 0.9, blur: 10, config: SPRING.pop }}
+        enter={{ delay: 1, y: 70, scale: 0.9, blur: 10, config: SPRING.pop }}
       >
         <Box bg={COLORS.pale} color={COLORS.greenInk} size={112} pad="46px 40px">
           {S.lines[0].text}

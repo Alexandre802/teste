@@ -62,12 +62,12 @@ const RowText: FC<{ children: ReactNode; size?: number; color?: string; weight?:
 export const Scene02: FC<{ cfg: SceneConfig }> = ({ cfg }) => (
   <SceneShell cfg={cfg}>
     <AbsoluteFill>
-      <Layer x={78} y={92} enter={{ delay: 4, x: -70 }}>
-        <Logo size={62} delay={6} />
+      <Layer x={78} y={92} enter={{ delay: 0, x: -70 }}>
+        <Logo size={62} delay={1} />
       </Layer>
 
       <Layer x={88} y={278} w={620} enter={{ fade: false }}>
-        <Headline lines={S.headline} size={108} delay={8} step={10} lineHeight={1.02} />
+        <Headline lines={S.headline} size={108} delay={1} step={10} lineHeight={1.02} />
       </Layer>
 
       <Layer x={92} y={640} enter={{ delay: 46, y: 26 }}>

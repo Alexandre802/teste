@@ -22,7 +22,7 @@ export const Scene07: FC<{ cfg: SceneConfig }> = ({ cfg }) => (
   <SceneShell cfg={cfg}>
     <AbsoluteFill>
       <Layer x={0} y={214} w={1080} enter={{ fade: false }}>
-        <Headline lines={S.headline} size={126} delay={8} step={10} align="center" lineHeight={1.0} />
+        <Headline lines={S.headline} size={126} delay={1} step={10} align="center" lineHeight={1.0} />
       </Layer>
 
       <Layer x={0} y={604} w={1080} enter={{ delay: 44, y: 24 }}>

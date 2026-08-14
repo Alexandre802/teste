@@ -21,12 +21,12 @@ const BANK_SPARK = [5, 4, 6, 5, 7, 6.4, 8, 7, 9, 8.2, 10, 9.2, 11.4, 13.6];
 export const Scene10: FC<{ cfg: SceneConfig }> = ({ cfg }) => (
   <SceneShell cfg={cfg} dark>
     <AbsoluteFill>
-      <Layer x={0} y={86} w={1080} enter={{ delay: 14, y: -40, scale: 0.9, config: SPRING.pop }}>
-        <Logo size={62} delay={16} onDark style={{ justifyContent: "center" }} />
+      <Layer x={0} y={86} w={1080} enter={{ delay: 0, y: -40, scale: 0.9, config: SPRING.pop }}>
+        <Logo size={62} delay={2} onDark style={{ justifyContent: "center" }} />
       </Layer>
 
       <Layer x={0} y={182} w={1080} enter={{ fade: false }}>
-        <Headline lines={S.headline} size={126} delay={24} step={11} align="center" lineHeight={0.99} />
+        <Headline lines={S.headline} size={126} delay={6} step={11} align="center" lineHeight={0.99} />
       </Layer>
 
       <Layer x={0} y={588} w={1080} enter={{ delay: 62, y: 30 }}>

@@ -20,8 +20,8 @@ const FUTURE = [13, 12.4, 11.2, 11.8, 10.4, 9.6, 10.2];
 export const Scene04: FC<{ cfg: SceneConfig }> = ({ cfg }) => (
   <SceneShell cfg={cfg}>
     <AbsoluteFill>
-      <Layer x={78} y={92} enter={{ delay: 4, x: -70 }}>
-        <Logo size={64} delay={6} />
+      <Layer x={78} y={92} enter={{ delay: 0, x: -70 }}>
+        <Logo size={64} delay={1} />
       </Layer>
 
       {/* card Mês atual */}
@@ -51,7 +51,7 @@ export const Scene04: FC<{ cfg: SceneConfig }> = ({ cfg }) => (
       </Layer>
 
       <Layer x={186} y={452} w={800} enter={{ fade: false }}>
-        <Headline lines={S.headline} size={136} delay={14} step={11} lineHeight={1.0} />
+        <Headline lines={S.headline} size={136} delay={2} step={11} lineHeight={1.0} />
       </Layer>
 
       <Layer x={190} y={892} enter={{ delay: 50, y: 30 }}>

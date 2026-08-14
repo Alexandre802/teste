@@ -20,12 +20,12 @@ const DRAW_LEN = 92;
 export const Scene05: FC<{ cfg: SceneConfig }> = ({ cfg }) => (
   <SceneShell cfg={cfg} dark>
     <AbsoluteFill>
-      <Layer x={72} y={84} enter={{ delay: 4, x: -70 }}>
-        <Logo size={60} delay={6} onDark />
+      <Layer x={72} y={84} enter={{ delay: 0, x: -70 }}>
+        <Logo size={60} delay={1} onDark />
       </Layer>
 
       {/* blocos da frase */}
-      <Layer x={140} y={268} w={800} enter={{ delay: 18, x: -110, scale: 0.92, blur: 8, config: SPRING.pop }}>
+      <Layer x={140} y={268} w={800} enter={{ delay: 2, x: -110, scale: 0.92, blur: 8, config: SPRING.pop }}>
         <PhraseBox size={104}>{S.lines[0]}</PhraseBox>
       </Layer>
       <Layer x={228} y={418} w={716} enter={{ delay: 32, x: 120, scale: 0.92, blur: 8, config: SPRING.pop }}>

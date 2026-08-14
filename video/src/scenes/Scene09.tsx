@@ -26,12 +26,12 @@ const BALANCE = [4, 3.4, 5, 4.4, 6.2, 5.4, 7, 6.2, 8, 7, 9, 8.2, 10.4, 12];
 export const Scene09: FC<{ cfg: SceneConfig }> = ({ cfg }) => (
   <SceneShell cfg={cfg}>
     <AbsoluteFill>
-      <Layer x={70} y={92} enter={{ delay: 2, x: -60 }}>
-        <Logo size={56} delay={4} />
+      <Layer x={70} y={92} enter={{ delay: 0, x: -60 }}>
+        <Logo size={56} delay={0} />
       </Layer>
 
       <Layer x={0} y={206} w={1080} enter={{ fade: false }}>
-        <Headline lines={S.headline} size={106} delay={6} step={10} align="center" lineHeight={1.0} />
+        <Headline lines={S.headline} size={106} delay={0} step={10} align="center" lineHeight={1.0} />
       </Layer>
 
       <Layer x={0} y={560} w={1080} enter={{ delay: 36, y: 22 }}>
