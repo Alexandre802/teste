@@ -1,27 +1,26 @@
 import React from 'react';
 import { AbsoluteFill, useCurrentFrame } from 'remotion';
 import { BgLight, MiniChart } from '../components/Bg';
-import { LightSweep } from '../components/Fx';
+import { Flash, LightSweep } from '../components/Fx';
+import { KineticBlock } from '../components/Kinetic';
 import { LogoHeader } from '../components/Logo';
 import { Scene, Stack } from '../components/Scene';
 import { SfxTrack } from '../components/Sfx';
-import { Line } from '../components/Type';
 import { tween } from '../components/anim';
 import { COLORS, FONTS } from '../config/theme';
 
 /**
- * Cena 02 — "Não é necessariamente por causa do método."
- * Referência: 5B1C2A21-49F1-4A46-B18C-12B2F3DB636B.png (display condensado)
+ * Cena 02 (texto) — "Não é necessariamente por causa do método."
+ * Referência: 5B1C2A21-49F1-4A46-B18C-12B2F3DB636B.png
  */
 export const S02Nao: React.FC<{ total: number }> = ({ total }) => {
   const frame = useCurrentFrame();
-  const A = 118; // Anton — display condensado
+  const A = 118;
 
   return (
     <AbsoluteFill>
       <BgLight tone="warm" charts={false} />
 
-      {/* gráficos decorativos das laterais, como na arte */}
       <MiniChart
         points={[
           [0, 120],
@@ -33,7 +32,7 @@ export const S02Nao: React.FC<{ total: number }> = ({ total }) => {
         height={130}
         style={{ left: -14, top: 980 }}
         color={COLORS.greenPale}
-        progress={tween(frame, [6, 56], [0, 1])}
+        progress={tween(frame, [4, 44], [0, 1])}
       />
       <MiniChart
         points={[
@@ -46,74 +45,56 @@ export const S02Nao: React.FC<{ total: number }> = ({ total }) => {
         height={140}
         style={{ right: 40, top: 790 }}
         color={COLORS.greenPale}
-        progress={tween(frame, [14, 64], [0, 1])}
+        progress={tween(frame, [10, 52], [0, 1])}
       />
 
-      <Scene total={total} zoom={0.055} driftY={-14}>
+      <Scene total={total} zoom={0.085} driftY={-18}>
         <LogoHeader delay={0} size={78} />
 
         <Stack top={700}>
-          <Line
-            size={A * 0.86}
-            tone="ink"
-            family={FONTS.display}
-            weight={400}
-            tracking="-0.005em"
-            lineHeight={0.9}
-            delay={6}
-          >
-            Não é
-          </Line>
-          <Line
+          <KineticBlock
             size={A}
-            tone="teal"
             family={FONTS.display}
             weight={400}
-            tracking="-0.008em"
+            tracking="-0.006em"
             lineHeight={0.9}
-            delay={14}
-          >
-            necessariamente
-          </Line>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 22 }}>
-            <Line
-              size={A}
-              tone="teal"
-              family={FONTS.display}
-              weight={400}
-              tracking="-0.008em"
-              lineHeight={0.9}
-              delay={23}
-            >
-              por causa
-            </Line>
-            <Line
-              size={A * 0.66}
-              tone="ink"
-              family={FONTS.display}
-              weight={400}
-              tracking="-0.005em"
-              lineHeight={0.9}
-              delay={31}
-            >
-              do método.
-            </Line>
-          </div>
+            step={5}
+            dur={13}
+            delay={3}
+            rise={0.5}
+            lines={[
+              [
+                { t: 'Não', tone: 'ink', scale: 0.86 },
+                { t: 'é', tone: 'ink', scale: 0.86 },
+              ],
+              [{ t: 'necessariamente', tone: 'teal' }],
+              [
+                { t: 'por', tone: 'teal' },
+                { t: 'causa', tone: 'teal' },
+                { t: 'do', tone: 'ink', scale: 0.66 },
+                { t: 'método.', tone: 'ink', scale: 0.66 },
+              ],
+            ]}
+          />
         </Stack>
       </Scene>
 
-      <LightSweep delay={40} dur={38} />
+      <LightSweep delay={26} dur={32} />
+      <Flash at={0} dur={6} max={0.32} />
 
       <SfxTrack
         cues={[
-          { name: 'whooshTransition', at: 0, volume: 0.75 },
-          { name: 'swipeFast', at: 6 },
-          { name: 'swipeFast', at: 14, rate: 0.92 },
-          { name: 'swipeFast', at: 23, rate: 1.1 },
-          { name: 'popUi', at: 31 },
-          { name: 'subBoom', at: 14, volume: 0.55 },
-          { name: 'tickMicro', at: 46 },
-          { name: 'tickMicro', at: 52, rate: 1.2 },
+          { name: 'whooshTransition', at: 0, volume: 0.78 },
+          { name: 'swipeFast', at: 3 },
+          { name: 'popUi', at: 8 },
+          { name: 'whooshShort', at: 13, rate: 0.94 },
+          { name: 'subBoom', at: 13, volume: 0.55 },
+          { name: 'popUi', at: 18, rate: 1.06 },
+          { name: 'popUi', at: 23, rate: 1.12 },
+          { name: 'tickMicro', at: 28 },
+          { name: 'tickMicro', at: 33, rate: 1.2 },
+          { name: 'impactHit', at: 24, volume: 0.7 },
+          { name: 'sparkleShine', at: 40, volume: 0.6 },
         ]}
       />
     </AbsoluteFill>

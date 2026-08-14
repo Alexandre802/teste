@@ -1,21 +1,21 @@
 import React from 'react';
 import { AbsoluteFill, useCurrentFrame } from 'remotion';
 import { BgLight, MiniChart } from '../components/Bg';
-import { LightSweep } from '../components/Fx';
+import { Flash, LightSweep } from '../components/Fx';
+import { KineticBlock } from '../components/Kinetic';
 import { LogoHeader } from '../components/Logo';
 import { Scene, Stack } from '../components/Scene';
 import { SfxTrack } from '../components/Sfx';
-import { Line } from '../components/Type';
 import { tween } from '../components/anim';
-import { COLORS, FONTS } from '../config/theme';
+import { COLORS } from '../config/theme';
 
 /**
- * Cena 07 — "E mais importante: quanto vai fechar na próxima semana?"
+ * Cena 07 (texto) — "E mais importante: quanto vai fechar na próxima semana?"
  * Referência: DD7785A5-981F-4EB7-A382-9925D6A4CD70.png
  */
 export const S07Prever: React.FC<{ total: number }> = ({ total }) => {
   const frame = useCurrentFrame();
-  const H = 118;
+  const H = 138;
 
   return (
     <AbsoluteFill>
@@ -31,11 +31,11 @@ export const S07Prever: React.FC<{ total: number }> = ({ total }) => {
         ]}
         width={250}
         height={84}
-        style={{ right: 150, top: 786 }}
+        style={{ right: 44, top: 690 }}
         color={COLORS.greenDeep}
         strokeWidth={3.4}
         nodes={false}
-        progress={tween(frame, [22, 62], [0, 1])}
+        progress={tween(frame, [16, 52], [0, 1])}
       />
       <MiniChart
         points={[
@@ -50,60 +50,79 @@ export const S07Prever: React.FC<{ total: number }> = ({ total }) => {
         color={COLORS.greenDeep}
         strokeWidth={3.4}
         nodes={false}
-        progress={tween(frame, [46, 82], [0, 1])}
+        progress={tween(frame, [44, 78], [0, 1])}
       />
 
-      <Scene total={total} zoom={0.05} driftY={-20}>
+      <Scene total={total} zoom={0.08} driftY={-24}>
         <LogoHeader delay={0} size={78} />
 
-        <Stack top={560}>
-          <Line size={H} tone="ink" weight={800} tracking="-0.04em" delay={4}>
-            E mais
-          </Line>
-          <Line size={H} tone="green" weight={800} tracking="-0.04em" delay={11}>
-            importante:
-          </Line>
-
-          <div style={{ height: 26 }} />
-
-          <Line
-            size={H * 0.70}
-            tone="ink"
-            weight={800}
-            tracking="-0.035em"
-            delay={26}
-          >
-            Quanto vai fechar
-          </Line>
+        <Stack top={496}>
+          <KineticBlock
+            size={H}
+            step={5}
+            dur={13}
+            delay={2}
+            rise={0.46}
+            lines={[
+              [{ t: 'E', tone: 'ink' }],
+              [{ t: 'mais', tone: 'green' }],
+              [{ t: 'importante:', tone: 'green' }],
+            ]}
+          />
 
           <div style={{ height: 22 }} />
 
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 26 }}>
-            <Line size={H * 0.86} tone="ink" weight={800} tracking="-0.04em" delay={38}>
-              na
-            </Line>
-            <Line size={H} tone="green" weight={800} tracking="-0.04em" delay={44}>
-              próxima
-            </Line>
-          </div>
-          <Line size={H} tone="green" weight={800} tracking="-0.04em" delay={52}>
-            semana?
-          </Line>
+          <KineticBlock
+            size={H}
+            step={5}
+            dur={13}
+            delay={26}
+            rise={0.46}
+            lines={[
+              [
+                { t: 'Quanto', tone: 'ink', scale: 0.70 },
+                { t: 'vai', tone: 'ink', scale: 0.70 },
+                { t: 'fechar', tone: 'ink', scale: 0.70 },
+              ],
+            ]}
+          />
+
+          <div style={{ height: 18 }} />
+
+          <KineticBlock
+            size={H}
+            step={5}
+            dur={13}
+            delay={42}
+            rise={0.46}
+            lines={[
+              [
+                { t: 'na', tone: 'ink' },
+                { t: 'próxima', tone: 'green' },
+              ],
+              [{ t: 'semana?', tone: 'green' }],
+            ]}
+          />
         </Stack>
       </Scene>
 
-      <LightSweep delay={58} dur={38} />
+      <LightSweep delay={54} dur={34} />
+      <Flash at={0} dur={6} max={0.3} />
 
       <SfxTrack
         cues={[
-          { name: 'whooshTransition', at: 0, volume: 0.72 },
-          { name: 'whooshShort', at: 4 },
-          { name: 'popUi', at: 11 },
+          { name: 'whooshTransition', at: 0, volume: 0.75 },
+          { name: 'whooshShort', at: 2 },
+          { name: 'popUi', at: 7 },
+          { name: 'popUi', at: 12, rate: 1.08 },
+          { name: 'impactHit', at: 12, volume: 0.7 },
           { name: 'swipeFast', at: 26 },
-          { name: 'popSoft', at: 38 },
-          { name: 'whooshShort', at: 44, rate: 1.08 },
-          { name: 'impactHit', at: 52, volume: 0.85 },
-          { name: 'notificationPop', at: 62, volume: 0.7 },
+          { name: 'tickMicro', at: 31 },
+          { name: 'tickMicro', at: 36, rate: 1.12 },
+          { name: 'whooshShort', at: 42, rate: 1.05 },
+          { name: 'popUi', at: 47 },
+          { name: 'bassHit', at: 52, volume: 0.72 },
+          { name: 'notificationPop', at: 60, volume: 0.7 },
         ]}
       />
     </AbsoluteFill>

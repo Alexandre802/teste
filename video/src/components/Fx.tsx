@@ -278,6 +278,68 @@ export const RedSlash: React.FC<{
   );
 };
 
+/**
+ * Formas decorativas de 4 pontas que giram e pulsam ao fundo — mantêm a
+ * tela viva mesmo enquanto o texto segura.
+ */
+const SPARK_D =
+  'M 50 0 C 56 30, 70 44, 100 50 C 70 56, 56 70, 50 100 C 44 70, 30 56, 0 50 C 30 44, 44 30, 50 0 Z';
+
+export const Bursts: React.FC<{
+  count?: number;
+  color?: string;
+  opacity?: number;
+  seed?: string;
+  min?: number;
+  max?: number;
+  blur?: number;
+  delay?: number;
+}> = ({
+  count = 5,
+  color = COLORS.greenPale,
+  opacity = 1,
+  seed = 'b',
+  min = 190,
+  max = 460,
+  blur = 0,
+  delay = 0,
+}) => {
+  const frame = useCurrentFrame();
+  return (
+    <AbsoluteFill style={{ pointerEvents: 'none', opacity }}>
+      {Array.from({ length: count }).map((_, i) => {
+        const x = rndRange(`${seed}x${i}`, -160, 1080);
+        const y = rndRange(`${seed}y${i}`, -140, 1920);
+        const s = rndRange(`${seed}s${i}`, min, max);
+        const rot = rndRange(`${seed}r${i}`, 0, 360);
+        const spin = rndRange(`${seed}v${i}`, -0.16, 0.16);
+        const d = delay + i * 5;
+        const p = prog(frame, d, 34, EASE.out);
+        const pulse = 1 + Math.sin(frame * 0.026 + i * 1.7) * 0.16;
+        const dx = Math.sin(frame * 0.011 + i) * 34;
+        const dy = Math.cos(frame * 0.009 + i * 2) * 28;
+        return (
+          <svg
+            key={i}
+            width={s}
+            height={s}
+            viewBox="0 0 100 100"
+            style={{
+              position: 'absolute',
+              left: x + dx,
+              top: y + dy,
+              transform: `rotate(${rot + frame * spin}deg) scale(${p * pulse})`,
+              filter: blur ? `blur(${blur}px)` : undefined,
+            }}
+          >
+            <path d={SPARK_D} fill={color} />
+          </svg>
+        );
+      })}
+    </AbsoluteFill>
+  );
+};
+
 /** Cortina que varre a tela — transicao entre blocos. */
 export const Wipe: React.FC<{
   at: number;

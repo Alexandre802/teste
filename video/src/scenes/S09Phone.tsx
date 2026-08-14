@@ -81,10 +81,10 @@ export const S09Phone: React.FC<{ total: number }> = ({ total }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const phoneS = springAt(frame, fps, 8, SPRINGS.heavy);
-  const greet = typewriter(frame, 34, COPY.s09.greeting, 22, fps);
-  const chipL = springAt(frame, fps, 84, SPRINGS.pop);
-  const chipR = springAt(frame, fps, 96, SPRINGS.pop);
+  const phoneS = springAt(frame, fps, 4, SPRINGS.heavy);
+  const greet = typewriter(frame, 20, COPY.s09.greeting, 34, fps);
+  const chipL = springAt(frame, fps, 54, SPRINGS.pop);
+  const chipR = springAt(frame, fps, 62, SPRINGS.pop);
 
   return (
     <AbsoluteFill>
@@ -103,7 +103,7 @@ export const S09Phone: React.FC<{ total: number }> = ({ total }) => {
           </filter>
         </defs>
         {[0, 1, 2].map((i) => {
-          const p = prog(frame, 16 + i * 6, 70, EASE.inOut);
+          const p = prog(frame, 8 + i * 4, 48, EASE.inOut);
           const L = 3400;
           return (
             <path
@@ -137,8 +137,8 @@ export const S09Phone: React.FC<{ total: number }> = ({ total }) => {
             fontSize: 60,
             letterSpacing: '-0.02em',
             color: COLORS.inkSoft,
-            opacity: prog(frame, 4, 20),
-            transform: `translateY(${(1 - prog(frame, 4, 26)) * 26}px)`,
+            opacity: prog(frame, 2, 14),
+            transform: `translateY(${(1 - prog(frame, 2, 20)) * 26}px)`,
           }}
         >
           {COPY.s09.title[0]}
@@ -159,7 +159,7 @@ export const S09Phone: React.FC<{ total: number }> = ({ total }) => {
             background: 'linear-gradient(150deg, #1B2C2A 0%, #0B1817 40%, #233B37 100%)',
             padding: 9,
             boxShadow: '0 50px 110px rgba(9,32,27,0.30), 0 12px 32px rgba(9,32,27,0.16)',
-            opacity: prog(frame, 8, 14),
+            opacity: prog(frame, 4, 12),
             transform: `translateY(${(1 - phoneS) * 140}px) scale(${0.92 + phoneS * 0.08}) rotate(${(1 - phoneS) * 1.6}deg)`,
           }}
         >
@@ -196,7 +196,7 @@ export const S09Phone: React.FC<{ total: number }> = ({ total }) => {
                 top: 74,
                 display: 'flex',
                 justifyContent: 'space-between',
-                opacity: prog(frame, 26, 14),
+                opacity: prog(frame, 16, 12),
               }}
             >
               <Menu size={30} color={COLORS.ink} strokeWidth={2.4} />
@@ -225,7 +225,7 @@ export const S09Phone: React.FC<{ total: number }> = ({ total }) => {
               size={21}
               weight={400}
               color={COLORS.grayLight}
-              delay={54}
+              delay={34}
               style={{ position: 'absolute', left: PAD, top: 178 }}
             >
               {COPY.s09.greetingSub}
@@ -241,23 +241,23 @@ export const S09Phone: React.FC<{ total: number }> = ({ total }) => {
                 height: 128,
                 borderRadius: 26,
                 background: 'linear-gradient(120deg, #DFF3EA 0%, #C9EEDD 100%)',
-                opacity: prog(frame, 58, 14),
-                transform: `scale(${0.94 + springAt(frame, fps, 58, SPRINGS.snappy) * 0.06})`,
+                opacity: prog(frame, 36, 12),
+                transform: `scale(${0.94 + springAt(frame, fps, 36, SPRINGS.snappy) * 0.06})`,
               }}
             >
               <UiText
                 size={21}
                 weight={500}
                 color={COLORS.inkSoft}
-                delay={62}
+                delay={38}
                 style={{ position: 'absolute', left: 22, top: 18 }}
               >
                 {COPY.s09.totalLabel}
               </UiText>
               <Counter
                 to={COPY.s09.total}
-                delay={64}
-                dur={46}
+                delay={40}
+                dur={30}
                 prefix="R$ "
                 decimals={2}
                 size={40}
@@ -269,7 +269,7 @@ export const S09Phone: React.FC<{ total: number }> = ({ total }) => {
                 size={20}
                 weight={600}
                 color={COLORS.green}
-                delay={104}
+                delay={70}
                 style={{ position: 'absolute', left: 22, top: 96 }}
               >
                 {COPY.s09.delta}
@@ -286,7 +286,7 @@ export const S09Phone: React.FC<{ total: number }> = ({ total }) => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  transform: `scale(${springAt(frame, fps, 68, SPRINGS.pop)}) rotate(${breathe(frame, 0.05, 3)}deg)`,
+                  transform: `scale(${springAt(frame, fps, 44, SPRINGS.pop)}) rotate(${breathe(frame, 0.05, 3)}deg)`,
                 }}
               >
                 <TrendUp size={32} color={COLORS.green} strokeWidth={2.6} />
@@ -305,7 +305,7 @@ export const S09Phone: React.FC<{ total: number }> = ({ total }) => {
                   height: 74,
                   borderRadius: 20,
                   background: '#F4F6F6',
-                  opacity: prog(frame, 72 + i * 4, 14),
+                  opacity: prog(frame, 46 + i * 3, 12),
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'center',
@@ -313,8 +313,8 @@ export const S09Phone: React.FC<{ total: number }> = ({ total }) => {
                   paddingLeft: 16,
                 }}
               >
-                <Skeleton w="62%" h={9} delay={76 + i * 4} color="#E4E8E8" />
-                <Skeleton w="40%" h={9} delay={79 + i * 4} color="#EAEDED" />
+                <Skeleton w="62%" h={9} delay={49 + i * 3} color="#E4E8E8" />
+                <Skeleton w="40%" h={9} delay={51 + i * 3} color="#EAEDED" />
               </div>
             ))}
 
@@ -323,7 +323,7 @@ export const S09Phone: React.FC<{ total: number }> = ({ total }) => {
               size={22}
               weight={500}
               color={COLORS.inkSoft}
-              delay={84}
+              delay={54}
               style={{ position: 'absolute', left: PAD, top: 462 }}
             >
               {COPY.s09.perfLabel}
@@ -337,7 +337,7 @@ export const S09Phone: React.FC<{ total: number }> = ({ total }) => {
                     top: i * 56,
                     width: PHONE.w - PAD * 2,
                     borderTop: '2px dashed #EDF0EF',
-                    opacity: prog(frame, 86 + i * 3, 12),
+                    opacity: prog(frame, 55 + i * 2, 10),
                   }}
                 />
               ))}
@@ -357,8 +357,8 @@ export const S09Phone: React.FC<{ total: number }> = ({ total }) => {
                 ]}
                 width={PHONE.w - PAD * 2}
                 height={168}
-                delay={88}
-                dur={54}
+                delay={56}
+                dur={38}
                 color={COLORS.green}
                 areaFrom="rgba(1,146,102,0.22)"
                 strokeWidth={5}
@@ -376,8 +376,8 @@ export const S09Phone: React.FC<{ total: number }> = ({ total }) => {
                   borderRadius: '50%',
                   background: COLORS.greenBright,
                   boxShadow: `0 0 ${10 + breathe(frame, 0.12, 6)}px ${COLORS.greenNeon}`,
-                  opacity: prog(frame, 138, 10),
-                  transform: `scale(${springAt(frame, fps, 138, SPRINGS.pop)})`,
+                  opacity: prog(frame, 92, 10),
+                  transform: `scale(${springAt(frame, fps, 92, SPRINGS.pop)})`,
                 }}
               />
             </div>
@@ -387,13 +387,13 @@ export const S09Phone: React.FC<{ total: number }> = ({ total }) => {
               size={22}
               weight={500}
               color={COLORS.inkSoft}
-              delay={132}
+              delay={86}
               style={{ position: 'absolute', left: PAD, top: 762 }}
             >
               {COPY.s09.activityLabel}
             </UiText>
             {COPY.s09.activity.map((v, i) => (
-              <ActivityRow key={v} value={v} delay={138 + i * 8} y={816 + i * 74} />
+              <ActivityRow key={v} value={v} delay={90 + i * 6} y={816 + i * 74} />
             ))}
 
             {/* nav inferior */}
@@ -413,8 +413,8 @@ export const S09Phone: React.FC<{ total: number }> = ({ total }) => {
                 <div
                   key={i}
                   style={{
-                    opacity: prog(frame, 118 + i * 4, 12),
-                    transform: `scale(${springAt(frame, fps, 118 + i * 4, SPRINGS.pop)})`,
+                    opacity: prog(frame, 76 + i * 3, 10),
+                    transform: `scale(${springAt(frame, fps, 76 + i * 3, SPRINGS.pop)})`,
                   }}
                 >
                   <Ico size={34} color={i === 0 ? COLORS.greenBright : '#C3CBCB'} />
@@ -423,7 +423,7 @@ export const S09Phone: React.FC<{ total: number }> = ({ total }) => {
             </div>
 
             <Rule
-              delay={112}
+              delay={72}
               color="#EDEFEF"
               height={2}
               style={{ position: 'absolute', left: PAD, right: PAD, bottom: 96 }}
@@ -442,7 +442,7 @@ export const S09Phone: React.FC<{ total: number }> = ({ total }) => {
             borderRadius: 34,
             background: COLORS.white,
             boxShadow: SHADOW.cardHi,
-            opacity: prog(frame, 84, 12),
+            opacity: prog(frame, 54, 10),
             transform: `translateX(${(1 - chipL) * -140}px) rotate(${(1 - chipL) * -6}deg) translateY(${breathe(frame, 0.03, 7)}px)`,
             padding: 26,
           }}
@@ -462,8 +462,8 @@ export const S09Phone: React.FC<{ total: number }> = ({ total }) => {
             ]}
             width={236}
             height={110}
-            delay={92}
-            dur={38}
+            delay={60}
+            dur={28}
             color={COLORS.greenBright}
             areaFrom="rgba(3,179,119,0.24)"
             strokeWidth={5}
@@ -480,7 +480,7 @@ export const S09Phone: React.FC<{ total: number }> = ({ total }) => {
               height: 16,
               borderRadius: '50%',
               background: COLORS.greenBright,
-              opacity: prog(frame, 126, 10),
+              opacity: prog(frame, 84, 10),
             }}
           />
         </div>
@@ -496,7 +496,7 @@ export const S09Phone: React.FC<{ total: number }> = ({ total }) => {
             borderRadius: 34,
             background: COLORS.white,
             boxShadow: SHADOW.cardHi,
-            opacity: prog(frame, 96, 12),
+            opacity: prog(frame, 62, 10),
             transform: `translateX(${(1 - chipR) * 150}px) rotate(${(1 - chipR) * 6}deg) translateY(${breathe(frame, 0.028, 8, 1.4)}px)`,
             display: 'flex',
             flexDirection: 'column',
@@ -512,13 +512,13 @@ export const S09Phone: React.FC<{ total: number }> = ({ total }) => {
               fontSize: 66,
               letterSpacing: '-0.03em',
               color: COLORS.green,
-              opacity: prog(frame, 104, 12),
-              transform: `scale(${tween(frame, [104, 122], [0.7, 1], EASE.back)})`,
+              opacity: prog(frame, 68, 10),
+              transform: `scale(${tween(frame, [68, 86], [0.7, 1], EASE.back)})`,
             }}
           >
             {COPY.s09.badge.value}
           </div>
-          <UiText size={26} weight={400} color={COLORS.gray} delay={112}>
+          <UiText size={26} weight={400} color={COLORS.gray} delay={76}>
             {COPY.s09.badge.caption}
           </UiText>
         </div>
@@ -526,41 +526,42 @@ export const S09Phone: React.FC<{ total: number }> = ({ total }) => {
 
       <Sparks
         count={16}
-        delay={104}
+        delay={68}
         origin={[900, 1160]}
         spread={240}
         rise={160}
         color={COLORS.greenNeon}
         seed="ph"
       />
-      <LightSweep delay={30} dur={46} />
-      <LightSweep delay={150} dur={44} />
+      <LightSweep delay={16} dur={36} />
+      <LightSweep delay={100} dur={38} />
 
       <SfxTrack
         cues={[
           { name: 'whooshTransition', at: 0, volume: 0.8 },
-          { name: 'whooshShort', at: 8 },
-          { name: 'bassHit', at: 12, volume: 0.7 },
-          { name: 'clickDigital', at: 26 },
-          { name: 'tickMicro', at: 36 },
-          { name: 'tickMicro', at: 42, rate: 1.1 },
-          { name: 'tickMicro', at: 48, rate: 0.9 },
-          { name: 'popSoft', at: 58 },
-          { name: 'tapButton', at: 68 },
-          { name: 'popUi', at: 72 },
-          { name: 'popUi', at: 76, rate: 1.1 },
-          { name: 'swipeFast', at: 88 },
-          { name: 'whooshShort', at: 84, rate: 1.2 },
-          { name: 'whooshShort', at: 96, rate: 1.1 },
-          { name: 'notificationPop', at: 104 },
-          { name: 'clickDigital', at: 118 },
-          { name: 'clickDigital', at: 122, rate: 1.08 },
-          { name: 'clickDigital', at: 126, rate: 1.16 },
-          { name: 'clickDigital', at: 130, rate: 1.24 },
-          { name: 'sparkleShine', at: 138 },
-          { name: 'popSoft', at: 138 },
-          { name: 'popSoft', at: 146, rate: 1.06 },
-          { name: 'popSoft', at: 154, rate: 1.12 },
+          { name: 'whooshShort', at: 4 },
+          { name: 'bassHit', at: 6, volume: 0.7 },
+          { name: 'clickDigital', at: 16 },
+          { name: 'tickMicro', at: 21 },
+          { name: 'tickMicro', at: 25, rate: 1.1 },
+          { name: 'tickMicro', at: 29, rate: 0.9 },
+          { name: 'popSoft', at: 36 },
+          { name: 'tapButton', at: 44 },
+          { name: 'popUi', at: 46 },
+          { name: 'popUi', at: 49, rate: 1.1 },
+          { name: 'whooshShort', at: 54, rate: 1.2 },
+          { name: 'swipeFast', at: 56 },
+          { name: 'whooshShort', at: 62, rate: 1.1 },
+          { name: 'notificationPop', at: 68 },
+          { name: 'clickDigital', at: 76 },
+          { name: 'clickDigital', at: 79, rate: 1.08 },
+          { name: 'clickDigital', at: 82, rate: 1.16 },
+          { name: 'clickDigital', at: 85, rate: 1.24 },
+          { name: 'sparkleShine', at: 90 },
+          { name: 'popSoft', at: 90 },
+          { name: 'popSoft', at: 96, rate: 1.06 },
+          { name: 'popSoft', at: 102, rate: 1.12 },
+          { name: 'successChime', at: 108, volume: 0.55 },
         ]}
       />
     </AbsoluteFill>

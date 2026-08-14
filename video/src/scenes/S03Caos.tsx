@@ -2,26 +2,26 @@ import React from 'react';
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from 'remotion';
 import { BgLight } from '../components/Bg';
 import { Flash, RedSlash, Shards, SpeedLines } from '../components/Fx';
-import { DownloadBox, UploadBox, BarsIcon } from '../components/Icons';
+import { BarsIcon, DownloadBox, UploadBox } from '../components/Icons';
 import { LogoHeader } from '../components/Logo';
 import { Scene } from '../components/Scene';
 import { SfxTrack } from '../components/Sfx';
 import { UiText } from '../components/Type';
 import { Card, Counter, IconBadge } from '../components/Ui';
 import { prog, rndRange, springAt, tween } from '../components/anim';
-import { COLORS, EASE, FONTS, SHADOW, SPRINGS } from '../config/theme';
+import { COLORS, EASE, SHADOW, SPRINGS } from '../config/theme';
 import { COPY } from '../config/timeline';
 
 /** Cédula estilizada que atravessa a tela (camada de parallax). */
 const Bill: React.FC<{ i: number; delay: number }> = ({ i, delay }) => {
   const frame = useCurrentFrame();
-  const p = prog(frame, delay + rndRange(`bd${i}`, 0, 14), rndRange(`bu${i}`, 70, 130), EASE.out);
+  const p = prog(frame, delay + rndRange(`bd${i}`, 0, 12), rndRange(`bu${i}`, 60, 110), EASE.out);
   if (p <= 0) return null;
   const ang = rndRange(`ba${i}`, 0, Math.PI * 2);
   const r = rndRange(`br${i}`, 420, 1180) * p;
   const w = rndRange(`bw${i}`, 110, 210);
-  const rot = rndRange(`bo${i}`, -220, 220) * p;
-  const tilt = rndRange(`bt${i}`, -60, 60) * p;
+  const rot = rndRange(`bo${i}`, -240, 240) * p;
+  const tilt = rndRange(`bt${i}`, -70, 70) * p;
   return (
     <div
       style={{
@@ -38,32 +38,19 @@ const Bill: React.FC<{ i: number; delay: number }> = ({ i, delay }) => {
         overflow: 'hidden',
       }}
     >
-      <div
-        style={{
-          position: 'absolute',
-          inset: '14%',
-          border: '2px solid rgba(255,255,255,0.55)',
-          borderRadius: 4,
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          left: '10%',
-          top: '34%',
-          width: '26%',
-          height: '32%',
-          borderRadius: '50%',
-          background: 'rgba(255,255,255,0.4)',
-        }}
-      />
+      <div style={{ position: 'absolute', inset: '14%', border: '2px solid rgba(255,255,255,0.55)', borderRadius: 4 }} />
+      <div style={{ position: 'absolute', left: '10%', top: '34%', width: '26%', height: '32%', borderRadius: '50%', background: 'rgba(255,255,255,0.4)' }} />
     </div>
   );
 };
 
 /**
- * Cena 03 — ganhos e gastos espalhados: receitas x despesas x resultado.
+ * Cena 03 (gráficos) — receitas × despesas × resultado.
  * Referência: 5F0A4926-BA0B-49C5-8626-D2B40D37A110.png
+ *
+ * Layout fiel à arte: logo, dois cards lado a lado, o card de resultado
+ * abaixo ligado por conectores, o X vermelho e o dinheiro voando.
+ * Nenhum texto além do que existe na arte.
  */
 export const S03Caos: React.FC<{ total: number }> = ({ total }) => {
   const frame = useCurrentFrame();
@@ -71,45 +58,70 @@ export const S03Caos: React.FC<{ total: number }> = ({ total }) => {
 
   const CARD_W = 400;
   const CARD_H = 430;
-  const connector = prog(frame, 84, 26, EASE.out);
-  const resultSpring = springAt(frame, fps, 96, SPRINGS.pop);
+  const connector = prog(frame, 46, 20, EASE.out);
+  const RESULT = 54;
+  const resultSpring = springAt(frame, fps, RESULT, SPRINGS.pop);
+
+  // linhas de tendência do fundo da arte (uma verde caindo, uma vermelha subindo)
+  const lineP = prog(frame, 6, 40, EASE.inOut);
 
   return (
     <AbsoluteFill>
       <BgLight tone="cool" charts={false} />
-      <SpeedLines delay={2} dur={30} count={40} color="rgba(220,58,63,0.10)" />
+      <SpeedLines delay={0} dur={26} count={40} color="rgba(220,58,63,0.10)" />
 
-      <Scene total={total} zoom={0.07} driftY={-10}>
-        <LogoHeader delay={0} />
+      <Scene total={total} zoom={0.1} driftY={-14}>
+        <LogoHeader delay={0} size={78} />
 
-        {/* cédulas voando */}
+        {/* colunas e linhas de tendência ao fundo, como na arte */}
+        <svg width={1080} height={1920} style={{ position: 'absolute', left: 0, top: 0 }}>
+          {[0, 1, 2, 3, 4].map((i) => {
+            const h = [300, 430, 360, 250, 190][i] * prog(frame, 2 + i * 3, 26, EASE.out);
+            return (
+              <rect
+                key={i}
+                x={330 + i * 105}
+                y={620 - h + 300}
+                width={82}
+                height={h}
+                rx={14}
+                fill={i % 2 ? 'rgba(242,80,58,0.16)' : 'rgba(1,146,102,0.17)'}
+              />
+            );
+          })}
+          <path
+            d="M -20 400 L 240 380 L 400 470 L 620 545 L 900 505 L 1100 560"
+            fill="none"
+            stroke="rgba(1,146,102,0.35)"
+            strokeWidth={5}
+            strokeLinecap="round"
+            strokeDasharray={1600}
+            strokeDashoffset={1600 * (1 - lineP)}
+          />
+          <path
+            d="M -20 620 L 260 600 L 430 640 L 640 540 L 860 470 L 1100 300"
+            fill="none"
+            stroke="rgba(242,80,58,0.5)"
+            strokeWidth={5}
+            strokeLinecap="round"
+            strokeDasharray={1600}
+            strokeDashoffset={1600 * (1 - lineP)}
+          />
+          <circle cx={240} cy={380} r={13 * prog(frame, 20, 12)} fill="none" stroke="rgba(1,146,102,0.45)" strokeWidth={5} />
+          <circle cx={860} cy={470} r={13 * prog(frame, 30, 12)} fill="none" stroke="rgba(242,80,58,0.6)" strokeWidth={5} />
+        </svg>
+
         {Array.from({ length: 12 }).map((_, i) => (
-          <Bill key={i} i={i} delay={26} />
+          <Bill key={i} i={i} delay={14} />
         ))}
 
-        <RedSlash delay={30} dur={16} opacity={0.52} />
-        <Shards count={30} delay={34} />
-
-        <UiText
-          size={34}
-          weight={500}
-          color={COLORS.gray}
-          delay={10}
-          style={{
-            position: 'absolute',
-            top: 320,
-            width: '100%',
-            textAlign: 'center',
-            letterSpacing: '0.01em',
-          }}
-        >
-          {COPY.s03.kicker}
-        </UiText>
+        <RedSlash delay={18} dur={14} opacity={0.55} />
+        <Shards count={30} delay={22} />
 
         {/* cards receitas / despesas */}
         {COPY.s03.cards.map((c, i) => {
           const isRed = c.tone === 'red';
-          const delay = 16 + i * 10;
+          const delay = 8 + i * 8;
           return (
             <Card
               key={c.label}
@@ -118,7 +130,7 @@ export const S03Caos: React.FC<{ total: number }> = ({ total }) => {
               h={CARD_H}
               radius={44}
               from={i === 0 ? 'left' : 'right'}
-              distance={220}
+              distance={240}
               spring="snappy"
               shadow={SHADOW.cardHi}
               style={{
@@ -137,7 +149,7 @@ export const S03Caos: React.FC<{ total: number }> = ({ total }) => {
                 bg={isRed ? COLORS.redPale : COLORS.greenPaler}
                 size={128}
                 radius={34}
-                delay={delay + 8}
+                delay={delay + 5}
               >
                 {isRed ? (
                   <UploadBox size={68} color={COLORS.red} strokeWidth={2.4} />
@@ -149,14 +161,14 @@ export const S03Caos: React.FC<{ total: number }> = ({ total }) => {
                 size={38}
                 weight={600}
                 color={isRed ? COLORS.red : COLORS.green}
-                delay={delay + 12}
+                delay={delay + 8}
               >
                 {c.label}
               </UiText>
               <Counter
                 to={c.value}
-                delay={delay + 14}
-                dur={46}
+                delay={delay + 10}
+                dur={30}
                 prefix="R$ "
                 size={62}
                 weight={700}
@@ -179,7 +191,7 @@ export const S03Caos: React.FC<{ total: number }> = ({ total }) => {
             stroke={COLORS.greenBright}
             strokeWidth={4}
             strokeDasharray="14 12"
-            strokeDashoffset={-frame * 0.8}
+            strokeDashoffset={-frame * 1.1}
             opacity={connector}
           />
           <path
@@ -188,7 +200,7 @@ export const S03Caos: React.FC<{ total: number }> = ({ total }) => {
             stroke={COLORS.red}
             strokeWidth={4}
             strokeDasharray="14 12"
-            strokeDashoffset={frame * 0.8}
+            strokeDashoffset={frame * 1.1}
             opacity={connector}
           />
         </svg>
@@ -199,8 +211,8 @@ export const S03Caos: React.FC<{ total: number }> = ({ total }) => {
             position: 'absolute',
             left: '50%',
             top: 1226,
-            transform: `translateX(-50%) scale(${0.7 + resultSpring * 0.3})`,
-            opacity: prog(frame, 96, 12),
+            transform: `translateX(-50%) scale(${0.68 + resultSpring * 0.32})`,
+            opacity: prog(frame, RESULT, 10),
           }}
         >
           <div
@@ -209,7 +221,7 @@ export const S03Caos: React.FC<{ total: number }> = ({ total }) => {
               height: 380,
               borderRadius: 46,
               background: COLORS.white,
-              boxShadow: `${SHADOW.cardHi}, 0 0 ${60 * resultSpring}px rgba(3,179,119,0.35)`,
+              boxShadow: `${SHADOW.cardHi}, 0 0 ${70 * resultSpring}px rgba(3,179,119,0.38)`,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -217,16 +229,16 @@ export const S03Caos: React.FC<{ total: number }> = ({ total }) => {
               gap: 24,
             }}
           >
-            <IconBadge bg={COLORS.greenPaler} size={118} radius={32} delay={104}>
+            <IconBadge bg={COLORS.greenPaler} size={118} radius={32} delay={RESULT + 6}>
               <BarsIcon size={62} color={COLORS.greenBright} />
             </IconBadge>
-            <UiText size={36} weight={600} color={COLORS.greenDeep} delay={108}>
+            <UiText size={36} weight={600} color={COLORS.greenDeep} delay={RESULT + 9}>
               {COPY.s03.result.label}
             </UiText>
             <Counter
               to={COPY.s03.result.value}
-              delay={110}
-              dur={44}
+              delay={RESULT + 11}
+              dur={30}
               prefix="R$ "
               size={66}
               weight={700}
@@ -234,45 +246,26 @@ export const S03Caos: React.FC<{ total: number }> = ({ total }) => {
             />
           </div>
         </div>
-
-        {/* pergunta que fica */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 118,
-            width: '100%',
-            textAlign: 'center',
-            fontFamily: FONTS.sans,
-            fontWeight: 800,
-            fontSize: 52,
-            letterSpacing: '-0.03em',
-            color: COLORS.ink,
-            opacity: prog(frame, 150, 18),
-            transform: `translateY(${(1 - prog(frame, 150, 24)) * 30}px)`,
-          }}
-        >
-          Tudo espalhado.{' '}
-          <span style={{ color: COLORS.red }}>Nada claro.</span>
-        </div>
       </Scene>
 
-      <Flash at={30} dur={8} color="#FFD9D3" max={0.55} />
+      <Flash at={18} dur={8} color="#FFD9D3" max={0.55} />
 
       <SfxTrack
         cues={[
           { name: 'riserShort', at: 0, volume: 0.6 },
-          { name: 'whooshShort', at: 16 },
-          { name: 'whooshShort', at: 26, rate: 1.1 },
-          { name: 'popSoft', at: 24 },
-          { name: 'popSoft', at: 34, rate: 1.1 },
-          { name: 'impactHit', at: 30, volume: 1 },
-          { name: 'subBoom', at: 30, volume: 0.7 },
-          { name: 'glitchDigital', at: 36 },
-          { name: 'tickMicro', at: 84 },
-          { name: 'tickMicro', at: 90, rate: 1.15 },
-          { name: 'notificationPop', at: 96 },
-          { name: 'bassHit', at: 96, volume: 0.65 },
-          { name: 'whooshShort', at: 150, rate: 0.9 },
+          { name: 'whooshShort', at: 8 },
+          { name: 'whooshShort', at: 16, rate: 1.1 },
+          { name: 'popSoft', at: 13 },
+          { name: 'popSoft', at: 21, rate: 1.1 },
+          { name: 'impactHit', at: 18, volume: 1 },
+          { name: 'subBoom', at: 18, volume: 0.7 },
+          { name: 'glitchDigital', at: 24 },
+          { name: 'tickMicro', at: 46 },
+          { name: 'tickMicro', at: 50, rate: 1.15 },
+          { name: 'notificationPop', at: RESULT },
+          { name: 'bassHit', at: RESULT, volume: 0.68 },
+          { name: 'successChime', at: RESULT + 30, volume: 0.6 },
+          { name: 'sparkleShine', at: RESULT + 30, volume: 0.5 },
         ]}
       />
     </AbsoluteFill>

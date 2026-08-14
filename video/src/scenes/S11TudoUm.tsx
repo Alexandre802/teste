@@ -15,9 +15,9 @@ import { COPY } from '../config/timeline';
 
 /** Geometria dos três cards, medida sobre a arte de referência. */
 const CARDS = [
-  { x: 94, y: 706, w: 296, h: 452, delay: 20, glow: false },
-  { x: 367, y: 1251, w: 305, h: 490, delay: 34, glow: false },
-  { x: 626, y: 476, w: 367, h: 556, delay: 48, glow: true },
+  { x: 94, y: 706, w: 296, h: 452, delay: 10, glow: false },
+  { x: 367, y: 1251, w: 305, h: 490, delay: 20, glow: false },
+  { x: 626, y: 476, w: 367, h: 556, delay: 30, glow: true },
 ];
 
 /** Nós do conector que liga os cards. */
@@ -34,7 +34,7 @@ const LINK = [
 export const S11TudoUm: React.FC<{ total: number }> = ({ total }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const link = prog(frame, 64, 30);
+  const link = prog(frame, 40, 22);
 
   return (
     <AbsoluteFill>
@@ -59,8 +59,8 @@ export const S11TudoUm: React.FC<{ total: number }> = ({ total }) => {
             fontSize: 56,
             letterSpacing: '-0.02em',
             color: COLORS.inkSoft,
-            opacity: prog(frame, 4, 18),
-            transform: `translateY(${(1 - prog(frame, 4, 24)) * 22}px)`,
+            opacity: prog(frame, 2, 14),
+            transform: `translateY(${(1 - prog(frame, 2, 18)) * 22}px)`,
           }}
         >
           {COPY.s11.title}
@@ -71,14 +71,14 @@ export const S11TudoUm: React.FC<{ total: number }> = ({ total }) => {
           values={[0.42, 0.3, 0.58, 0.74, 0.5, 0.9, 0.66]}
           width={980}
           height={520}
-          delay={70}
-          step={5}
+          delay={44}
+          step={4}
           gap={22}
           depth={22}
           opacity={0.85}
           style={{ left: 40, top: 1330 }}
         />
-        <IsoArrow width={900} height={520} delay={84} dur={50} style={{ left: 120, top: 1290 }} />
+        <IsoArrow width={900} height={520} delay={54} dur={40} style={{ left: 120, top: 1290 }} />
 
         {/* conector entre os cards */}
         <svg width={1080} height={1920} style={{ position: 'absolute', left: 0, top: 0 }}>
@@ -150,7 +150,7 @@ export const S11TudoUm: React.FC<{ total: number }> = ({ total }) => {
               <Counter
                 to={c.value}
                 delay={g.delay + 16}
-                dur={44}
+                dur={30}
                 prefix="R$ "
                 size={g.w * 0.155}
                 weight={600}
@@ -167,7 +167,7 @@ export const S11TudoUm: React.FC<{ total: number }> = ({ total }) => {
           style={{ position: 'absolute', left: 0, top: 0, zIndex: 5 }}
         >
           {LINK.map((p, i) => {
-            const s = prog(frame, 68 + i * 10, 16);
+            const s = prog(frame, 44 + i * 8, 14);
             return (
               <g key={i}>
                 <circle cx={p[0]} cy={p[1]} r={24 * s} fill={COLORS.white} />
@@ -187,31 +187,31 @@ export const S11TudoUm: React.FC<{ total: number }> = ({ total }) => {
 
       <Sparks
         count={20}
-        delay={70}
+        delay={44}
         origin={[810, 740]}
         spread={300}
         rise={220}
         color={COLORS.greenNeon}
         seed="tudo"
       />
-      <LightSweep delay={92} dur={44} />
+      <LightSweep delay={58} dur={38} />
 
       <SfxTrack
         cues={[
           { name: 'whooshTransition', at: 0, volume: 0.75 },
-          { name: 'popSoft', at: 4 },
-          { name: 'whooshShort', at: 20 },
-          { name: 'popUi', at: 28 },
-          { name: 'whooshShort', at: 34, rate: 1.08 },
-          { name: 'popUi', at: 42, rate: 1.06 },
-          { name: 'whooshShort', at: 48, rate: 0.92 },
-          { name: 'popUi', at: 56, rate: 0.94 },
-          { name: 'successChime', at: 70, volume: 0.8 },
-          { name: 'bassHit', at: 70, volume: 0.6 },
-          { name: 'tickMicro', at: 64 },
-          { name: 'tickMicro', at: 74, rate: 1.1 },
-          { name: 'whooshShort', at: 84, rate: 0.86 },
-          { name: 'sparkleShine', at: 92, volume: 0.7 },
+          { name: 'popSoft', at: 2 },
+          { name: 'whooshShort', at: 10 },
+          { name: 'popUi', at: 17 },
+          { name: 'whooshShort', at: 20, rate: 1.08 },
+          { name: 'popUi', at: 27, rate: 1.06 },
+          { name: 'whooshShort', at: 30, rate: 0.92 },
+          { name: 'popUi', at: 37, rate: 0.94 },
+          { name: 'tickMicro', at: 40 },
+          { name: 'successChime', at: 46, volume: 0.8 },
+          { name: 'bassHit', at: 46, volume: 0.6 },
+          { name: 'tickMicro', at: 50, rate: 1.1 },
+          { name: 'whooshShort', at: 54, rate: 0.86 },
+          { name: 'sparkleShine', at: 58, volume: 0.7 },
         ]}
       />
     </AbsoluteFill>

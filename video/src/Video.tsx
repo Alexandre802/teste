@@ -44,23 +44,25 @@ const SCENES: Record<SceneId, React.FC<{ total: number }>> = {
 };
 
 /**
- * A cena que sai continua na tela por mais alguns frames enquanto a que entra
- * aparece por cima — é isso que transforma o corte em uma dissolução com
- * empurrão de câmera, em vez de um quadro vazio entre as duas.
+ * A cena que sai continua alguns frames na tela, encolhendo e borrando,
+ * enquanto a que entra chega ampliada e desfocada por cima. É esse par
+ * (punch out / punch in) que dá o corte seco e dinâmico da referência.
  */
 const OVERLAP = 12;
-const ENTER = 10;
+const ENTER = 11;
 
-/** Entrada da cena: aplicada por fora, cobre inclusive o fundo. */
 const SceneEnter: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const frame = useCurrentFrame();
   const p = tween(frame, [0, ENTER], [0, 1], EASE.out);
+  const pf = tween(frame, [0, ENTER * 0.62], [0, 1], EASE.out);
   return (
     <AbsoluteFill
       style={{
-        opacity: p,
-        transform: `scale(${1.045 - p * 0.045})`,
+        opacity: pf,
+        transform: `scale(${1.3 - p * 0.3})`,
+        filter: pf < 0.999 ? `blur(${(1 - pf) * 30}px)` : undefined,
         transformOrigin: 'center center',
+        willChange: 'transform, filter',
       }}
     >
       {children}

@@ -2,22 +2,22 @@ import React from 'react';
 import { AbsoluteFill, useCurrentFrame } from 'remotion';
 import { BgLight, MiniChart } from '../components/Bg';
 import { Flash, LightSweep } from '../components/Fx';
+import { KineticBlock, KineticWord } from '../components/Kinetic';
 import { LogoHeader } from '../components/Logo';
 import { Scene, Stack } from '../components/Scene';
 import { SfxTrack } from '../components/Sfx';
-import { Line } from '../components/Type';
-import { prog, tween } from '../components/anim';
+import { tween } from '../components/anim';
 import { COLORS, FONTS } from '../config/theme';
 
 /**
- * Cena 05 — "Mas não consegue ENXERGAR quanto realmente está ganhando."
+ * Cena 05 (texto) — "Mas não consegue ENXERGAR quanto realmente está ganhando."
  * Referência: 9D589EAF-16DD-4878-B6B9-040DE283ED67.png
- * "enxergar" é a palavra-herói: entra maior, com desfoque que resolve.
+ * "enxergar" é a palavra-herói: entra maior e mais tarde, com desfoque forte.
  */
 export const S05Enxergar: React.FC<{ total: number }> = ({ total }) => {
   const frame = useCurrentFrame();
-  const A = 144;
-  const heroP = prog(frame, 22, 34);
+  const A = 148;
+  const HERO = 22;
 
   return (
     <AbsoluteFill>
@@ -34,7 +34,7 @@ export const S05Enxergar: React.FC<{ total: number }> = ({ total }) => {
         height={160}
         style={{ right: 30, top: 470 }}
         color={COLORS.greenPale}
-        progress={tween(frame, [8, 58], [0, 1])}
+        progress={tween(frame, [4, 46], [0, 1])}
       />
       <MiniChart
         points={[
@@ -45,99 +45,91 @@ export const S05Enxergar: React.FC<{ total: number }> = ({ total }) => {
         height={50}
         style={{ left: -10, top: 990 }}
         color={COLORS.greenPale}
-        progress={tween(frame, [18, 44], [0, 1])}
+        progress={tween(frame, [14, 40], [0, 1])}
       />
 
-      <Scene total={total} zoom={0.05} driftY={-16}>
+      <Scene total={total} zoom={0.08} driftY={-18}>
         <LogoHeader delay={0} size={78} />
 
-        <Stack top={580}>
-          <Line
+        <Stack top={556}>
+          <KineticBlock
             size={A}
-            tone="ink"
             family={FONTS.display}
             weight={400}
             tracking="-0.004em"
             lineHeight={0.92}
-            delay={4}
-          >
-            Mas não
-          </Line>
-          <Line
-            size={A}
-            tone="ink"
-            family={FONTS.display}
-            weight={400}
-            tracking="-0.004em"
-            lineHeight={0.92}
-            delay={12}
-          >
-            consegue
-          </Line>
+            step={5}
+            dur={13}
+            delay={2}
+            rise={0.5}
+            lines={[
+              [
+                { t: 'Mas', tone: 'ink' },
+                { t: 'não', tone: 'ink' },
+              ],
+              [{ t: 'consegue', tone: 'ink' }],
+            ]}
+          />
 
-          {/* palavra-herói: escala + desfoque que "foca" */}
-          <div
-            style={{
-              transform: `scale(${0.86 + heroP * 0.14})`,
-              transformOrigin: 'left center',
-              filter: `blur(${(1 - heroP) * 26}px)`,
-              opacity: prog(frame, 22, 14),
-              marginTop: -6,
-              marginBottom: -4,
-            }}
-          >
-            <div
-              style={{
-                fontFamily: FONTS.display,
-                fontSize: A * 1.62,
-                lineHeight: 0.92,
-                letterSpacing: '-0.01em',
-                color: COLORS.greenTeal,
-              }}
-            >
-              enxergar
-            </div>
+          {/* palavra-herói */}
+          <div style={{ marginTop: -4, marginBottom: -2 }}>
+            <KineticWord
+              word={{ t: 'enxergar', tone: 'teal' }}
+              size={A * 1.62}
+              delay={HERO}
+              dur={22}
+              family={FONTS.display}
+              weight={400}
+              tracking="-0.012em"
+              lineHeight={0.92}
+              rise={0.3}
+              zoom={0.42}
+              blur={48}
+            />
           </div>
 
-          <Line
-            size={A * 0.62}
-            tone="ink"
-            family={FONTS.display}
-            weight={400}
-            tracking="-0.004em"
-            lineHeight={0.95}
-            delay={44}
-          >
-            quanto realmente
-          </Line>
-          <Line
+          <KineticBlock
             size={A}
-            tone="teal"
             family={FONTS.display}
             weight={400}
             tracking="-0.004em"
             lineHeight={0.95}
-            delay={52}
-          >
-            está ganhando.
-          </Line>
+            step={5}
+            dur={13}
+            delay={HERO + 26}
+            rise={0.5}
+            lines={[
+              [
+                { t: 'quanto', tone: 'ink', scale: 0.62 },
+                { t: 'realmente', tone: 'ink', scale: 0.62 },
+              ],
+              [
+                { t: 'está', tone: 'teal' },
+                { t: 'ganhando.', tone: 'teal' },
+              ],
+            ]}
+          />
         </Stack>
       </Scene>
 
-      <Flash at={22} dur={9} max={0.42} />
-      <LightSweep delay={56} dur={36} />
+      <Flash at={HERO} dur={9} max={0.45} />
+      <LightSweep delay={HERO + 30} dur={34} />
 
       <SfxTrack
         cues={[
-          { name: 'whooshTransition', at: 0, volume: 0.7 },
-          { name: 'swipeFast', at: 4 },
+          { name: 'whooshTransition', at: 0, volume: 0.72 },
+          { name: 'swipeFast', at: 2 },
+          { name: 'popUi', at: 7 },
           { name: 'swipeFast', at: 12, rate: 1.08 },
-          { name: 'reverseWhoosh', at: 8, volume: 0.7 },
-          { name: 'impactHit', at: 22, volume: 0.95 },
-          { name: 'subBoom', at: 22, volume: 0.7 },
-          { name: 'popUi', at: 44 },
-          { name: 'whooshShort', at: 52, rate: 0.92 },
-          { name: 'sparkleShine', at: 58, volume: 0.6 },
+          { name: 'reverseWhoosh', at: 10, volume: 0.75 },
+          { name: 'impactHit', at: HERO, volume: 1 },
+          { name: 'subBoom', at: HERO, volume: 0.75 },
+          { name: 'sparkleShine', at: HERO + 8, volume: 0.7 },
+          { name: 'popUi', at: HERO + 26 },
+          { name: 'popUi', at: HERO + 31, rate: 1.08 },
+          { name: 'whooshShort', at: HERO + 36, rate: 0.92 },
+          { name: 'popUi', at: HERO + 41, rate: 0.96 },
+          { name: 'bassHit', at: HERO + 41, volume: 0.6 },
         ]}
       />
     </AbsoluteFill>

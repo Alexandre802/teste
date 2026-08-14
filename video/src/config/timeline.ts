@@ -11,38 +11,43 @@ export const HEIGHT = 1920;
 
 /** Duracao de cada cena, em segundos. */
 export const SCENE_SECONDS = {
-  s01Hook: 5.0, // "Metodo nao da resultado. Mas sabe por que?"
-  s02Nao: 4.2, // "Nao e necessariamente por causa do metodo."
-  s03Caos: 6.2, // ganhos e gastos espalhados
-  s04Dinheiro: 3.8, // "Voce ate pode estar fazendo dinheiro..."
-  s05Enxergar: 4.8, // "mas nao consegue enxergar..."
-  s06Quanto: 5.2, // "Quanto entrou? Quanto saiu? Quanto sobrou?"
-  s07Prever: 4.8, // "Quanto vai fechar na proxima semana?"
-  s08Nasceu: 4.6, // "Foi pensando nisso que nasceu a Monttra"
-  s09Phone: 6.6, // mockup "Veja o lucro real"
-  s10Periodo: 6.2, // "Acompanhe por periodo"
-  s11TudoUm: 5.8, // "Tudo em um so lugar"
-  s12Operacao: 6.6, // cena escura "Resultado da operacao"
-  s13Previsao: 6.6, // "Previsao da semana" + meta
-  s14Cta: 6.0, // "Teste gratuitamente por 3 dias"
+  s01Hook: 4.6, // T — "Metodo nao da resultado. Mas sabe por que?"
+  s03Caos: 5.2, // G — ganhos e gastos espalhados
+  s02Nao: 4.0, // T — "Nao e necessariamente por causa do metodo."
+  s10Periodo: 5.4, // G — "Acompanhe por periodo"
+  s04Dinheiro: 3.6, // T — "Voce ate pode estar fazendo dinheiro..."
+  s11TudoUm: 5.2, // G — "Tudo em um so lugar"
+  s05Enxergar: 4.4, // T — "mas nao consegue enxergar..."
+  s09Phone: 5.8, // G — mockup "Veja o lucro real"
+  s06Quanto: 4.6, // T — "Quanto entrou? saiu? sobrou?"
+  s12Operacao: 5.6, // G — "Resultado da operacao"
+  s07Prever: 4.4, // T — "Quanto vai fechar na proxima semana?"
+  s13Previsao: 5.8, // G — "Previsao da semana"
+  s08Nasceu: 4.4, // T — "Foi pensando nisso que nasceu a Monttra"
+  s14Cta: 5.6, // CTA final
 } as const;
 
 export type SceneId = keyof typeof SCENE_SECONDS;
 
+/**
+ * Alternancia deliberada: cena de texto -> cena de baloes/graficos ->
+ * cena de texto -> ... Cada bloco de argumento e seguido pela tela do
+ * produto que o ilustra.
+ */
 export const SCENE_ORDER: SceneId[] = [
   's01Hook',
-  's02Nao',
   's03Caos',
-  's04Dinheiro',
-  's05Enxergar',
-  's06Quanto',
-  's07Prever',
-  's08Nasceu',
-  's09Phone',
+  's02Nao',
   's10Periodo',
+  's04Dinheiro',
   's11TudoUm',
+  's05Enxergar',
+  's09Phone',
+  's06Quanto',
   's12Operacao',
+  's07Prever',
   's13Previsao',
+  's08Nasceu',
   's14Cta',
 ];
 

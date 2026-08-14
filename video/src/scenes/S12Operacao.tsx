@@ -194,7 +194,7 @@ const GlassCard: React.FC<{
 export const S12Operacao: React.FC<{ total: number }> = ({ total }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const wire = prog(frame, 92, 26);
+  const wire = prog(frame, 60, 20);
 
   return (
     <AbsoluteFill style={{ background: COLORS.bgDarkDeep }}>
@@ -220,8 +220,8 @@ export const S12Operacao: React.FC<{ total: number }> = ({ total }) => {
             fontSize: 56,
             letterSpacing: '-0.015em',
             color: '#EAF6F2',
-            opacity: prog(frame, 8, 18),
-            transform: `translateY(${(1 - prog(frame, 8, 26)) * 24}px)`,
+            opacity: prog(frame, 4, 14),
+            transform: `translateY(${(1 - prog(frame, 4, 20)) * 24}px)`,
           }}
         >
           {COPY.s12.title[0]}
@@ -244,13 +244,13 @@ export const S12Operacao: React.FC<{ total: number }> = ({ total }) => {
             strokeWidth={4}
             strokeLinecap="round"
             strokeDasharray={420}
-            strokeDashoffset={420 * (1 - prog(frame, 22, 22))}
+            strokeDashoffset={420 * (1 - prog(frame, 12, 18))}
             opacity={0.85}
           />
         </svg>
 
         {COPY.s12.suggestions.map((d, i) => (
-          <GlassCard key={d.n} i={i} delay={20 + i * 12} data={d} />
+          <GlassCard key={d.n} i={i} delay={12 + i * 10} data={d} />
         ))}
 
         {/* nó central entre os cards */}
@@ -264,8 +264,8 @@ export const S12Operacao: React.FC<{ total: number }> = ({ total }) => {
             borderRadius: '50%',
             background: '#C9FFEA',
             boxShadow: `0 0 ${26 + breathe(frame, 0.1, 10)}px ${COLORS.greenNeon}`,
-            opacity: prog(frame, 70, 14),
-            transform: `scale(${springAt(frame, fps, 70, SPRINGS.pop)})`,
+            opacity: prog(frame, 46, 12),
+            transform: `scale(${springAt(frame, fps, 46, SPRINGS.pop)})`,
           }}
         />
 
@@ -306,7 +306,7 @@ export const S12Operacao: React.FC<{ total: number }> = ({ total }) => {
 
         {/* cards de resultado */}
         {COPY.s12.stats.map((st, i) => {
-          const delay = 104 + i * 10;
+          const delay = 70 + i * 8;
           const s = springAt(frame, fps, delay, SPRINGS.pop);
           return (
             <div
@@ -382,7 +382,7 @@ export const S12Operacao: React.FC<{ total: number }> = ({ total }) => {
 
       <Sparks
         count={22}
-        delay={20}
+        delay={12}
         origin={[540, 900]}
         spread={420}
         rise={280}
@@ -391,26 +391,26 @@ export const S12Operacao: React.FC<{ total: number }> = ({ total }) => {
       />
       <GlitchSlices at={0} dur={9} slices={11} amount={54} />
       <Flash at={0} dur={6} color="#0AFFB0" max={0.28} />
-      <LightSweep delay={54} dur={44} color="rgba(160,255,222,0.5)" />
+      <LightSweep delay={34} dur={38} color="rgba(160,255,222,0.5)" />
 
       <SfxTrack
         cues={[
           { name: 'glitchDigital', at: 0, volume: 1.1 },
           { name: 'subBoom', at: 0, volume: 0.9 },
-          { name: 'whooshTransition', at: 2, volume: 0.85, rate: 0.86 },
-          { name: 'popSoft', at: 8 },
-          { name: 'reverseWhoosh', at: 14, volume: 0.6 },
-          { name: 'whooshShort', at: 20, rate: 0.9 },
-          { name: 'whooshShort', at: 32, rate: 0.96 },
-          { name: 'sparkleShine', at: 40 },
-          { name: 'clickDigital', at: 42 },
-          { name: 'clickDigital', at: 54, rate: 1.1 },
-          { name: 'notificationPop', at: 70 },
-          { name: 'tickMicro', at: 92 },
-          { name: 'tickMicro', at: 98, rate: 1.1 },
-          { name: 'successChime', at: 104, volume: 0.85 },
-          { name: 'bassHit', at: 104, volume: 0.6 },
-          { name: 'popUi', at: 114 },
+          { name: 'whooshTransition', at: 1, volume: 0.85, rate: 0.86 },
+          { name: 'popSoft', at: 4 },
+          { name: 'reverseWhoosh', at: 6, volume: 0.6 },
+          { name: 'whooshShort', at: 12, rate: 0.9 },
+          { name: 'whooshShort', at: 22, rate: 0.96 },
+          { name: 'sparkleShine', at: 26 },
+          { name: 'clickDigital', at: 28 },
+          { name: 'clickDigital', at: 34, rate: 1.1 },
+          { name: 'notificationPop', at: 46 },
+          { name: 'tickMicro', at: 60 },
+          { name: 'tickMicro', at: 64, rate: 1.1 },
+          { name: 'successChime', at: 70, volume: 0.85 },
+          { name: 'bassHit', at: 70, volume: 0.6 },
+          { name: 'popUi', at: 78 },
         ]}
       />
     </AbsoluteFill>

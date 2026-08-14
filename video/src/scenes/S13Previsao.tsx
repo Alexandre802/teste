@@ -40,10 +40,10 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const calS = springAt(frame, fps, 22, SPRINGS.snappy);
-  const chartS = springAt(frame, fps, 44, SPRINGS.soft);
-  const goalS = springAt(frame, fps, 120, SPRINGS.snappy);
-  const robotS = springAt(frame, fps, 108, SPRINGS.pop);
+  const calS = springAt(frame, fps, 14, SPRINGS.snappy);
+  const chartS = springAt(frame, fps, 28, SPRINGS.soft);
+  const goalS = springAt(frame, fps, 80, SPRINGS.snappy);
+  const robotS = springAt(frame, fps, 70, SPRINGS.pop);
 
   return (
     <AbsoluteFill>
@@ -63,7 +63,7 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
               'linear-gradient(90deg, rgba(5,213,142,0) 0%, rgba(5,213,142,0.16) 55%, rgba(5,213,142,0) 100%)',
             filter: 'blur(48px)',
             transform: `rotate(${-14 + i * 4}deg)`,
-            opacity: prog(frame, 10 + i * 6, 40),
+            opacity: prog(frame, 6 + i * 4, 30),
           }}
         />
       ))}
@@ -85,8 +85,8 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
               fontSize: 66,
               letterSpacing: '-0.03em',
               color: COLORS.ink,
-              opacity: prog(frame, 4, 16),
-              transform: `translateY(${(1 - prog(frame, 4, 24)) * 26}px)`,
+              opacity: prog(frame, 2, 12),
+              transform: `translateY(${(1 - prog(frame, 2, 18)) * 26}px)`,
             }}
           >
             {COPY.s13.title[0]}
@@ -98,15 +98,15 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
               fontSize: 66,
               letterSpacing: '-0.03em',
               color: COLORS.green,
-              opacity: prog(frame, 10, 16),
-              transform: `translateY(${(1 - prog(frame, 10, 24)) * 26}px)`,
+              opacity: prog(frame, 7, 12),
+              transform: `translateY(${(1 - prog(frame, 7, 18)) * 26}px)`,
             }}
           >
             {COPY.s13.title[1]}
           </div>
           <div style={{ height: 18 }} />
           {COPY.s13.sub.map((s, i) => (
-            <UiText key={s} size={30} weight={400} color={COLORS.gray} delay={20 + i * 5}>
+            <UiText key={s} size={30} weight={400} color={COLORS.gray} delay={13 + i * 4}>
               {s}
             </UiText>
           ))}
@@ -123,7 +123,7 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
             background: COLORS.white,
             boxShadow: SHADOW.card,
             padding: '22px 20px 26px',
-            opacity: prog(frame, 22, 14),
+            opacity: prog(frame, 14, 12),
             transform: `translateY(${(1 - calS) * 60}px) scale(${0.93 + calS * 0.07})`,
           }}
         >
@@ -158,7 +158,7 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
                   fontSize: 21,
                   color: COLORS.grayLight,
                   paddingBottom: 6,
-                  opacity: prog(frame, 28 + i, 10),
+                  opacity: prog(frame, 19 + i, 9),
                 }}
               >
                 {w}
@@ -170,9 +170,9 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
                 const isToday = r === 4 && c === 0;
                 const inWeek = r === 4 && c <= 4;
                 const muted = (r === 0 && c < 2) || (r === 4 && c > 4);
-                const p = prog(frame, 32 + idx * 0.7, 10);
-                const sel = isToday ? prog(frame, 66, 14, EASE.back) : 0;
-                const wk = inWeek ? prog(frame, 70, 16) : 0;
+                const p = prog(frame, 22 + idx * 0.5, 9);
+                const sel = isToday ? prog(frame, 44, 12, EASE.back) : 0;
+                const wk = inWeek ? prog(frame, 47, 13) : 0;
                 return (
                   <div
                     key={`${r}-${c}`}
@@ -217,7 +217,7 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
             borderRadius: 34,
             background: COLORS.white,
             boxShadow: SHADOW.card,
-            opacity: prog(frame, 44, 14),
+            opacity: prog(frame, 28, 12),
             transform: `translateY(${(1 - chartS) * 70}px) scale(${0.95 + chartS * 0.05})`,
             overflow: 'hidden',
           }}
@@ -230,7 +230,7 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
               display: 'flex',
               alignItems: 'center',
               gap: 14,
-              opacity: prog(frame, 50, 12),
+              opacity: prog(frame, 33, 10),
             }}
           >
             <Sparkle size={30} color={COLORS.greenBright} style={{ transform: `rotate(${breathe(frame, 0.05, 8)}deg)` }} />
@@ -257,8 +257,8 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
               padding: '12px 22px',
               borderRadius: 999,
               background: COLORS.greenPaler,
-              opacity: prog(frame, 56, 12),
-              transform: `scale(${springAt(frame, fps, 56, SPRINGS.pop)})`,
+              opacity: prog(frame, 37, 10),
+              transform: `scale(${springAt(frame, fps, 37, SPRINGS.pop)})`,
             }}
           >
             <div style={{ width: 14, height: 14, borderRadius: '50%', background: COLORS.green }} />
@@ -279,7 +279,7 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
                 stroke="#E4E9E8"
                 strokeWidth={2}
                 strokeDasharray="5 6"
-                opacity={prog(frame, 62 + i * 3, 12)}
+                opacity={prog(frame, 41 + i * 2, 10)}
               />
             ))}
           </svg>
@@ -289,8 +289,8 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
             points={SERIES.map((p) => [p[0], p[1]] as [number, number])}
             width={868}
             height={330}
-            delay={62}
-            dur={58}
+            delay={41}
+            dur={44}
             color={COLORS.green}
             areaFrom="rgba(1,146,102,0.16)"
             strokeWidth={6}
@@ -303,7 +303,7 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
 
           {/* balões de previsão */}
           {COPY.s13.forecasts.map((f, i) => {
-            const d = 104 + i * 8;
+            const d = 68 + i * 7;
             const s = springAt(frame, fps, d, SPRINGS.pop);
             const pos = [
               { left: 496, top: 148 },
@@ -348,8 +348,8 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
               position: 'absolute',
               left: 868,
               top: 112,
-              opacity: prog(frame, 118, 12),
-              transform: `scale(${springAt(frame, fps, 118, SPRINGS.pop)}) rotate(-6deg)`,
+              opacity: prog(frame, 78, 10),
+              transform: `scale(${springAt(frame, fps, 78, SPRINGS.pop)}) rotate(-6deg)`,
             }}
           >
             <ArrowUpRight size={62} color={COLORS.green} strokeWidth={3} />
@@ -367,7 +367,7 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
                 fontFamily: FONTS.ui,
                 fontSize: 28,
                 color: COLORS.inkSoft,
-                opacity: prog(frame, 66 + i * 3, 12),
+                opacity: prog(frame, 44 + i * 2, 10),
               }}
             >
               {d}
@@ -386,8 +386,8 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
             borderRadius: 26,
             background: 'rgba(255,255,255,0.88)',
             boxShadow: SHADOW.card,
-            opacity: prog(frame, 112, 14),
-            transform: `translateX(${(1 - springAt(frame, fps, 112, SPRINGS.snappy)) * -80}px)`,
+            opacity: prog(frame, 74, 12),
+            transform: `translateX(${(1 - springAt(frame, fps, 74, SPRINGS.snappy)) * -80}px)`,
             paddingLeft: 132,
             paddingTop: 34,
             paddingRight: 22,
@@ -406,7 +406,7 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
               lineHeight: 1.45,
               color: COLORS.gray,
               marginTop: 10,
-              opacity: prog(frame, 120, 14),
+              opacity: prog(frame, 78, 12),
             }}
           >
             {COPY.s13.assistant.body}
@@ -419,7 +419,7 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
             left: 24,
             top: 1236,
             width: 176,
-            opacity: prog(frame, 108, 14),
+            opacity: prog(frame, 70, 12),
             transform: `translateY(${(1 - robotS) * 50}px) scale(${0.8 + robotS * 0.2}) rotate(${breathe(frame, 0.03, 2.4)}deg)`,
             filter: 'drop-shadow(0 18px 26px rgba(9,32,27,0.16))',
           }}
@@ -437,7 +437,7 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
             background: 'linear-gradient(140deg, #0E6B4B 0%, #04452F 100%)',
             boxShadow: '0 26px 60px rgba(4,69,47,0.34)',
             overflow: 'hidden',
-            opacity: prog(frame, 120, 14),
+            opacity: prog(frame, 78, 12),
             transform: `translateX(${(1 - goalS) * 90}px) scale(${0.94 + goalS * 0.06})`,
             padding: '22px 26px',
           }}
@@ -450,7 +450,7 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
               padding: '9px 18px',
               borderRadius: 999,
               background: 'rgba(0,0,0,0.34)',
-              opacity: prog(frame, 126, 12),
+              opacity: prog(frame, 84, 10),
             }}
           >
             <Star size={18} color="#FFFFFF" />
@@ -465,15 +465,15 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
               fontSize: 34,
               color: '#FFFFFF',
               marginTop: 16,
-              opacity: prog(frame, 130, 12),
+              opacity: prog(frame, 87, 10),
             }}
           >
             {COPY.s13.goal.label}
           </div>
           <Counter
             to={COPY.s13.goal.value}
-            delay={134}
-            dur={40}
+            delay={90}
+            dur={30}
             prefix="+"
             suffix="%"
             size={64}
@@ -487,7 +487,7 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
               fontSize: 21,
               color: 'rgba(255,255,255,0.8)',
               marginTop: 6,
-              opacity: prog(frame, 150, 12),
+              opacity: prog(frame, 100, 10),
             }}
           >
             {COPY.s13.goal.caption}
@@ -496,7 +496,7 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
           {/* alvo luminoso */}
           <div style={{ position: 'absolute', right: 12, top: 26 }}>
             {[0, 1, 2].map((i) => {
-              const p = prog(frame, 132 + i * 6, 22, EASE.back);
+              const p = prog(frame, 88 + i * 5, 18, EASE.back);
               const size = 174 - i * 48;
               return (
                 <div
@@ -525,7 +525,7 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
                 borderRadius: '50%',
                 background: '#FFFFFF',
                 boxShadow: `0 0 ${20 + breathe(frame, 0.12, 8)}px #FFFFFF`,
-                opacity: prog(frame, 150, 10),
+                opacity: prog(frame, 100, 9),
               }}
             />
           </div>
@@ -533,7 +533,7 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
 
         {/* pílulas finais */}
         {COPY.s13.pills.map((p, i) => {
-          const d = 154 + i * 8;
+          const d = 106 + i * 7;
           const s = springAt(frame, fps, d, SPRINGS.pop);
           return (
             <div
@@ -588,37 +588,37 @@ export const S13Previsao: React.FC<{ total: number }> = ({ total }) => {
 
       <Sparks
         count={20}
-        delay={132}
+        delay={88}
         origin={[930, 1330]}
         spread={260}
         rise={180}
         color={COLORS.greenNeon}
         seed="prev"
       />
-      <Flash at={44} dur={7} max={0.3} />
-      <LightSweep delay={70} dur={48} />
+      <Flash at={28} dur={7} max={0.3} />
+      <LightSweep delay={46} dur={40} />
 
       <SfxTrack
         cues={[
           { name: 'whooshTransition', at: 0, volume: 0.78 },
-          { name: 'whooshShort', at: 4 },
-          { name: 'popSoft', at: 22 },
-          { name: 'tickMicro', at: 32 },
-          { name: 'tickMicro', at: 40, rate: 1.1 },
-          { name: 'whooshShort', at: 44, rate: 0.9 },
-          { name: 'popUi', at: 56 },
-          { name: 'tapButton', at: 66, volume: 1.1 },
-          { name: 'clickDigital', at: 70 },
-          { name: 'riserShort', at: 62, volume: 0.42 },
-          { name: 'notificationPop', at: 104 },
-          { name: 'notificationPop', at: 112, rate: 1.08 },
-          { name: 'popSoft', at: 108 },
-          { name: 'whooshShort', at: 120, rate: 1.06 },
-          { name: 'sparkleShine', at: 132 },
-          { name: 'successChime', at: 134, volume: 0.8 },
-          { name: 'bassHit', at: 134, volume: 0.55 },
-          { name: 'popUi', at: 154 },
-          { name: 'popUi', at: 162, rate: 1.08 },
+          { name: 'whooshShort', at: 2 },
+          { name: 'popSoft', at: 14 },
+          { name: 'tickMicro', at: 22 },
+          { name: 'tickMicro', at: 26, rate: 1.1 },
+          { name: 'whooshShort', at: 28, rate: 0.9 },
+          { name: 'popUi', at: 37 },
+          { name: 'riserShort', at: 40, volume: 0.42 },
+          { name: 'tapButton', at: 44, volume: 1.1 },
+          { name: 'clickDigital', at: 47 },
+          { name: 'notificationPop', at: 68 },
+          { name: 'notificationPop', at: 75, rate: 1.08 },
+          { name: 'popSoft', at: 70 },
+          { name: 'whooshShort', at: 78, rate: 1.06 },
+          { name: 'sparkleShine', at: 88 },
+          { name: 'successChime', at: 90, volume: 0.8 },
+          { name: 'bassHit', at: 90, volume: 0.55 },
+          { name: 'popUi', at: 106 },
+          { name: 'popUi', at: 113, rate: 1.08 },
         ]}
       />
     </AbsoluteFill>

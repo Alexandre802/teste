@@ -61,7 +61,9 @@ src/
     Scene.tsx          deriva de câmera + saída padrão de cena
     Bg.tsx             fundos claro/escuro, barras, grão, vinheta
     Logo.tsx           símbolo + wordmark em vetor, barras animáveis
-    Type.tsx           revelação tipográfica com máscara, stagger, sweep
+    Type.tsx           utilitários de texto (máscara, sweep, texto de UI)
+    Kinetic.tsx        tipografia cinética: palavras que encaixam, batidas,
+                       troca de palavra, odômetro, badges
     Ui.tsx             cards, abas, chips, contadores, esqueletos
     Charts.tsx         linhas que se desenham, barras 3D, seta luminosa
     Icons.tsx          ícones em SVG
@@ -82,22 +84,25 @@ tools/
 
 ## As 14 cenas
 
-| # | Cena | Referência |
-| --- | --- | --- |
-| 01 | "Método não dá resultado. Mas sabe por quê?" | `55933092…` |
-| 02 | "Não é necessariamente por causa do método." | `5B1C2A21…` |
-| 03 | Receitas × Despesas × Resultado (o caos) | `5F0A4926…` |
-| 04 | "Você até pode estar fazendo dinheiro..." | `13D31795…` |
-| 05 | "Mas não consegue enxergar…" | `9D589EAF…` |
-| 06 | "Quanto entrou? saiu? sobrou?" | `FD6718AA…` |
-| 07 | "Quanto vai fechar na próxima semana?" | `DD7785A5…` |
-| 08 | "Foi pensando nisso que nasceu a Monttra" | `81318C44…` |
-| 09 | Mockup do app — "Veja o lucro real" | `133BCCC2…` |
-| 10 | "Acompanhe por período" | `5E1A6311…` |
-| 11 | "Tudo em um só lugar" | `E58E53D7…` |
-| 12 | "Resultado da operação" (surebets, cena escura) | `E0DC9E01…` |
-| 13 | "Previsão da semana" (IA, calendário, meta) | `934F3467…` |
-| 14 | Chamada final — "Teste grátis por 3 dias" | — |
+A ordem alterna deliberadamente **texto → balões/gráficos → texto → …**,
+para o vídeo nunca ficar dois blocos seguidos no mesmo registro.
+
+| # | Tipo | Cena | Referência |
+| --- | --- | --- | --- |
+| 1 | texto | "Método não dá resultado. Mas sabe por quê?" | `55933092…` |
+| 2 | gráfico | Receitas × Despesas × Resultado | `5F0A4926…` |
+| 3 | texto | "Não é necessariamente por causa do método." | `5B1C2A21…` |
+| 4 | gráfico | "Acompanhe por período" | `5E1A6311…` |
+| 5 | texto | "Você até pode estar fazendo dinheiro..." | `13D31795…` |
+| 6 | gráfico | "Tudo em um só lugar" | `E58E53D7…` |
+| 7 | texto | "Mas não consegue enxergar…" | `9D589EAF…` |
+| 8 | gráfico | Mockup do app — "Veja o lucro real" | `133BCCC2…` |
+| 9 | texto | "Quanto entrou? saiu? sobrou?" | `FD6718AA…` |
+| 10 | gráfico | "Resultado da operação" (surebets) | `E0DC9E01…` |
+| 11 | texto | "Quanto vai fechar na próxima semana?" | `DD7785A5…` |
+| 12 | gráfico | "Previsão da semana" (IA, calendário, meta) | `934F3467…` |
+| 13 | texto | "Foi pensando nisso que nasceu a Monttra" | `81318C44…` |
+| 14 | CTA | "Teste grátis por 3 dias" | — |
 
 ---
 
@@ -115,6 +120,21 @@ Duas exceções, recortadas das artes em 2× e usadas como camadas: o robô do
 Posições, proporções e cores foram medidas diretamente sobre as artes originais
 para preservar o layout e a identidade.
 
+## Animação
+
+O gesto tipográfico do reel está em `components/Kinetic.tsx`: cada palavra é
+uma camada que chega de baixo, ampliada e borrada, e **encaixa** no lugar com
+um leve overshoot — uma palavra a cada ~5 frames. O layout é fixado por flex,
+então só transformações animam e nada reflui.
+
+As cenas de texto **constroem** o bloco em ondas, mas nenhum elemento sai: o
+quadro final de cada cena reproduz a arte de referência como ela é.
+
+Entre cenas há um par punch-out / punch-in — a que sai encolhe e borra
+enquanto a que entra chega ampliada e desfocada. `Scene.tsx` ainda aplica um
+avanço de câmera contínuo e uma micro-oscilação, de modo que nenhum quadro
+fica completamente parado.
+
 ## Efeitos sonoros
 
 Os 18 efeitos são **sintetizados do zero** por `tools/make_sfx.py` (48kHz,
@@ -131,8 +151,8 @@ síntese e rode `python3 tools/make_sfx.py`.
 
 ## Entrega
 
-`out/monttra-reel.mp4` — 1080×1920, 60fps, 76,5s, H.264 High (CRF 20, faststart),
-áudio AAC 192kbps estéreo a 48kHz com ~1,6 dB de headroom. ~75 MB.
+`out/monttra-reel.mp4` — 1080×1920, 60fps, 68,6s, H.264 High (CRF 20, faststart),
+áudio AAC 192kbps estéreo a 48kHz com ~1,6 dB de headroom. ~40 MB.
 
 Para regerar:
 
@@ -140,11 +160,11 @@ Para regerar:
 npm run build     # master CRF 17 em out/monttra-reel.mp4
 ```
 
-Para uma versão leve (~20 MB, útil para WhatsApp ou revisão rápida):
+Para uma versão leve (~21 MB, útil para WhatsApp ou revisão rápida):
 
 ```bash
 npx remotion ffmpeg -i out/monttra-reel.mp4 \
-  -c:v libx264 -preset slow -b:v 2100k -maxrate 2600k -bufsize 4200k \
+  -c:v libx264 -preset slow -b:v 2400k -maxrate 3000k -bufsize 4800k \
   -profile:v main -pix_fmt yuv420p -c:a aac -b:a 128k -movflags +faststart \
   -y out/monttra-reel-preview.mp4
 ```

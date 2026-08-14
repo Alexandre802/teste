@@ -31,7 +31,7 @@ export const S10Periodo: React.FC<{ total: number }> = ({ total }) => {
   const { fps } = useVideoConfig();
 
   // seleção da aba "Mês" acontece depois que as abas entram
-  const select = tween(frame, [46, 62], [0, 1], EASE.back);
+  const select = tween(frame, [26, 42], [0, 1], EASE.back);
 
   return (
     <AbsoluteFill>
@@ -47,7 +47,7 @@ export const S10Periodo: React.FC<{ total: number }> = ({ total }) => {
 
         <RingChip
           label={COPY.s10.chipTop}
-          delay={14}
+          delay={6}
           size={31}
           from="right"
           style={{ position: 'absolute', left: 520, top: 522 }}
@@ -71,7 +71,7 @@ export const S10Periodo: React.FC<{ total: number }> = ({ total }) => {
               label={t}
               active={i === COPY.s10.activeTab}
               activeProgress={select}
-              delay={24 + i * 4}
+              delay={12 + i * 3}
               size={34}
             />
           ))}
@@ -84,15 +84,15 @@ export const S10Periodo: React.FC<{ total: number }> = ({ total }) => {
           points={[{ x: -90, y: 1560 }, ...NODES].map((n) => [n.x, n.y] as [number, number])}
           tip={[978, 882]}
           tipAngle={-50}
-          delay={62}
-          dur={72}
+          delay={40}
+          dur={58}
           style={{ left: 0, top: 0 }}
         />
 
         {/* nós + hastes até os rótulos dos meses */}
         <svg width={1080} height={1920} viewBox="0 0 1080 1920" style={{ position: 'absolute', left: 0, top: 0 }}>
           {NODES.map((n, i) => {
-            const d = 76 + i * 8;
+            const d = 50 + i * 6;
             const p = prog(frame, d, 18, EASE.back);
             const stem = prog(frame, d + 4, 16);
             const stemTo = 1530;
@@ -116,7 +116,7 @@ export const S10Periodo: React.FC<{ total: number }> = ({ total }) => {
         </svg>
 
         {COPY.s10.months.map((m, i) => {
-          const d = 82 + i * 8;
+          const d = 55 + i * 6;
           const p = prog(frame, d, 16);
           return (
             <div
@@ -140,7 +140,7 @@ export const S10Periodo: React.FC<{ total: number }> = ({ total }) => {
 
         <RingChip
           label={COPY.s10.chipBottom}
-          delay={130}
+          delay={96}
           size={34}
           from="left"
           style={{ position: 'absolute', left: 660, top: 1638 }}
@@ -149,37 +149,37 @@ export const S10Periodo: React.FC<{ total: number }> = ({ total }) => {
 
       <Sparks
         count={18}
-        delay={124}
+        delay={92}
         origin={[960, 1000]}
         spread={260}
         rise={200}
         color={COLORS.greenNeon}
         seed="per"
       />
-      <LightSweep delay={40} dur={40} />
+      <LightSweep delay={24} dur={34} />
 
       <SfxTrack
         cues={[
           { name: 'whooshTransition', at: 0, volume: 0.78 },
-          { name: 'popSoft', at: 14 },
-          { name: 'popUi', at: 24 },
-          { name: 'popUi', at: 28, rate: 1.05 },
-          { name: 'popUi', at: 32, rate: 1.1 },
-          { name: 'popUi', at: 36, rate: 1.15 },
-          { name: 'popUi', at: 40, rate: 1.2 },
-          { name: 'tapButton', at: 46, volume: 1.1 },
-          { name: 'clickDigital', at: 48 },
-          { name: 'riserShort', at: 44, volume: 0.5 },
-          { name: 'whooshTransition', at: 62, volume: 0.7, rate: 0.9 },
-          { name: 'tickMicro', at: 76 },
-          { name: 'tickMicro', at: 84, rate: 1.06 },
-          { name: 'tickMicro', at: 92, rate: 1.12 },
-          { name: 'tickMicro', at: 100, rate: 1.18 },
-          { name: 'tickMicro', at: 108, rate: 1.24 },
-          { name: 'tickMicro', at: 116, rate: 1.3 },
-          { name: 'impactHit', at: 124, volume: 0.7 },
-          { name: 'sparkleShine', at: 126 },
-          { name: 'popSoft', at: 130, rate: 0.95 },
+          { name: 'popSoft', at: 6 },
+          { name: 'popUi', at: 12 },
+          { name: 'popUi', at: 15, rate: 1.05 },
+          { name: 'popUi', at: 18, rate: 1.1 },
+          { name: 'popUi', at: 21, rate: 1.15 },
+          { name: 'popUi', at: 24, rate: 1.2 },
+          { name: 'riserShort', at: 22, volume: 0.5 },
+          { name: 'tapButton', at: 26, volume: 1.15 },
+          { name: 'clickDigital', at: 28 },
+          { name: 'whooshTransition', at: 40, volume: 0.72, rate: 0.9 },
+          { name: 'tickMicro', at: 50 },
+          { name: 'tickMicro', at: 56, rate: 1.06 },
+          { name: 'tickMicro', at: 62, rate: 1.12 },
+          { name: 'tickMicro', at: 68, rate: 1.18 },
+          { name: 'tickMicro', at: 74, rate: 1.24 },
+          { name: 'tickMicro', at: 80, rate: 1.3 },
+          { name: 'impactHit', at: 92, volume: 0.75 },
+          { name: 'sparkleShine', at: 92 },
+          { name: 'popSoft', at: 96, rate: 0.95 },
         ]}
       />
     </AbsoluteFill>
