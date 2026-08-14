@@ -17,23 +17,27 @@ import os
 import subprocess
 import sys
 
-W, H = 48, 85          # resolução de análise (mantém o 9:16)
+W, H = 24, 42          # resolução de análise (mantém o 9:16)
 FRAME = W * H * 3
 FPS = 30
 
 # Um frame com desvio padrão abaixo disso não tem praticamente nenhum
 # conteúdo — é fundo chapado.
 STD_LIMIT = 6.0
-# Trechos mortos mais curtos que isso são transições legítimas (flash, wipe).
-MIN_RUN = 4
+# Trechos mortos mais curtos que isso (0,2 s) são batidas legítimas — o flash
+# preto do glitch, o instante inicial de um snap-in. Acima disso é defeito.
+MIN_RUN = 6
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def decode(path):
+    # o ffmpeg do Remotion traz o codec rawvideo mas nao o muxer homonimo;
+    # image2pipe entrega os frames crus em sequencia do mesmo jeito.
     cmd = [
         "npx", "remotion", "ffmpeg", "-v", "error", "-i", path,
-        "-vf", f"scale={W}:{H}", "-f", "rawvideo", "-pix_fmt", "rgb24", "-",
+        "-vf", f"scale={W}:{H}", "-f", "image2pipe",
+        "-vcodec", "rawvideo", "-pix_fmt", "rgb24", "-",
     ]
     p = subprocess.run(cmd, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if p.returncode != 0 or not p.stdout:

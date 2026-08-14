@@ -47,8 +47,8 @@ export const Scene01: FC<{ cfg: SceneConfig }> = ({ cfg }) => (
         />
       </Layer>
 
-      <Layer x={78} y={90} enter={{ delay: 8, x: -70 }}>
-        <Logo size={66} delay={10} />
+      <Layer x={78} y={90} enter={{ delay: 0, x: -70 }}>
+        <Logo size={66} delay={0} />
       </Layer>
 
       {/* card Desempenho */}
@@ -110,10 +110,10 @@ export const Scene01: FC<{ cfg: SceneConfig }> = ({ cfg }) => (
 
       {/* headline */}
       <Layer x={0} y={648} w={1080} enter={{ fade: false }}>
-        <Headline lines={S.headline} size={150} delay={20} step={9} align="center" lineHeight={0.99} />
+        <Headline lines={S.headline} size={150} delay={2} step={9} align="center" lineHeight={0.99} />
       </Layer>
 
-      <Layer x={0} y={1148} w={1080} enter={{ delay: 54, y: 26 }}>
+      <Layer x={0} y={1148} w={1080} enter={{ delay: 44, y: 26 }}>
         <div
           style={{
             fontFamily: FONT.family,
