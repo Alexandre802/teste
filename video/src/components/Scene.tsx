@@ -21,6 +21,10 @@ export const Scene: React.FC<{
   exitBlur?: number;
   /** amplitude da oscilação contínua (px) */
   handheld?: number;
+  /** frames em que a câmera dá um avanço rápido (acentos) */
+  punches?: number[];
+  /** amplitude da rotação lenta da câmera, em graus */
+  roll?: number;
   style?: React.CSSProperties;
 }> = ({
   children,
@@ -32,6 +36,8 @@ export const Scene: React.FC<{
   exitScale = 0.26,
   exitBlur = 34,
   handheld = 3,
+  punches = [],
+  roll = 0.35,
   style,
 }) => {
   const frame = useCurrentFrame();
@@ -40,14 +46,24 @@ export const Scene: React.FC<{
 
   const hx = Math.sin(frame * 0.021) * handheld;
   const hy = Math.cos(frame * 0.017) * handheld * 0.7;
+  // rotação muito lenta: tira o "travado" sem desalinhar nada
+  const rot = Math.sin(frame * 0.0062) * roll;
 
-  const scale = 1 + p * zoom - e * exitScale;
+  // acentos: um avanço curto da câmera nos momentos de impacto
+  const punch = punches.reduce((acc, at) => {
+    const up = tween(frame, [at - 2, at + 5], [0, 1], EASE.out);
+    const down = tween(frame, [at + 5, at + 22], [0, 1], EASE.inOut);
+    return acc + up * (1 - down);
+  }, 0);
+
+  // a rotação expõe os cantos: uma escala base mínima cobre isso
+  const scale = 1.008 + p * zoom - e * exitScale + punch * 0.032;
   const blurring = e > 0.001;
 
   return (
     <AbsoluteFill
       style={{
-        transform: `scale(${scale}) translate3d(${p * driftX + hx}px, ${p * driftY + hy}px, 0)`,
+        transform: `scale(${scale}) rotate(${rot}deg) translate3d(${p * driftX + hx}px, ${p * driftY + hy}px, 0)`,
         opacity: 1 - e * 0.85,
         filter: blurring ? `blur(${e * exitBlur}px)` : undefined,
         transformOrigin: 'center center',

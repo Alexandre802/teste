@@ -18,8 +18,8 @@ const NODES = [
   { x: 918, y: 1010, v: 'R$ 24.900' },
 ];
 
-const ARROW_AT = 26;
-const ARROW_DUR = 208; // a linha sobe devagar, ao longo de quase toda a cena
+const ARROW_AT = 20;
+const ARROW_DUR = 150; // a linha sobe devagar, ao longo de quase toda a cena
 
 /** Momento em que a varredura da linha alcança cada nó. */
 const nodeAt = (x: number) => ARROW_AT + ARROW_DUR * (x / 1080);
@@ -102,11 +102,11 @@ const ArrowTravel: React.FC = () => {
  */
 export const S10Periodo: React.FC<{ total: number }> = ({ total }) => (
   <AbsoluteFill>
-    <Scene total={total} zoom={0.022} driftY={-7} handheld={2.2}>
+    <Scene total={total} zoom={0.05} driftX={-14} driftY={-12} handheld={2.4} punches={[36, 176]}>
       <PlateScene
         scene="periodo"
         layers={[
-          { id: 'chipTop', delay: 12, from: 'right', distance: 130, spring: 'pop', float: 4 },
+          { id: 'chipTop', delay: 12, from: 'right', distance: 130, spring: 'pop', float: 4, sweepAt: 54 },
           { id: 'tab0', delay: 24, from: 'scale', spring: 'pop', blur: 10 },
           { id: 'tab1', delay: 30, from: 'scale', spring: 'pop', blur: 10 },
           { id: 'tab2', delay: 36, from: 'scale', spring: 'pop', blur: 10, glow: 'rgba(3,80,54,0.45)' },
@@ -125,7 +125,7 @@ export const S10Periodo: React.FC<{ total: number }> = ({ total }) => (
             blur: 6,
           })),
 
-          { id: 'chipBottom', delay: 250, from: 'left', distance: 130, spring: 'pop', float: 4, phase: 2 },
+          { id: 'chipBottom', delay: 196, from: 'left', distance: 130, spring: 'pop', float: 4, phase: 2, sweepAt: 224 },
         ]}
       >
         <Logo
@@ -138,7 +138,7 @@ export const S10Periodo: React.FC<{ total: number }> = ({ total }) => (
 
       <ArrowTravel />
       <MonthValues />
-      <Sparks count={18} delay={224} origin={[960, 940]} spread={260} rise={210} color={COLORS.greenNeon} seed="per" />
+      <Sparks count={18} delay={176} origin={[960, 940]} spread={260} rise={210} color={COLORS.greenNeon} seed="per" />
     </Scene>
 
     <LightSweep delay={26} dur={38} />
@@ -161,9 +161,9 @@ export const S10Periodo: React.FC<{ total: number }> = ({ total }) => (
           volume: 0.5 + i * 0.06,
           rate: 0.94 + i * 0.05,
         })),
-        { name: 'sparkleShine', at: 224 },
-        { name: 'impactHit', at: 226, volume: 0.7 },
-        { name: 'popSoft', at: 250, rate: 0.95 },
+        { name: 'sparkleShine', at: 176 },
+        { name: 'impactHit', at: 178, volume: 0.7 },
+        { name: 'popSoft', at: 196, rate: 0.95 },
       ]}
     />
   </AbsoluteFill>

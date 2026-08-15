@@ -1,6 +1,6 @@
 import React from 'react';
 import { AbsoluteFill } from 'remotion';
-import { LightSweep, Sparks } from '../components/Fx';
+import { LightSweep, PulseRing, Sparks } from '../components/Fx';
 import { Logo } from '../components/Logo';
 import { PlateScene } from '../components/Plate';
 import { Scene } from '../components/Scene';
@@ -16,19 +16,19 @@ import { COLORS } from '../config/theme';
  */
 export const S11TudoUm: React.FC<{ total: number }> = ({ total }) => (
   <AbsoluteFill>
-    <Scene total={total} zoom={0.022} driftY={-7} handheld={2.2}>
+    <Scene total={total} zoom={0.05} driftX={14} driftY={-12} handheld={2.4} punches={[14, 40]}>
       <PlateScene
         scene="tudoum"
         layers={[
           // o grafico do fundo se forma; entra abaixo dos cards
-          { id: 'iso', delay: 40, from: 'none', wipe: 'right', wipeDur: 88, blur: 0 },
+          { id: 'iso', delay: 26, from: 'none', wipe: 'diag', wipeDur: 84, blur: 0 },
 
-          { id: 'title', delay: 6, from: 'up', distance: 40, blur: 14 },
+          { id: 'title', delay: 6, from: 'none', wipe: 'right', wipeDur: 34, blur: 0 },
           { id: 'cardIn', delay: 14, from: 'left', distance: 240, spring: 'snappy', rotate: -4, float: 5 },
           { id: 'numIn', delay: 32, from: 'none', roll: true, rollDur: 24, blur: 0, float: 5 },
           { id: 'cardOut', delay: 26, from: 'down', distance: 230, spring: 'snappy', rotate: 3, float: 5, phase: 2 },
           { id: 'numOut', delay: 44, from: 'none', roll: true, rollDur: 24, blur: 0, float: 5, phase: 2 },
-          { id: 'cardRest', delay: 40, from: 'scale', spring: 'pop', glow: 'rgba(5,213,142,0.55)', float: 6, phase: 4, sweepAt: 120 },
+          { id: 'cardRest', delay: 40, from: 'scale', spring: 'pop', glow: 'rgba(5,213,142,0.55)', float: 6, phase: 4, sweepAt: 96 },
           { id: 'numRest', delay: 60, from: 'none', roll: true, rollDur: 26, blur: 0, float: 6, phase: 4 },
         ]}
       >
@@ -40,10 +40,16 @@ export const S11TudoUm: React.FC<{ total: number }> = ({ total }) => (
         />
       </PlateScene>
 
+      {/* os nós que ligam os cards são pixels da arte: ganham um anel
+          pulsando por cima para não ficarem parados */}
+      <PulseRing x={270} y={1168} delay={52} r={26} />
+      <PulseRing x={516} y={1246} delay={60} r={26} />
+      <PulseRing x={772} y={1010} delay={68} r={28} />
+
       <Sparks count={22} delay={42} origin={[820, 720]} spread={320} rise={230} color={COLORS.greenNeon} seed="tudo" />
     </Scene>
 
-    <LightSweep delay={78} dur={44} />
+    <LightSweep delay={62} dur={38} />
 
     <SfxTrack
       cues={[
@@ -59,7 +65,7 @@ export const S11TudoUm: React.FC<{ total: number }> = ({ total }) => (
         { name: 'riserShort', at: 44, volume: 0.42 },
         { name: 'tickMicro', at: 60, rate: 0.95 },
         { name: 'sparkleShine', at: 66 },
-        { name: 'popSoft', at: 190, volume: 0.5 },
+        { name: 'popSoft', at: 132, volume: 0.5 },
       ]}
     />
   </AbsoluteFill>

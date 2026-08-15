@@ -40,12 +40,14 @@ export type LayerAnim = {
    * 'right' varre da esquerda para a direita — é o que faz uma linha de
    * gráfico "crescer" usando os pixels da própria arte.
    */
-  wipe?: 'up' | 'down' | 'left' | 'right';
+  wipe?: 'up' | 'down' | 'left' | 'right' | 'diag';
   wipeDur?: number;
   /** deslocamento radial na entrada (a partir do centro da tela) */
   radial?: number;
   /** deriva contínua com tombo — para elementos soltos, como as cédulas */
   orbit?: { rx?: number; ry?: number; spin?: number; speed?: number };
+  /** queda contínua: desce, balança de lado e tomba (cédulas caindo) */
+  fall?: { vy?: number; sway?: number; speed?: number; spin?: number };
   /** o número sobe para o lugar como um contador assentando */
   roll?: boolean;
   rollDur?: number;
@@ -59,9 +61,19 @@ const wipeInset = (
   frame: number,
   delay: number,
   dur: number,
-  dir: 'up' | 'down' | 'left' | 'right',
+  dir: 'up' | 'down' | 'left' | 'right' | 'diag',
 ) => {
-  const q = (1 - prog(frame, delay, dur, EASE.inOut)) * 100;
+  const t = prog(frame, delay, dur, EASE.inOut);
+  if (dir === 'diag') {
+    // varredura na diagonal, do canto inferior esquerdo ao superior
+    // direito: a seta cresce ao longo do proprio traçado e as barras
+    // aparecem subindo, em vez de simplesmente surgirem da esquerda.
+    const pc = (v: number) => `${(v * 100).toFixed(2)}%`;
+    return t <= 0.5
+      ? `polygon(0% ${pc(1 - 2 * t)}, ${pc(2 * t)} 100%, 0% 100%)`
+      : `polygon(0% 0%, ${pc(2 * t - 1)} 0%, 100% ${pc(2 - 2 * t)}, 100% 100%, 0% 100%)`;
+  }
+  const q = (1 - t) * 100;
   return dir === 'right'
     ? `inset(0 ${q}% 0 0)`
     : dir === 'left'
@@ -96,6 +108,7 @@ const Layer: React.FC<{
     wipeDur = 26,
     radial = 0,
     orbit,
+    fall,
     roll = false,
     rollDur = 22,
     spin = 0,
@@ -126,6 +139,12 @@ const Layer: React.FC<{
   const ox = orbit ? Math.sin(frame * sp + phase) * (orbit.rx ?? 20) : 0;
   const oy = orbit ? Math.cos(frame * sp * 0.78 + phase) * (orbit.ry ?? 14) : 0;
   const tumble = orbit ? Math.sin(frame * sp * 0.62 + phase) * (orbit.spin ?? 6) : 0;
+
+  // queda contínua com balanço e tombo
+  const fsp = fall?.speed ?? 0.03;
+  const fy = fall ? frame * (fall.vy ?? 0.9) : 0;
+  const fx = fall ? Math.sin(frame * fsp + phase) * (fall.sway ?? 26) : 0;
+  const froll = fall ? Math.sin(frame * fsp * 0.74 + phase) * (fall.spin ?? 14) : 0;
 
   // entrada radial: o elemento chega de fora, na direção do centro da tela
   const cx = geom.x + geom.w / 2;
@@ -163,7 +182,7 @@ const Layer: React.FC<{
         width: geom.w,
         height: geom.h,
         opacity: p,
-        transform: `${move} ${scaleIn} translate3d(${ox + rx}px, ${drift + oy + ry}px, 0) rotate(${(1 - s) * rotate + tumble + frame * spin}deg)`,
+        transform: `${move} ${scaleIn} translate3d(${ox + rx + fx}px, ${drift + oy + ry + fy}px, 0) rotate(${(1 - s) * rotate + tumble + froll + frame * spin}deg)`,
         overflow: roll ? 'hidden' : undefined,
         filter: p < 0.999 && blur ? `blur(${(1 - p) * blur}px)` : undefined,
         zIndex,

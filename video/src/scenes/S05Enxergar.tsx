@@ -48,7 +48,7 @@ export const S05Enxergar: React.FC<{ total: number }> = ({ total }) => {
         progress={tween(frame, [14, 40], [0, 1])}
       />
 
-      <Scene total={total} zoom={0.08} driftY={-18}>
+      <Scene total={total} zoom={0.08} driftY={-18} punches={[2, 22]}>
         <LogoHeader delay={0} size={78} />
 
         <Stack top={556}>

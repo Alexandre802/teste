@@ -48,7 +48,7 @@ export const S02Nao: React.FC<{ total: number }> = ({ total }) => {
         progress={tween(frame, [10, 52], [0, 1])}
       />
 
-      <Scene total={total} zoom={0.085} driftY={-18}>
+      <Scene total={total} zoom={0.085} driftY={-18} punches={[3, 23]}>
         <LogoHeader delay={0} size={78} />
 
         <Stack top={700}>

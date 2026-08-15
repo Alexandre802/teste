@@ -340,6 +340,47 @@ export const Bursts: React.FC<{
   );
 };
 
+/**
+ * Anel que pulsa sobre um ponto da arte — usado nos nós que ligam os cards
+ * e no dia destacado do calendário, que na arte são pixels estáticos.
+ */
+export const PulseRing: React.FC<{
+  x: number;
+  y: number;
+  delay?: number;
+  r?: number;
+  color?: string;
+  period?: number;
+}> = ({ x, y, delay = 0, r = 26, color = COLORS.greenBright, period = 72 }) => {
+  const frame = useCurrentFrame();
+  const p = prog(frame, delay, 14, EASE.out);
+  if (p <= 0) return null;
+  const t = ((frame - delay) % period) / period;
+  return (
+    <div style={{ position: 'absolute', left: x, top: y, pointerEvents: 'none' }}>
+      {[0, 0.5].map((off) => {
+        const q = (t + off) % 1;
+        return (
+          <div
+            key={off}
+            style={{
+              position: 'absolute',
+              left: -r,
+              top: -r,
+              width: r * 2,
+              height: r * 2,
+              borderRadius: '50%',
+              border: `3px solid ${color}`,
+              opacity: (1 - q) * 0.5 * p,
+              transform: `scale(${0.7 + q * 1.5})`,
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+};
+
 /** Cortina que varre a tela — transicao entre blocos. */
 export const Wipe: React.FC<{
   at: number;

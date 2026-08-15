@@ -17,7 +17,7 @@ import { COLORS } from '../config/theme';
  */
 export const S12Operacao: React.FC<{ total: number }> = ({ total }) => (
   <AbsoluteFill style={{ background: COLORS.bgDarkDeep }}>
-    <Scene total={total} zoom={0.022} driftY={-7} handheld={2.4}>
+    <Scene total={total} zoom={0.055} driftX={-12} driftY={-14} handheld={2.6} punches={[30, 108, 126]}>
       <PlateScene
         scene="operacao"
         layers={[
@@ -25,7 +25,7 @@ export const S12Operacao: React.FC<{ total: number }> = ({ total }) => (
           { id: 'cols', delay: 6, from: 'none', wipe: 'up', wipeDur: 74, blur: 0 },
           { id: 'star', delay: 10, from: 'scale', spring: 'soft', blur: 10, spin: 0.16 },
 
-          { id: 'title', delay: 14, from: 'up', distance: 46, blur: 16 },
+          { id: 'title', delay: 14, from: 'none', wipe: 'right', wipeDur: 40, blur: 0 },
 
           // --- cards de sugestao ---
           { id: 'card1', delay: 30, from: 'up', distance: 220, spring: 'snappy', glow: 'rgba(5,213,142,0.45)', float: 5, sweepAt: 160 },

@@ -62,7 +62,7 @@ export const S01Hook: React.FC<{ total: number }> = ({ total }) => {
       <BgLight tone="warm" charts={false} />
       <SpeedLines delay={0} dur={20} count={26} />
 
-      <Scene total={total} zoom={0.085} driftY={-24}>
+      <Scene total={total} zoom={0.085} driftY={-24} punches={[3, 64]}>
         <LogoHeader delay={0} size={78} />
 
         <Dashes x={86} y={470} delay={6} />

@@ -1,7 +1,7 @@
 import React from 'react';
 import { AbsoluteFill, Img, staticFile, useCurrentFrame } from 'remotion';
-import { COLORS } from '../config/theme';
-import { breathe, rndRange, tween } from './anim';
+import { COLORS, EASE } from '../config/theme';
+import { breathe, prog, rndRange, tween } from './anim';
 
 /** Barras verticais translucidas do fundo das artes de referencia. */
 const BARS = [
@@ -13,31 +13,37 @@ const BARS = [
   { x: -3, w: 9, h: 44, d: 0.65 },
 ];
 
-export const BgBars: React.FC<{ opacity?: number; speed?: number }> = ({
+export const BgBars: React.FC<{ opacity?: number; speed?: number; delay?: number }> = ({
   opacity = 1,
   speed = 1,
+  delay = 0,
 }) => {
   const frame = useCurrentFrame();
   return (
     <AbsoluteFill style={{ opacity }}>
-      {BARS.map((b, i) => (
-        <div
-          key={i}
-          style={{
-            position: 'absolute',
-            left: `${b.x}%`,
-            width: `${b.w}%`,
-            bottom: `-6%`,
-            height: `${b.h}%`,
-            borderRadius: 36,
-            // as barras das artes originais são quase imperceptíveis:
-            // apenas alguns níveis acima do fundo
-            background:
-              'linear-gradient(180deg, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.16) 100%)',
-            transform: `translateY(${breathe(frame, 0.006 * speed, 10, i) - frame * 0.05 * b.d * speed}px)`,
-          }}
-        />
-      ))}
+      {BARS.map((b, i) => {
+        // cada coluna sobe a partir da base ao entrar na cena
+        const grow = prog(frame, delay + i * 4, 40, EASE.out);
+        return (
+          <div
+            key={i}
+            style={{
+              position: 'absolute',
+              left: `${b.x}%`,
+              width: `${b.w}%`,
+              bottom: `-6%`,
+              height: `${b.h}%`,
+              borderRadius: 36,
+              // as barras das artes originais são quase imperceptíveis:
+              // apenas alguns níveis acima do fundo
+              background:
+                'linear-gradient(180deg, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.16) 100%)',
+              transformOrigin: 'center bottom',
+              transform: `translateY(${breathe(frame, 0.006 * speed, 10, i) - frame * 0.05 * b.d * speed}px) scaleY(${grow})`,
+            }}
+          />
+        );
+      })}
     </AbsoluteFill>
   );
 };
@@ -64,6 +70,7 @@ export const MiniChart: React.FC<{
   filled = false,
   progress = 1,
 }) => {
+  const frame = useCurrentFrame();
   const d = points
     .map((p, i) => `${i === 0 ? 'M' : 'L'} ${p[0]} ${p[1]}`)
     .join(' ');
@@ -85,16 +92,34 @@ export const MiniChart: React.FC<{
         strokeDasharray={len}
         strokeDashoffset={len * (1 - progress)}
       />
+      {/* brilho que corre pelo traçado enquanto ele se desenha */}
+      {progress > 0.02 && progress < 0.995 && (
+        <path
+          d={d}
+          fill="none"
+          stroke="#FFFFFF"
+          strokeWidth={strokeWidth * 2.4}
+          strokeLinecap="round"
+          strokeDasharray={`${len * 0.05} ${len}`}
+          strokeDashoffset={len * (1 - progress) - len * 0.02}
+          opacity={0.85}
+          style={{ filter: 'blur(4px)' }}
+        />
+      )}
       {nodes &&
         points.map((p, i) => {
           const step = 1 / points.length;
           const local = Math.min(1, Math.max(0, (progress - i * step) / step));
+          // pequeno overshoot ao pousar, para o nó "estalar", e depois
+          // uma pulsação lenta para não ficar congelado
+          const pop = local < 1 ? local * (1.65 - 0.65 * local) : 1;
+          const alive = local >= 1 ? 1 + 0.11 * Math.sin(frame * 0.06 + i * 1.3) : 1;
           return (
             <circle
               key={i}
               cx={p[0]}
               cy={p[1]}
-              r={6 * local}
+              r={6 * pop * alive}
               fill={filled ? color : '#FFFFFF'}
               stroke={color}
               strokeWidth={2.5}

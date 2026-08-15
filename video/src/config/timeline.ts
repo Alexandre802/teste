@@ -12,32 +12,35 @@ export const HEIGHT = 1920;
 /**
  * Duracao de cada cena, em segundos.
  *
- * Os valores nao sao arbitrarios: cada cena esta ancorada em uma frase da
- * narracao (referencias/audio, 67,0s). As fronteiras foram medidas nas
- * pausas reais do audio, entao as cenas de texto ficam curtas (a frase e
- * curta) e as cenas de interface ficam longas (a descricao e longa) — o
- * ritmo rapido/devagar sai do proprio roteiro.
+ * Alinhado a narracao (referencias/audio, 67,0s) por analise do proprio
+ * audio: a fala foi segmentada por envelope de energia e cada frase da copy
+ * recebeu a fatia de tempo proporcional a sua contagem de silabas — a taxa
+ * de fala e praticamente constante, entao isso mapeia frase em relogio com
+ * precisao. As fronteiras foram encaixadas nas pausas reais.
+ *
+ * Rode `python3 tools/align_audio.py` para recalcular.
  */
 export const SCENE_SECONDS = {
-  s01Hook: 2.63, //  0.00 "Metodo nao da resultado. Mas sabe por que?"
-  s02Nao: 2.39, //  2.63 "Nao e necessariamente por causa do metodo."
-  s03Caos: 8.97, //  5.02 "...ganhos e gastos espalhados em anotacoes, planilhas..."
-  s04Dinheiro: 1.77, // 13.99 "voce ate pode estar fazendo dinheiro..."
-  s05Enxergar: 3.24, // 15.76 "mas nao consegue enxergar quanto esta ganhando."
-  s06Quanto: 2.56, // 19.00 "quanto entrou, quanto saiu..."
-  s11TudoUm: 4.54, // 21.56 "...e quanto realmente sobrou pra voce esse mes?"
-  s07Prever: 4.70, // 26.10 "E mais importante: quanto vai fechar na proxima semana?"
-  s08Nasceu: 2.39, // 30.80 "Foi pensando nisso que nasceu a Monttra."
-  s09Phone: 7.41, // 33.19 "Uma plataforma criada para quem trabalha com metodos..."
-  s10Periodo: 5.82, // 40.60 "Voce acompanha tudo que entrou e saiu por dia, semana..."
-  s12Operacao: 7.26, // 46.42 "Registra suas surebets em uma calculadora inteligente..."
-  s13Previsao: 7.06, // 53.68 "E ainda define metas para saber onde quer chegar."
-  s14Cta: 6.26, // 60.74 "...parar de trabalhar no escuro? Teste gratis por 3 dias."
+  s01Hook: 2.62, //  0.00s  "Metodo nao da resultado. Mas sabe por que?"
+  s02Nao: 2.27, //  2.62s  "Nao e necessariamente por causa do metodo."
+  s03Caos: 5.65, //  4.89s  "...ganhos e gastos espalhados em anotacoes, planilhas..."
+  s04Dinheiro: 1.90, // 10.54s  "voce ate pode estar fazendo dinheiro"
+  s05Enxergar: 3.32, // 12.44s  "mas nao consegue enxergar quanto esta ganhando."
+  s06Quanto: 3.24, // 15.76s  "Voce sabe quanto entrou, quanto saiu"
+  s11TudoUm: 2.55, // 19.00s  "e quanto realmente sobrou pra voce esse mes?"
+  s07Prever: 4.41, // 21.55s  "E mais importante: quanto vai fechar na proxima semana?"
+  s08Nasceu: 2.09, // 25.96s  "Foi pensando nisso que nasceu a Monttra."
+  s09Phone: 8.16, // 28.05s  "Uma plataforma criada para quem trabalha com metodos..."
+  s10Periodo: 4.34, // 36.21s  "Voce acompanha tudo por dia, semana, mes, 90 dias ou ano."
+  s12Operacao: 8.57, // 40.55s  "Registra suas surebets em uma calculadora inteligente..."
+  s13Previsao: 4.56, // 49.12s  "E ainda define metas para saber onde quer chegar."
+  s15Clareza: 7.06, // 53.68s  "Porque nao basta ganhar dinheiro. Voce precisa saber..."
+  s14Cta: 6.26, // 60.74s  "...parar de trabalhar no escuro? Teste gratis por 3 dias."
 } as const;
 
 export type SceneId = keyof typeof SCENE_SECONDS;
 
-/** A ordem segue a narracao; cada texto e seguido da tela que o ilustra. */
+/** A ordem segue a narracao. */
 export const SCENE_ORDER: SceneId[] = [
   's01Hook',
   's02Nao',
@@ -52,6 +55,7 @@ export const SCENE_ORDER: SceneId[] = [
   's10Periodo',
   's12Operacao',
   's13Previsao',
+  's15Clareza',
   's14Cta',
 ];
 

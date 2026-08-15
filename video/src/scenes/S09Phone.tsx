@@ -49,11 +49,11 @@ const OrbitLight: React.FC<{ delay: number }> = ({ delay }) => {
  */
 export const S09Phone: React.FC<{ total: number }> = ({ total }) => (
   <AbsoluteFill>
-    <Scene total={total} zoom={0.022} driftY={-7} handheld={2.6}>
+    <Scene total={total} zoom={0.055} driftX={12} driftY={-14} handheld={2.8} punches={[18, 54, 132]}>
       <PlateScene
         scene="phone"
         layers={[
-          { id: 'title', delay: 8, from: 'up', distance: 44, blur: 16 },
+          { id: 'title', delay: 8, from: 'none', wipe: 'right', wipeDur: 38, blur: 0 },
           { id: 'phone', delay: 18, from: 'up', distance: 190, spring: 'heavy', rotate: 2, blur: 20, float: 5 },
 
           // --- conteudo da tela, em cascata ---
@@ -68,7 +68,7 @@ export const S09Phone: React.FC<{ total: number }> = ({ total }) => (
           { id: 'chipLeft', delay: 84, from: 'left', distance: 170, spring: 'pop', rotate: -6, float: 6, phase: 1 },
           // o mesmo desenho de linha no card lateral
           { id: 'chipChart', delay: 104, from: 'none', wipe: 'right', wipeDur: 70, blur: 0, float: 6, phase: 1 },
-          { id: 'badgeRight', delay: 132, from: 'right', distance: 180, spring: 'pop', rotate: 6, float: 6, phase: 3 },
+          { id: 'badgeRight', delay: 132, from: 'right', distance: 180, spring: 'pop', rotate: 6, float: 6, phase: 3, sweepAt: 176, sweepLoop: 120 },
         ]}
       >
         <Logo

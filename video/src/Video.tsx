@@ -25,6 +25,7 @@ import { S11TudoUm } from './scenes/S11TudoUm';
 import { S12Operacao } from './scenes/S12Operacao';
 import { S13Previsao } from './scenes/S13Previsao';
 import { S14Cta } from './scenes/S14Cta';
+import { S15Clareza } from './scenes/S15Clareza';
 
 const SCENES: Record<SceneId, React.FC<{ total: number }>> = {
   s01Hook: S01Hook,
@@ -41,6 +42,7 @@ const SCENES: Record<SceneId, React.FC<{ total: number }>> = {
   s12Operacao: S12Operacao,
   s13Previsao: S13Previsao,
   s14Cta: S14Cta,
+  s15Clareza: S15Clareza,
 };
 
 /**

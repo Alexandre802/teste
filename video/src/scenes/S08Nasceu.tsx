@@ -18,7 +18,7 @@ export const S08Nasceu: React.FC<{ total: number }> = ({ total }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const H = 158;
-  const BRAND = 42;
+  const BRAND = 34;
 
   const brandS = springAt(frame, fps, BRAND, SPRINGS.snappy);
   const brandP = prog(frame, BRAND, 12);
@@ -55,7 +55,7 @@ export const S08Nasceu: React.FC<{ total: number }> = ({ total }) => {
         progress={tween(frame, [14, 54], [0, 1])}
       />
 
-      <Scene total={total} zoom={0.075} driftY={-16}>
+      <Scene total={total} zoom={0.075} driftY={-16} punches={[2, 34]}>
         <LogoHeader delay={0} size={78} />
 
         <Stack top={500}>

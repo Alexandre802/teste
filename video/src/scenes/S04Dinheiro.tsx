@@ -51,7 +51,7 @@ export const S04Dinheiro: React.FC<{ total: number }> = ({ total }) => {
         progress={tween(frame, [22, 54], [0, 1])}
       />
 
-      <Scene total={total} zoom={0.095} driftY={-20}>
+      <Scene total={total} zoom={0.095} driftY={-20} punches={[3, 19]}>
         <LogoHeader delay={0} size={78} />
 
         <Stack top={790} style={{ transform: 'rotate(-2.2deg)' }}>

@@ -53,7 +53,7 @@ export const S07Prever: React.FC<{ total: number }> = ({ total }) => {
         progress={tween(frame, [44, 78], [0, 1])}
       />
 
-      <Scene total={total} zoom={0.08} driftY={-24}>
+      <Scene total={total} zoom={0.08} driftY={-24} punches={[2, 26, 42]}>
         <LogoHeader delay={0} size={78} />
 
         <Stack top={496}>

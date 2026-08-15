@@ -17,7 +17,7 @@ import { COLORS } from '../config/theme';
  */
 export const S03Caos: React.FC<{ total: number }> = ({ total }) => (
   <AbsoluteFill>
-    <Scene total={total} zoom={0.022} driftY={-7} handheld={2.4}>
+    <Scene total={total} zoom={0.05} driftX={-16} driftY={-12} handheld={2.6} punches={[20, 44, 96]}>
       <PlateScene
         scene="caos"
         layers={[
@@ -26,13 +26,14 @@ export const S03Caos: React.FC<{ total: number }> = ({ total }) => (
           { id: 'bars', delay: 4, from: 'none', wipe: 'up', wipeDur: 64, blur: 0 },
           // linhas de tendencia se desenham da esquerda para a direita
           { id: 'trend', delay: 16, from: 'none', wipe: 'right', wipeDur: 96, blur: 0 },
-          // cedulas caindo devagar, cada uma com deriva e tombo proprios
-          { id: 'note1', delay: 0, from: 'none', blur: 0, orbit: { rx: 16, ry: 46, spin: 7, speed: 0.0072 }, phase: 0 },
-          { id: 'note2', delay: 0, from: 'none', blur: 0, orbit: { rx: 12, ry: 52, spin: 9, speed: 0.0061 }, phase: 1.2 },
-          { id: 'note3', delay: 0, from: 'none', blur: 0, orbit: { rx: 10, ry: 40, spin: 6, speed: 0.0083 }, phase: 2.4 },
-          { id: 'note4', delay: 0, from: 'none', blur: 0, orbit: { rx: 18, ry: 58, spin: 8, speed: 0.0055 }, phase: 3.6 },
-          { id: 'note5', delay: 0, from: 'none', blur: 0, orbit: { rx: 14, ry: 44, spin: 10, speed: 0.0069 }, phase: 4.8 },
-          { id: 'note6', delay: 0, from: 'none', blur: 0, orbit: { rx: 11, ry: 36, spin: 7, speed: 0.0077 }, phase: 6.0 },
+          // cedulas caindo: descida continua + balanco lateral + tombo,
+          // cada uma com velocidade propria para nao cairem em bloco
+          { id: 'note1', delay: 0, from: 'none', blur: 0, fall: { vy: 1.05, sway: 34, spin: 16, speed: 0.026 }, phase: 0 },
+          { id: 'note2', delay: 0, from: 'none', blur: 0, fall: { vy: 0.82, sway: 27, spin: 13, speed: 0.031 }, phase: 1.2 },
+          { id: 'note3', delay: 0, from: 'none', blur: 0, fall: { vy: 1.28, sway: 22, spin: 19, speed: 0.036 }, phase: 2.4 },
+          { id: 'note4', delay: 0, from: 'none', blur: 0, fall: { vy: 0.74, sway: 40, spin: 11, speed: 0.023 }, phase: 3.6 },
+          { id: 'note5', delay: 0, from: 'none', blur: 0, fall: { vy: 0.95, sway: 30, spin: 15, speed: 0.029 }, phase: 4.8 },
+          { id: 'note6', delay: 0, from: 'none', blur: 0, fall: { vy: 1.16, sway: 24, spin: 18, speed: 0.034 }, phase: 6.0 },
 
           // --- cards ---
           { id: 'cardIn', delay: 20, from: 'left', distance: 300, spring: 'snappy', rotate: -5, float: 4, sweepAt: 120 },
@@ -76,7 +77,7 @@ export const S03Caos: React.FC<{ total: number }> = ({ total }) => (
         { name: 'tickMicro', at: 118, rate: 0.95 },
         { name: 'sparkleShine', at: 130, volume: 0.55 },
         { name: 'successChime', at: 210, volume: 0.5 },
-        { name: 'popSoft', at: 380, volume: 0.5 },
+        { name: 'popSoft', at: 290, volume: 0.5 },
       ]}
     />
   </AbsoluteFill>

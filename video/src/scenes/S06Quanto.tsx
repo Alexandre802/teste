@@ -49,7 +49,7 @@ export const S06Quanto: React.FC<{ total: number }> = ({ total }) => {
         />
       ))}
 
-      <Scene total={total} zoom={0.075} driftY={-30}>
+      <Scene total={total} zoom={0.075} driftY={-30} punches={[4, 30, 56]}>
         <LogoHeader delay={0} size={78} />
 
         <Stack top={420} gap={92}>
