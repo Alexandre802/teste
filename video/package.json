@@ -1,0 +1,25 @@
+{
+  "name": "nubank-reels",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "remotion studio",
+    "render": "remotion render NubankReels out/nubank-reels.mp4 --concurrency=4",
+    "still": "remotion still NubankReels"
+  },
+  "dependencies": {
+    "@fontsource/archivo": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "@remotion/cli": "4.0.417",
+    "@remotion/media-utils": "4.0.417",
+    "@remotion/shapes": "4.0.417",
+    "@remotion/transitions": "4.0.417",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "remotion": "4.0.417"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.2",
+    "typescript": "5.9.3"
+  }
+}
