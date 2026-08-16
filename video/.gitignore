@@ -2,3 +2,10 @@ node_modules/
 .remotion/
 out/*.png
 out/render.log
+out/chunks/
+out/*.wav
+
+# Versões recomprimidas do master (geradas sob demanda para envio por
+# canais com limite de tamanho). O master fica versionado em
+# out/nubank-reels-1080x1920.mp4 — não duplicar o mesmo vídeo no repo.
+out/nubank-reels-compacto.mp4
