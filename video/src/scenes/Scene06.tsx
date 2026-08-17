@@ -16,7 +16,7 @@ const T = TEXTS.s06;
 const INSET: [number, number] = [50, 58];
 
 /**
- * v0 — o lançamento ("nasceu o Waatzo");
+ * v0 — o lançamento ("nasceu a Waatzo");
  * v1 — retomada em "é como ter uma funcionária que nunca atrasa": tudo já está
  *      em cena e a câmera entra no aparelho e no robô confirmando.
  */
@@ -75,7 +75,7 @@ export const Scene06: React.FC = () => {
           <Logo size={100} delay={D.logo} fontSize={86} gap={24} />
         </div>
 
-        {/* "Nasceu o Waatzo" */}
+        {/* "Nasceu a Waatzo" */}
         <div style={{ position: 'absolute', top: 430, left: 60, right: 60 }}>
           <Headline
             lines={[[{ t: T.line1, c: 'dark' }]]}

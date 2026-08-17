@@ -303,7 +303,7 @@ export const TEXTS = {
   },
 
   s06: {
-    line1: 'Nasceu o',
+    line1: 'Nasceu a',
     line2: BRAND,
     subtitle: 'IA dentro do seu WhatsApp',
     botName: BRAND,
