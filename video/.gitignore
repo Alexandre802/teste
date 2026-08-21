@@ -1,0 +1,6 @@
+node_modules/
+.remotion/
+out/*
+!out/.gitkeep
+# o corte final fica versionado, como nos outros projetos do repositório
+!out/tres-estrelas.mp4
