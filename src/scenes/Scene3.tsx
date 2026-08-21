@@ -1,197 +1,154 @@
 /**
  * CENA 3 - "QUEM VENDE MAIS NÃO PODE ESPERAR MAIS."
  *
- * A tela de "Envio em andamento" ganha vida: a linha do rastreio desce de
- * Pedido vendido -> Separado -> Enviado, acendendo cada bolinha na chegada.
+ * O celular sobe e uma cortina da cor da tela recua de cima para baixo:
+ * e a propria linha do rastreio descendo de Pedido vendido -> Separado ->
+ * Enviado, acendendo cada etapa na ordem. Um brilho acompanha a borda.
  * Os titulos da direita entram palavra por palavra.
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { L, Plate, Clip, box, words } from "../lib/Layer";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import {
+  Backdrop,
+  Build,
+  Curtain,
+  Flash,
+  Piece,
+  Sweep,
+  band,
+  slice,
+  Glint,
+  Reveal,
+  curtainEdge,
+  wipeMask,
+  type Step,
+} from "../lib/Art";
 import { Sfx } from "../lib/Sfx";
-import { fadeInUp, float, popIn, pulse, ramp, slideIn3d, sp } from "../lib/anim";
-import { WORD_STEP, type SceneConfig } from "../config";
-
-/** Area branca da lista - o conteudo entra recortado por ela. */
-const SCREEN: [number, number, number, number] = [86, 660, 440, 950];
+import { camera, pulse, punch, ramp } from "../lib/anim";
+import { type SceneConfig } from "../config";
 
 const T = {
-  phone: 0,
-  logo: 8,
-  hdr: 18,
-  h1: 30,
-  h2: 46,
-  sub: 62,
-  /** Passos do rastreio: [bolinha, titulo, corpo, inicio da linha] */
-  step: [
-    { dot: 76, txt: 80, line: 92 },
-    { dot: 112, txt: 116, line: 128 },
-    { dot: 148, txt: 152, line: -1 },
+  logo: 0,
+  phone: 8,
+  h1: 34,
+  h2: 52,
+  sub: 72,
+  /** etapas do rastreio: quadro e altura relativa na tela do app */
+  steps: [
+    { at: 84, p: 0.34 },
+    { at: 116, p: 0.56 },
+    { at: 148, p: 0.78 },
+    { at: 176, p: 1.0 },
   ],
-  lineRun: 18,
-  eta: 168,
+  stepDur: 18,
+  sweep: 172,
 };
 
-/** Cabeca luminosa que corre junto com o traco. */
-const Head: React.FC<{ name: "lineA" | "lineB"; p: number }> = ({ name, p }) => {
-  const b = box("s3", name);
-  if (p <= 0 || p >= 1) return null;
-  return (
-    <div
-      style={{
-        position: "absolute",
-        left: b.x + b.w / 2 - 17,
-        top: b.y + b.h * p - 17,
-        width: 34,
-        height: 34,
-        borderRadius: 17,
-        background: "radial-gradient(circle, #dfffe9 0%, #35c14a 45%, rgba(53,193,74,0) 72%)",
-        opacity: 0.95,
-      }}
-    />
-  );
-};
+const HEAD_START = 0.148; // cabecalho "Envio em andamento" ja visivel
+const PHONE = slice(0, 380, 520, 1920);
+
+const STEPS: Step[] = [
+  { r: band(0, 380), at: T.logo, dur: 12, dir: "down", dy: -24 },
+  // celular sobe pela esquerda
+  // coluna da direita: fundo, depois titulo palavra por palavra
+  { r: slice(520, 380, 1080, 786), at: T.phone + 6, dur: 12, dir: "down" },
+  { r: slice(520, 786, 705, 892), at: T.h1, dur: 7, dir: "right", dx: -26 },
+  { r: slice(705, 786, 892, 892), at: T.h1 + 6, dur: 7, dir: "right", dx: -26 },
+  { r: slice(892, 786, 1080, 892), at: T.h1 + 12, dur: 7, dir: "right", dx: -26 },
+  { r: slice(520, 892, 632, 984), at: T.h2, dur: 6, dir: "right", dx: -20 },
+  { r: slice(632, 892, 750, 984), at: T.h2 + 5, dur: 6, dir: "right", dx: -20 },
+  { r: slice(750, 892, 937, 984), at: T.h2 + 10, dur: 6, dir: "right", dx: -20 },
+  { r: slice(937, 892, 1080, 984), at: T.h2 + 15, dur: 6, dir: "right", dx: -20 },
+  { r: slice(520, 984, 767, 1062), at: T.sub, dur: 6, dir: "right", dx: -16 },
+  { r: slice(767, 984, 1080, 1062), at: T.sub + 5, dur: 6, dir: "right", dx: -16 },
+  { r: slice(520, 1062, 1080, 1920), at: T.phone + 12, dur: 16, dir: "up", dy: 40 },
+];
 
 export const Scene3: React.FC<{ cfg: SceneConfig }> = ({ cfg }) => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const cam = camera(frame, cfg);
 
-  const h1 = words("s3", "h1");
-  const h2 = words("s3", "h2");
-  const sub = words("s3", "sub");
+  // o celular sobe e a cortina da tela usa a MESMA mascara: as duas nascem
+  // juntas, sem a lista piscar antes de a cortina entrar
+  const phoneP = Math.min(1, Math.max(0, (frame - T.phone) / 22));
+  const phoneEased = 1 - Math.pow(1 - phoneP, 3);
+  const phoneMask = wipeMask(PHONE, phoneEased, "up", 26);
 
-  const lineP = (i: number) =>
-    T.step[i].line < 0 ? 0 : ramp(frame, T.step[i].line, T.step[i].line + T.lineRun);
+  // a cortina recua em degraus: cada etapa do rastreio surge no seu tempo
+  // acumula etapa a etapa: cada uma leva a cortina do ponto atual ao alvo
+  let curtain = HEAD_START;
+  T.steps.forEach((st) => {
+    curtain += (st.p - curtain) * ramp(frame, st.at, st.at + T.stepDur);
+  });
 
-  const phoneP = sp(frame, fps, T.phone, "heavy");
-  const prog = ramp(frame, 0, cfg.duration);
-  // leve aproximacao no celular ao longo da cena
-  const push = 1 + prog * 0.022;
+  const arrived = pulse(frame, T.steps[2].at + T.stepDur, 3, 24);
+  const dots = ["dot1", "dot2", "dot3"] as const;
 
   return (
     <AbsoluteFill>
-      <Plate scene="s3" zoom={cfg.bgZoom[0] + (cfg.bgZoom[1] - cfg.bgZoom[0]) * prog} />
+      <Backdrop scene="s3" />
+      <Build scene="s3" steps={STEPS} frame={frame} cam={cam} fillAt={T.sub + 14} />
 
-      <L scene="s3" name="logo" a={fadeInUp(sp(frame, fps, T.logo, "snappy"), -50)} />
+      {/* a tela do app abrindo etapa por etapa - so depois que o celular
+          termina de subir, senao a cortina apareceria solta no fundo */}
+      {/* celular subindo */}
+      <Reveal scene="s3" r={PHONE} p={phoneEased} dir="up" soft={26} cam={cam} />
+      {phoneEased > 0.001 && (
+        <>
+          <Curtain scene="s3" name="scr" p={curtain} cam={cam} mask={phoneMask} />
+          {curtain > HEAD_START + 0.01 && curtain < 0.99 && (
+            <Glint at={curtainEdge("s3", "scr", curtain, 0.17)} size={40} color="#7fffa8" cam={cam} />
+          )}
+        </>
+      )}
 
-      {/* o celular entra pela esquerda com giro em Y */}
-      <L
+      {/* cada bolinha do rastreio acende quando a linha chega nela */}
+      {dots.map((n, i) => (
+        <Piece
+          key={n}
+          scene="s3"
+          name={n}
+          scale={punch(frame, T.steps[i].at + T.stepDur - 4, 1.2)}
+          glow={pulse(frame, T.steps[i].at + T.stepDur - 4, 3, 16) * 0.35}
+          cam={cam}
+        />
+      ))}
+      <Piece
         scene="s3"
-        name="phone"
-        origin="8% 58%"
-        a={slideIn3d(phoneP, -1, 320)}
-        extra={`scale(${push.toFixed(3)}) ${float(frame - T.phone, 3, 6, 0.5)}`}
+        name="eta"
+        scale={punch(frame, T.steps[3].at + 8, 1.05)}
+        cam={cam}
       />
 
-      {/* conteudo do app, recortado pela tela */}
-      <Clip rect={SCREEN}>
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            opacity: Math.min(1, phoneP * 2),
-            transform: `${slideIn3d(phoneP, -1, 320).transform} scale(${push.toFixed(3)})`,
-            transformOrigin: "8% 58%",
-          }}
-        >
-          <L scene="s3" name="hdr_t" a={fadeInUp(sp(frame, fps, T.hdr, "snappy"), 26)} />
-          <L scene="s3" name="hdr_s" a={fadeInUp(sp(frame, fps, T.hdr + 5, "snappy"), 22)} />
-
-          {/* tracos do rastreio, revelados de cima para baixo */}
-          {(["lineA", "lineB"] as const).map((n, i) => (
-            <L
-              key={n}
-              scene="s3"
-              name={n}
-              a={{ opacity: lineP(i) > 0 ? 1 : 0, transform: "none" }}
-              style={{ clipPath: `inset(0 0 ${((1 - lineP(i)) * 100).toFixed(2)}% 0)` }}
-            />
-          ))}
-          {(["lineA", "lineB"] as const).map((n, i) => (
-            <Head key={`h${n}`} name={n} p={lineP(i)} />
-          ))}
-
-          {/* bolinhas e textos de cada etapa */}
-          {T.step.map((st, i) => {
-            const glow = pulse(frame, st.dot, 3, 18);
-            return (
-              <React.Fragment key={i}>
-                <L
-                  scene="s3"
-                  name={`dot${i + 1}`}
-                  a={popIn(sp(frame, fps, st.dot, "punch"), 0.3)}
-                  style={{
-                    filter: `drop-shadow(0 0 ${(glow * 16).toFixed(1)}px rgba(60,210,90,.95))`,
-                  }}
-                />
-                <L
-                  scene="s3"
-                  name={`st${i + 1}_t`}
-                  a={fadeInUp(sp(frame, fps, st.txt, "snappy"), 18)}
-                />
-                <L
-                  scene="s3"
-                  name={`st${i + 1}_b`}
-                  a={fadeInUp(sp(frame, fps, st.txt + 4, "snappy"), 16)}
-                />
-              </React.Fragment>
-            );
-          })}
-
-          <L scene="s3" name="eta" a={popIn(sp(frame, fps, T.eta, "snappy"), 0.82)} />
-        </div>
-      </Clip>
-
-      {/* titulos a direita, palavra por palavra */}
-      {h1.map((n, i) => (
-        <L
-          key={n}
-          scene="s3"
-          name={n}
-          a={fadeInUp(sp(frame, fps, T.h1 + i * WORD_STEP, "punch"), 40)}
-        />
-      ))}
-      {h2.map((n, i) => (
-        <L
-          key={n}
-          scene="s3"
-          name={n}
-          a={fadeInUp(sp(frame, fps, T.h2 + i * WORD_STEP, "punch"), 40)}
-        />
-      ))}
-      {sub.map((n, i) => (
-        <L
-          key={n}
-          scene="s3"
-          name={n}
-          a={fadeInUp(sp(frame, fps, T.sub + i * WORD_STEP, "soft"), 26)}
-        />
-      ))}
+      <Flash p={arrived} spread="40% 22% at 22% 66%" strength={0.22} />
+      <Sweep p={ramp(frame, T.sweep, T.sweep + 26)} strength={0.28} />
 
       {/* ------------------------------------------------------------ audio */}
       <Sfx at={0} name="whoosh_trans" />
       <Sfx at={2} name="bass_hit" gain={0.8} />
-      <Sfx at={T.logo} name="soft_pop" />
-      <Sfx at={T.h1 - 3} name="whoosh_short" gain={0.7} />
-      <Sfx at={T.h2 - 3} name="whoosh_short" gain={0.7} />
-      {h1.map((n, i) => (
-        <Sfx key={`a${n}`} at={T.h1 + i * WORD_STEP} name="pop_ui" gain={0.8} />
+      <Sfx at={T.logo + 3} name="soft_pop" />
+      <Sfx at={T.phone} name="whoosh_short" />
+      {[0, 6, 12].map((d) => (
+        <Sfx key={d} at={T.h1 + d} name="pop_ui" gain={0.85} />
       ))}
-      {h2.map((n, i) => (
-        <Sfx key={`b${n}`} at={T.h2 + i * WORD_STEP} name="pop_ui" gain={0.8} />
+      {[0, 5, 10, 15].map((d) => (
+        <Sfx key={`b${d}`} at={T.h2 + d} name="pop_ui" gain={0.75} />
       ))}
-      {sub.map((n, i) => (
-        <Sfx key={`c${n}`} at={T.sub + i * WORD_STEP} name="soft_pop" gain={0.7} />
+      {[0, 5].map((d) => (
+        <Sfx key={`c${d}`} at={T.sub + d} name="soft_pop" gain={0.7} />
       ))}
-      <Sfx at={T.hdr} name="click" />
-      {T.step.map((st, i) => (
-        <React.Fragment key={i}>
-          <Sfx at={st.dot} name="tap" />
-          <Sfx at={st.dot} name={i === 2 ? "success" : "soft_pop"} gain={0.9} />
-          {st.line > 0 && <Sfx at={st.line} name="swipe" gain={0.7} />}
+      {T.steps.map((st, i) => (
+        <React.Fragment key={st.at}>
+          <Sfx at={st.at} name="swipe" gain={0.6} />
+          <Sfx at={st.at + T.stepDur - 4} name="tap" />
+          <Sfx
+            at={st.at + T.stepDur - 4}
+            name={i === 2 ? "success" : i === 3 ? "notif" : "soft_pop"}
+            gain={0.9}
+          />
         </React.Fragment>
       ))}
-      <Sfx at={T.eta} name="notif" />
+      <Sfx at={T.sweep} name="sparkle" gain={0.5} />
       <Sfx at={cfg.duration - 15} name="riser" gain={0.6} />
     </AbsoluteFill>
   );

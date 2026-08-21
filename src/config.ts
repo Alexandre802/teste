@@ -48,21 +48,6 @@ export const SCENE_STARTS = SCENES.reduce<number[]>((acc, sc, i) => {
 export const TOTAL_FRAMES =
   SCENE_STARTS[SCENES.length - 1] + SCENES[SCENES.length - 1].duration;
 
-/* ------------------------------------------------------- ritmo das entradas */
-
-/** Velocidade "padrao" pedida para o texto palavra a palavra. */
-export const WORD_STEP = 4; // quadros entre uma palavra e a proxima
-export const ROW_STEP = 9; // quadros entre um item de lista e o proximo
-export const CARD_STEP = 7; // quadros entre um card e o proximo
-
-/** Molas usadas nas entradas. Mexer aqui muda o "peso" de tudo. */
-export const SPRING = {
-  soft: { damping: 22, mass: 0.9, stiffness: 110 },
-  snappy: { damping: 16, mass: 0.65, stiffness: 190 },
-  punch: { damping: 13, mass: 0.55, stiffness: 260 },
-  heavy: { damping: 26, mass: 1.5, stiffness: 90 },
-} as const;
-
 /* --------------------------------------------------------------- audio mix */
 
 export const SFX_GAIN: Record<string, number> = {
@@ -89,9 +74,9 @@ export const SFX_GAIN: Record<string, number> = {
 /* ------------------------------------------------------------------ textos */
 
 /**
- * Os textos vivem dentro das imagens de referencia (a identidade visual da
- * Tres Estrelas e preservada pixel a pixel). Este mapa existe para
- * documentar o que cada camada de texto diz - util na hora de reeditar.
+ * REFERENCIA DE TEXTO (nao entra no render).
+ * Os textos sao os da propria arte - o video nunca escreve nada por cima.
+ * Este mapa serve so para saber o que cada regiao anima na hora de reeditar.
  */
 export const COPY = {
   s1: { h1: "VOCÊ VENDE.", h2: "A GENTE FAZ CHEGAR." },
@@ -119,13 +104,13 @@ export const COPY = {
 
 /* ------------------------------------------------------- cena 2: contagem */
 
+/**
+ * A contagem NAO desenha digito nenhum: ela e a ordem em que o numero da
+ * arte e descoberto, casa a casa (1 -> 10 -> 100 -> 1.000 -> ... -> 100.000).
+ */
 export const COUNTER = {
-  /** Valor final exibido. */
-  target: 100000,
-  /** Quadro em que a contagem comeca. */
+  /** Quadro em que a primeira casa aparece. */
   start: s(0.6),
-  /** Quantos quadros a contagem leva. */
-  run: s(2.5),
-  /** Quadro em que troca para o recorte original (repouso exato). */
-  settle: s(3.1),
+  /** Quadros por casa. */
+  stepDur: 5,
 };

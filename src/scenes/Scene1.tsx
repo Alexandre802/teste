@@ -1,212 +1,120 @@
 /**
  * CENA 1 - "VOCÊ VENDE. A GENTE FAZ CHEGAR."
  *
- * Tres celulares (Shopee / Mercado Livre / SHEIN) com os pedidos entrando na
- * tela um a um, e os cards de notificacao caindo pelos lados como alerta de
- * iPhone. O titulo aparece palavra por palavra.
+ * A arte se monta em faixas: logo, titulo palavra por palavra, os celulares
+ * subindo e os cards de notificacao entrando pelas laterais. Dentro das
+ * telas, uma cortina da cor do proprio app recua e os pedidos vao surgindo
+ * um a um - sao os pixels originais aparecendo, nada foi recriado.
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { L, Plate, Clip, words } from "../lib/Layer";
-import { Sfx } from "../lib/Sfx";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
 import {
-  backInDown,
-  fadeInUp,
-  float,
-  iosNotif,
-  merge,
-  popIn,
-  pulse,
-  ramp,
-  slam,
-  sp,
-} from "../lib/anim";
-import { ROW_STEP, WORD_STEP, type SceneConfig } from "../config";
+  Backdrop,
+  Build,
+  Flash,
+  Piece,
+  Reveal,
+  Sweep,
+  band,
+  slice,
+  type Step,
+} from "../lib/Art";
+import { Sfx } from "../lib/Sfx";
+import { camera, pulse, punch, ramp, stepWipe } from "../lib/anim";
+import { type SceneConfig } from "../config";
 
-/** Area util de cada tela de app - as linhas entram recortadas por ela. */
-const SCREENS = {
-  ml: [396, 936, 300, 570] as [number, number, number, number],
-  sh: [186, 980, 204, 424] as [number, number, number, number],
-  se: [692, 956, 214, 438] as [number, number, number, number],
-};
+const T = { logo: 0, h1: 12, h2: 28, cascade: 46, sweep: 156 };
 
-const T = {
-  logo: 3,
-  h1: 12,
-  h2: 27,
-  phones: 46,
-  badges: 64,
-  rows: 70,
-  more: 124,
-  notifL: 126,
-  notifR: 133,
-};
+/**
+ * A metade de baixo se monta numa cascata so: a borda desce em degraus e
+ * vai descobrindo, na ordem, o topo dos celulares, a primeira notificacao,
+ * os cabecalhos, os pedidos e as demais notificacoes. Cada degrau tem som.
+ */
+const CASCADE = [
+  { at: 46, to: 812, sfx: "notif" },      // topo dos celulares + 1a notificacao
+  { at: 60, to: 956, sfx: "tap" },        // cabecalhos das listas
+  { at: 72, to: 1014, sfx: "notif" },     // 2a notificacao
+  { at: 84, to: 1128, sfx: "tap" },       // 1o pedido
+  { at: 96, to: 1200, sfx: "notif" },     // 3a notificacao
+  { at: 108, to: 1300, sfx: "tap" },      // 2o pedido
+  { at: 120, to: 1432, sfx: "tap" },      // 3o pedido
+  { at: 132, to: 1920, sfx: "soft_pop" }, // barras de navegacao e base
+] as const;
+const LOWER = band(680, 1920);
 
-/** Cada pedido entra deslizando da direita, como item novo de lista. */
-const rowIn = (p: number) => ({
-  opacity: Math.min(1, p * 2),
-  transform: `translate3d(${((1 - p) * 46).toFixed(1)}px,${((1 - p) * 10).toFixed(
-    1
-  )}px,0) scale(${(0.94 + 0.06 * p).toFixed(3)})`,
-});
+const STEPS: Step[] = [
+  // logo
+  { r: band(0, 310), at: T.logo, dur: 12, dir: "down", dy: -26 },
+  // "VOCÊ VENDE." - uma palavra por vez
+  { r: slice(0, 310, 514, 532), at: T.h1, dur: 8, dir: "right", dx: -30 },
+  { r: slice(514, 310, 1080, 532), at: T.h1 + 7, dur: 8, dir: "right", dx: -30 },
+  // "A GENTE FAZ CHEGAR."
+  { r: slice(0, 532, 206, 680), at: T.h2, dur: 7, dir: "right", dx: -22 },
+  { r: slice(206, 532, 489, 680), at: T.h2 + 5, dur: 7, dir: "right", dx: -22 },
+  { r: slice(489, 532, 658, 680), at: T.h2 + 10, dur: 7, dir: "right", dx: -22 },
+  { r: slice(658, 532, 1080, 680), at: T.h2 + 15, dur: 7, dir: "right", dx: -22 },
+];
 
 export const Scene1: React.FC<{ cfg: SceneConfig }> = ({ cfg }) => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const cam = camera(frame, cfg);
 
-  const w1 = words("s1", "h1");
-  const w2 = words("s1", "h2");
-
-  // 3 telas x 3 pedidos, intercalados: os pedidos chegam nos tres apps juntos
-  const rows: { name: string; at: number; screen: keyof typeof SCREENS }[] = [];
-  (["ml", "sh", "se"] as const).forEach((app, col) => {
-    [1, 2, 3].forEach((r, i) => {
-      rows.push({
-        name: `${app}_row${r}`,
-        at: T.rows + i * (ROW_STEP + 4) + col * 4,
-        screen: app,
-      });
-    });
-  });
-
-  const phoneP = sp(frame, fps, T.phones, "heavy");
-  const flash = pulse(frame, T.phones + 4, 2, 14);
+  const y = stepWipe(frame, LOWER.y, CASCADE.map((c) => ({ at: c.at, to: c.to })), 11);
+  const lowerP = (y - LOWER.y) / LOWER.h;
+  const land = pulse(frame, T.cascade + 6, 3, 16);
 
   return (
     <AbsoluteFill>
-      <Plate
-        scene="s1"
-        zoom={
-          cfg.bgZoom[0] + (cfg.bgZoom[1] - cfg.bgZoom[0]) * ramp(frame, 0, cfg.duration)
-        }
-      />
+      <Backdrop scene="s1" />
+      <Build scene="s1" steps={STEPS} frame={frame} cam={cam} fillAt={CASCADE[CASCADE.length - 1].at + 12} />
 
-      {/* logo desce e assenta */}
-      <L scene="s1" name="logo" a={backInDown(sp(frame, fps, T.logo, "snappy"), 300)} />
+      {/* a cascata: celulares, pedidos e notificacoes descobertos na ordem */}
+      <Reveal scene="s1" r={LOWER} p={lowerP} dir="down" soft={22} cam={cam} />
 
-      {/* titulo palavra por palavra */}
-      {w1.map((n, i) => (
-        <L
-          key={n}
-          scene="s1"
-          name={n}
-          a={merge(
-            slam(sp(frame, fps, T.h1 + i * (WORD_STEP + 2), "punch"), 1.35),
-            fadeInUp(sp(frame, fps, T.h1 + i * (WORD_STEP + 2), "punch"), 22)
-          )}
-        />
-      ))}
-      {w2.map((n, i) => (
-        <L
-          key={n}
-          scene="s1"
-          name={n}
-          a={merge(
-            popIn(sp(frame, fps, T.h2 + i * WORD_STEP, "punch"), 0.78),
-            fadeInUp(sp(frame, fps, T.h2 + i * WORD_STEP, "punch"), 26)
-          )}
-        />
+      {/* contadores das listas dao uma batida quando o cabecalho aparece */}
+      {(["sh_badge", "ml_badge", "se_badge"] as const).map((n, i) => (
+        <Piece key={n} scene="s1" name={n} scale={punch(frame, 68 + i * 4, 1.22)} cam={cam} />
       ))}
 
-      {/* os tres celulares sobem juntos e ficam respirando */}
-      <L
-        scene="s1"
-        name="phones"
-        origin="center bottom"
-        a={{
-          opacity: Math.min(1, phoneP * 2.2),
-          transform: `translate3d(0,${((1 - phoneP) * 300).toFixed(1)}px,0) scale(${(
-            0.9 +
-            0.1 * phoneP
-          ).toFixed(3)})`,
-        }}
-        extra={float(frame - T.phones, 3, 7, 0.55)}
-        style={{ filter: `brightness(${1 + flash * 0.28})` }}
-      />
+      {/* cada notificacao pisca quando a borda passa por ela */}
+      {(["nl1", "nr1", "nl2", "nr2", "nl3", "nr3"] as const).map((n, i) => {
+        const at = [50, 53, 76, 79, 100, 103][i];
+        return (
+          <Piece
+            key={n}
+            scene="s1"
+            name={n}
+            scale={punch(frame, at, 1.1)}
+            glow={pulse(frame, at, 2, 12) * 0.22}
+            cam={cam}
+          />
+        );
+      })}
 
-      {/* contadores das telas */}
-      {(["ml_badge", "sh_badge", "se_badge"] as const).map((n, i) => (
-        <L
-          key={n}
-          scene="s1"
-          name={n}
-          a={popIn(sp(frame, fps, T.badges + i * 5, "punch"), 0.2)}
-        />
-      ))}
-
-      {/* pedidos chegando, recortados pela tela de cada app */}
-      {rows.map((r) => (
-        <Clip key={r.name} rect={SCREENS[r.screen]}>
-          <L scene="s1" name={r.name} a={rowIn(sp(frame, fps, r.at, "snappy"))} />
-        </Clip>
-      ))}
-      <Clip rect={SCREENS.ml}>
-        <L scene="s1" name="ml_more" a={fadeInUp(sp(frame, fps, T.more, "soft"), 20)} />
-      </Clip>
-
-      {/* notificacoes caindo dos lados, no gesto do iPhone */}
-      {["nl1", "nl2", "nl3"].map((n, i) => (
-        <L
-          key={n}
-          scene="s1"
-          name={n}
-          a={iosNotif(sp(frame, fps, T.notifL + i * 12, "snappy"), 150)}
-          extra={float(frame - T.notifL - i * 12, 5, 4, 0.7, i * 1.4)}
-        />
-      ))}
-      {["nr1", "nr2", "nr3"].map((n, i) => (
-        <L
-          key={n}
-          scene="s1"
-          name={n}
-          a={iosNotif(sp(frame, fps, T.notifR + i * 12, "snappy"), 150)}
-          extra={float(frame - T.notifR - i * 12, 5, 4, 0.7, 3 + i * 1.4)}
-        />
-      ))}
-
-      {/* brilho rapido quando os celulares chegam */}
-      <AbsoluteFill
-        style={{
-          background: "radial-gradient(60% 40% at 50% 62%, #7fb2ff, transparent 70%)",
-          opacity: flash * 0.22,
-          mixBlendMode: "screen",
-        }}
-      />
+      <Flash p={land} spread="60% 34% at 50% 62%" strength={0.26} />
+      <Sweep p={ramp(frame, T.sweep, T.sweep + 26)} strength={0.3} />
 
       {/* ------------------------------------------------------------ audio */}
       <Sfx at={0} name="whoosh_trans" />
       <Sfx at={0} name="sub_boom" gain={0.8} />
-      <Sfx at={T.logo + 3} name="impact" gain={0.8} />
-      {w1.map((n, i) => (
-        <React.Fragment key={n}>
-          <Sfx at={T.h1 + i * (WORD_STEP + 2)} name="whoosh_short" />
-          <Sfx at={T.h1 + i * (WORD_STEP + 2) + 1} name="pop_ui" />
+      <Sfx at={T.logo + 4} name="impact" gain={0.75} />
+      <Sfx at={T.h1} name="whoosh_short" />
+      <Sfx at={T.h1} name="pop_ui" />
+      <Sfx at={T.h1 + 7} name="whoosh_short" />
+      <Sfx at={T.h1 + 7} name="pop_ui" />
+      {[0, 5, 10, 15].map((d) => (
+        <Sfx key={d} at={T.h2 + d} name="soft_pop" gain={0.9} />
+      ))}
+      <Sfx at={T.cascade - 8} name="reverse_whoosh" />
+      <Sfx at={T.cascade} name="whoosh_trans" />
+      <Sfx at={T.cascade + 2} name="bass_hit" />
+      {CASCADE.map((c) => (
+        <React.Fragment key={c.at}>
+          <Sfx at={c.at + 4} name={c.sfx} gain={0.8} />
+          <Sfx at={c.at + 4} name="tick" gain={0.5} />
         </React.Fragment>
       ))}
-      {w2.map((n, i) => (
-        <Sfx key={n} at={T.h2 + i * WORD_STEP} name="soft_pop" gain={0.9} />
-      ))}
-      <Sfx at={T.phones - 8} name="reverse_whoosh" />
-      <Sfx at={T.phones} name="whoosh_trans" />
-      <Sfx at={T.phones + 2} name="bass_hit" />
-      {[0, 1, 2].map((i) => (
-        <Sfx key={i} at={T.badges + i * 5} name="soft_pop" gain={0.7} />
-      ))}
-      {rows.map((r, i) => (
-        <React.Fragment key={r.name}>
-          <Sfx at={r.at} name={i % 3 === 0 ? "notif" : "tap"} gain={0.75} />
-          <Sfx at={r.at} name="tick" gain={0.5} />
-        </React.Fragment>
-      ))}
-      {[0, 1, 2].map((i) => (
-        <React.Fragment key={i}>
-          <Sfx at={T.notifL + i * 12} name="notif" />
-          <Sfx at={T.notifL + i * 12 - 3} name="whoosh_short" gain={0.5} />
-          <Sfx at={T.notifR + i * 12} name="notif" gain={0.85} />
-        </React.Fragment>
-      ))}
-      <Sfx at={T.more} name="click" />
-      {/* leve empurrao final para a proxima cena */}
+      <Sfx at={T.sweep} name="sparkle" gain={0.5} />
       <Sfx at={cfg.duration - 16} name="riser" gain={0.7} />
     </AbsoluteFill>
   );

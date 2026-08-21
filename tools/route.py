@@ -38,7 +38,7 @@ ys[0], ys[-1] = A[1], B[1]
 
 pts = [[round(float(x), 1), round(float(v), 1)] for x, v in zip(xs, ys)]
 json.dump(dict(a=list(A), b=list(B), points=pts),
-          open("public/layers/s4/route.json", "w"))
+          open("public/art/route.json", "w"))
 print(f"{len(pts)} pontos  y: {ys.min():.0f}..{ys.max():.0f}")
 print("amostra:", pts[::20])
 

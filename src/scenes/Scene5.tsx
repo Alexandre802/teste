@@ -1,278 +1,169 @@
 /**
  * CENA 5 - "ENTREGAR BEM TAMBÉM É VENDER."
  *
- * Primeiro a imagem inteira se monta: titulo palavra por palavra, domo,
- * caixa, escudo e os quatro cards entrando pelas laterais. So depois a
- * linha do card de status percorre Pedido enviado -> Em transporte ->
- * ENTREGUE, e a camera aproxima para acompanhar esse percurso.
+ * Primeiro a imagem inteira se monta: titulo palavra por palavra, o centro
+ * subindo e os quatro cards entrando pelas laterais. So depois a cortina do
+ * card de status recua e a linha percorre Pedido enviado -> Em transporte ->
+ * ENTREGUE, com a camera fechando nesse percurso.
  */
 import React from "react";
-import { AbsoluteFill, interpolate, useCurrentFrame, useVideoConfig } from "remotion";
-import { L, Plate, box, words } from "../lib/Layer";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import {
+  Backdrop,
+  Build,
+  Curtain,
+  Flash,
+  Glint,
+  Reveal,
+  Piece,
+  Sweep,
+  band,
+  slice,
+  curtainEdge,
+  surfaceBox,
+  wipeMask,
+  type Step,
+} from "../lib/Art";
 import { Sfx } from "../lib/Sfx";
-import { fadeInUp, float, popIn, pulse, ramp, slideIn3d, sp, zoomIn } from "../lib/anim";
-import { CARD_STEP, WORD_STEP, type SceneConfig } from "../config";
+import { camera, pulse, punch, pushTo, ramp } from "../lib/anim";
+import { type SceneConfig } from "../config";
 
 const T = {
-  logo: 2,
-  h1: 10,
-  h2: 26,
-  dome: 34,
-  cbox: 42,
-  shield: 58,
-  cards: 44,
-  status: 82,
-  /** rastreio: bolinha e texto de cada etapa + trecho de linha */
-  step: [
-    { dot: 106, txt: 110, line: 118 },
-    { dot: 142, txt: 146, line: 154 },
-    { dot: 178, txt: 182, line: -1 },
+  logo: 0,
+  h1: 12,
+  h2: 30,
+  center: 42,
+  cards: [52, 58, 64, 70],
+  shield: 76,
+  /** etapas do rastreio no card de status */
+  steps: [
+    { at: 104, p: 0.30 },
+    { at: 140, p: 0.55 },
+    { at: 176, p: 0.78 },
+    { at: 200, p: 1.0 },
   ],
-  lineRun: 22,
-  stars: 196,
-  zoomIn: 104,
-  zoomOut: 190,
+  stepDur: 20,
+  zoom: [100, 132, 196, 216] as [number, number, number, number],
+  sweep: 60,
 };
 
-const CARDS = [
-  { name: "c_tl", dir: -1 as const },
-  { name: "c_tr", dir: 1 as const },
-  { name: "c_bl", dir: -1 as const },
-  { name: "c_br", dir: 1 as const },
+const CARD_START = 0.04;
+const CENTER = slice(290, 690, 800, 1920);
+
+const STEPS: Step[] = [
+  { r: band(0, 320), at: T.logo, dur: 12, dir: "down", dy: -24 },
+  // "ENTREGAR BEM"
+  { r: slice(0, 320, 754, 512), at: T.h1, dur: 9, dir: "right", dx: -30 },
+  { r: slice(754, 320, 1080, 512), at: T.h1 + 8, dur: 9, dir: "right", dx: -30 },
+  // "TAMBÉM É VENDER."
+  { r: slice(0, 512, 530, 690), at: T.h2, dur: 8, dir: "right", dx: -26 },
+  { r: slice(530, 512, 611, 690), at: T.h2 + 6, dur: 6, dir: "right", dx: -26 },
+  { r: slice(611, 512, 1080, 690), at: T.h2 + 11, dur: 8, dir: "right", dx: -26 },
+  // centro (domo, caixa, escudo) sobe
+  // quatro cards, alternando os lados
+  { r: slice(0, 690, 290, 1100), at: T.cards[0], dur: 12, dir: "right", dx: -80 },
+  { r: slice(800, 690, 1080, 1100), at: T.cards[1], dur: 12, dir: "left", dx: 80 },
+  { r: slice(0, 1100, 290, 1920), at: T.cards[2], dur: 12, dir: "right", dx: -80 },
+  { r: slice(800, 1100, 1080, 1920), at: T.cards[3], dur: 12, dir: "left", dx: 80 },
 ];
 
 export const Scene5: React.FC<{ cfg: SceneConfig }> = ({ cfg }) => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const card = surfaceBox("s5", "card");
+  const focus: [number, number] = [card.x + card.w / 2, card.y + card.h * 0.42];
+  const cam = camera(frame, cfg, pushTo(frame, T.zoom, 1.09, focus, 1.01));
 
-  const h1 = words("s5", "h1");
-  const h2 = words("s5", "h2");
-  const prog = ramp(frame, 0, cfg.duration);
+  // acumula etapa a etapa: cada uma leva a cortina do ponto atual ao alvo
+  // o centro sobe e a cortina do card usa a MESMA mascara
+  const centerP = Math.min(1, Math.max(0, (frame - T.center) / 22));
+  const centerEased = 1 - Math.pow(1 - centerP, 3);
+  const centerMask = wipeMask(CENTER, centerEased, "up", 26);
 
-  const lineB = box("s5", "s_line");
-  /** A linha e um traco unico: cada etapa revela a sua metade. */
-  const lineP = (i: number) =>
-    T.step[i].line < 0 ? 1 : ramp(frame, T.step[i].line, T.step[i].line + T.lineRun);
-  const reveal = Math.min(1, (lineP(0) + lineP(1)) / 2);
+  let curtain = CARD_START;
+  T.steps.forEach((st) => {
+    curtain += (st.p - curtain) * ramp(frame, st.at, st.at + T.stepDur);
+  });
 
-  // aproximacao acompanhando o percurso da linha
-  const zoom = interpolate(
-    frame,
-    [T.zoomIn, T.zoomIn + 30, T.zoomOut, T.zoomOut + 26],
-    [1, 1.2, 1.2, 1.02],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
-  );
-  const focusX = lineB.x + lineB.w / 2 + 60;
-  const focusY = lineB.y + lineB.h / 2;
-  const camX = interpolate(zoom, [1, 1.2], [0, (540 - focusX) * 0.45]);
-  const camY = interpolate(zoom, [1, 1.2], [0, (960 - focusY) * 0.45]);
+  // brilho descendo junto com a borda da cortina
+  const glintAt = curtainEdge("s5", "card", curtain, 0.15);
+  const running = curtain > CARD_START + 0.01 && curtain < 0.99;
 
-  // o topo abre espaco quando a camera fecha no percurso da linha
-  const focusFade =
-    1 - 0.92 * ramp(frame, T.zoomIn, T.zoomIn + 26) * (1 - ramp(frame, T.zoomOut, T.zoomOut + 20));
-
-  const domeP = sp(frame, fps, T.dome, "heavy");
-  const shieldGlow = pulse(frame, T.shield, 4, 26);
-  const delivered = pulse(frame, T.step[2].dot, 4, 30);
+  const delivered = pulse(frame, T.steps[2].at + T.stepDur - 4, 4, 30);
+  const dots = ["s_d1", "s_d2", "s_d3"] as const;
 
   return (
     <AbsoluteFill>
-      <Plate scene="s5" zoom={cfg.bgZoom[0] + (cfg.bgZoom[1] - cfg.bgZoom[0]) * prog} />
+      <Backdrop scene="s5" />
+      <Build scene="s5" steps={STEPS} frame={frame} cam={cam} fillAt={T.cards[3] + 14} />
 
-      <AbsoluteFill
-        style={{
-          transform: `translate3d(${camX.toFixed(1)}px,${camY.toFixed(1)}px,0) scale(${zoom.toFixed(3)})`,
-          transformOrigin: `${focusX}px ${focusY}px`,
-        }}
-      >
-        <L
-          scene="s5"
-          name="logo"
-          a={{ ...fadeInUp(sp(frame, fps, T.logo, "snappy"), -60), opacity: fadeInUp(sp(frame, fps, T.logo, "snappy"), -60).opacity * focusFade }}
-        />
+      {/* centro subindo */}
+      <Reveal scene="s5" r={CENTER} p={centerEased} dir="up" soft={26} cam={cam} />
+      {/* card de status abrindo etapa por etapa, com a mesma mascara */}
+      <Curtain scene="s5" name="card" p={curtain} cam={cam} mask={centerMask} />
+      {running && <Glint at={glintAt} size={44} color="#7fe6ff" cam={cam} />}
 
-        {/* titulo palavra por palavra */}
-        {h1.map((n, i) => (
-          <L
-            key={n}
-            scene="s5"
-            name={n}
-            a={{
-              ...fadeInUp(sp(frame, fps, T.h1 + i * (WORD_STEP + 2), "punch"), 44),
-              opacity:
-                fadeInUp(sp(frame, fps, T.h1 + i * (WORD_STEP + 2), "punch"), 44).opacity *
-                focusFade,
-            }}
-          />
-        ))}
-        {h2.map((n, i) => (
-          <L
-            key={n}
-            scene="s5"
-            name={n}
-            a={{
-              ...fadeInUp(sp(frame, fps, T.h2 + i * (WORD_STEP + 2), "punch"), 44),
-              opacity:
-                fadeInUp(sp(frame, fps, T.h2 + i * (WORD_STEP + 2), "punch"), 44).opacity *
-                focusFade,
-            }}
-          />
-        ))}
-
-        {/* domo -> caixa -> escudo, nessa ordem de profundidade */}
-        <L
-          scene="s5"
-          name="dome"
-          a={{
-            opacity: Math.min(1, domeP * 1.5),
-            transform: `scale(${(0.82 + 0.18 * domeP).toFixed(3)})`,
-          }}
-          extra={`rotate(${(Math.sin(frame / 60) * 1.2).toFixed(2)}deg)`}
-        />
-        <L
-          scene="s5"
-          name="cbox"
-          origin="center bottom"
-          a={zoomIn(sp(frame, fps, T.cbox, "punch"), 0.6)}
-          extra={float(frame - T.cbox, 3, 6, 0.45)}
-        />
-        <L
-          scene="s5"
-          name="shield"
-          a={popIn(sp(frame, fps, T.shield, "punch"), 0.35)}
-          extra={float(frame - T.shield, 2, 5, 0.6)}
-          style={{
-            filter: `drop-shadow(0 0 ${(shieldGlow * 26).toFixed(1)}px rgba(120,200,255,.95))`,
-          }}
-        />
-
-        {/* os quatro cards entram pelas laterais, em cascata */}
-        {CARDS.map((c, i) => (
-          <L
-            key={c.name}
-            scene="s5"
-            name={c.name}
-            a={slideIn3d(sp(frame, fps, T.cards + i * CARD_STEP, "snappy"), c.dir, 200)}
-            extra={float(frame - T.cards - i * CARD_STEP, 3, 5, 0.4, i * 2)}
-          />
-        ))}
-
-        {/* card de status sobe */}
-        <L
-          scene="s5"
-          name="status"
-          origin="center bottom"
-          a={fadeInUp(sp(frame, fps, T.status, "heavy"), 150)}
-        />
-
-        {/* a linha percorre as etapas */}
-        <L
-          scene="s5"
-          name="s_line"
-          a={{ opacity: reveal > 0 ? 1 : 0, transform: "none" }}
-          style={{ clipPath: `inset(0 0 ${((1 - reveal) * 100).toFixed(2)}% 0)` }}
-        />
-        {reveal > 0 && reveal < 1 && (
-          <div
-            style={{
-              position: "absolute",
-              left: lineB.x + lineB.w / 2 - 15,
-              top: lineB.y + lineB.h * reveal - 15,
-              width: 30,
-              height: 30,
-              borderRadius: 15,
-              background:
-                "radial-gradient(circle, #ffffff 0%, #4fd8ff 45%, rgba(60,180,255,0) 74%)",
-            }}
-          />
-        )}
-
-        {T.step.map((st, i) => (
-          <React.Fragment key={i}>
-            <L
-              scene="s5"
-              name={`s_d${i + 1}`}
-              a={popIn(sp(frame, fps, st.dot, "punch"), 0.25)}
-              style={
-                i === 2
-                  ? {
-                      filter: `drop-shadow(0 0 ${(delivered * 24).toFixed(1)}px rgba(70,240,120,.95))`,
-                    }
-                  : undefined
-              }
-            />
-            <L
-              scene="s5"
-              name={`s_t${i + 1}`}
-              a={fadeInUp(sp(frame, fps, st.txt, "snappy"), 18)}
-            />
-          </React.Fragment>
-        ))}
-
-        {/* estrelas acendendo uma a uma */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            clipPath: `inset(0 ${(
-              (1 - ramp(frame, T.stars, T.stars + 20)) *
-              100
-            ).toFixed(2)}% 0 0)`,
-          }}
-        >
-          <L scene="s5" name="stars" a={popIn(sp(frame, fps, T.stars, "punch"), 0.8)} />
-        </div>
-      </AbsoluteFill>
-
-      {/* clarao no ENTREGUE */}
-      <AbsoluteFill
-        style={{
-          background:
-            "radial-gradient(40% 20% at 50% 84%, #9dffc0, rgba(60,220,120,0) 70%)",
-          opacity: delivered * 0.34,
-          mixBlendMode: "screen",
-        }}
+      <Piece scene="s5" name="cbox" scale={punch(frame, T.center + 16, 1.05)} cam={cam} />
+      <Piece
+        scene="s5"
+        name="shield"
+        scale={punch(frame, T.shield, 1.14)}
+        glow={pulse(frame, T.shield, 3, 22) * 0.4}
+        cam={cam}
       />
+      {(["c_tl", "c_tr", "c_bl", "c_br"] as const).map((n, i) => (
+        <Piece key={n} scene="s5" name={n} scale={punch(frame, T.cards[i] + 9, 1.06)} cam={cam} />
+      ))}
+
+      {/* bolinhas do rastreio acendem quando a linha chega */}
+      {dots.map((n, i) => (
+        <Piece
+          key={n}
+          scene="s5"
+          name={n}
+          scale={punch(frame, T.steps[i].at + T.stepDur - 4, 1.22)}
+          glow={pulse(frame, T.steps[i].at + T.stepDur - 4, 3, 18) * 0.4}
+          cam={cam}
+        />
+      ))}
+      <Piece scene="s5" name="stars" scale={punch(frame, T.steps[3].at + 10, 1.08)} cam={cam} />
+
+      <Flash p={delivered} color="#9dffc0" spread="34% 18% at 50% 82%" strength={0.3} />
+      <Sweep p={ramp(frame, T.sweep, T.sweep + 26)} strength={0.28} />
 
       {/* ------------------------------------------------------------ audio */}
       <Sfx at={0} name="whoosh_trans" />
       <Sfx at={1} name="sub_boom" gain={0.7} />
-      {h1.map((n, i) => (
-        <React.Fragment key={n}>
-          <Sfx at={T.h1 + i * (WORD_STEP + 2) - 2} name="whoosh_short" gain={0.6} />
-          <Sfx at={T.h1 + i * (WORD_STEP + 2)} name="pop_ui" />
+      {[0, 8].map((d) => (
+        <React.Fragment key={d}>
+          <Sfx at={T.h1 + d - 2} name="whoosh_short" gain={0.6} />
+          <Sfx at={T.h1 + d} name="pop_ui" />
         </React.Fragment>
       ))}
-      {h2.map((n, i) => (
-        <React.Fragment key={n}>
-          <Sfx at={T.h2 + i * (WORD_STEP + 2) - 2} name="whoosh_short" gain={0.6} />
-          <Sfx at={T.h2 + i * (WORD_STEP + 2)} name="pop_ui" />
+      {[0, 6, 11].map((d) => (
+        <Sfx key={`b${d}`} at={T.h2 + d} name="pop_ui" gain={0.85} />
+      ))}
+      <Sfx at={T.center - 6} name="reverse_whoosh" gain={0.7} />
+      <Sfx at={T.center} name="bass_hit" />
+      {T.cards.map((f, i) => (
+        <React.Fragment key={f}>
+          <Sfx at={f - 2} name="whoosh_short" gain={0.65} />
+          <Sfx at={f + 9} name="soft_pop" gain={0.85} />
         </React.Fragment>
       ))}
-      <Sfx at={T.dome} name="riser" gain={0.55} />
-      <Sfx at={T.cbox} name="bass_hit" />
       <Sfx at={T.shield} name="success" gain={0.7} />
       <Sfx at={T.shield} name="sparkle" gain={0.6} />
-      {CARDS.map((c, i) => (
-        <React.Fragment key={c.name}>
-          <Sfx at={T.cards + i * CARD_STEP - 2} name="whoosh_short" gain={0.7} />
-          <Sfx at={T.cards + i * CARD_STEP} name="soft_pop" />
+      <Sfx at={T.zoom[0]} name="riser" gain={0.5} />
+      {T.steps.map((st, i) => (
+        <React.Fragment key={st.at}>
+          <Sfx at={st.at} name="swipe" gain={0.55} />
+          <Sfx at={st.at + T.stepDur - 4} name="tap" />
+          <Sfx
+            at={st.at + T.stepDur - 4}
+            name={i === 2 ? "success" : i === 3 ? "sparkle" : "soft_pop"}
+            gain={0.9}
+          />
         </React.Fragment>
       ))}
-      <Sfx at={T.status - 4} name="reverse_whoosh" gain={0.7} />
-      <Sfx at={T.status} name="impact" gain={0.6} />
-      <Sfx at={T.zoomIn} name="riser" gain={0.5} />
-      {T.step.map((st, i) => (
-        <React.Fragment key={i}>
-          <Sfx at={st.dot} name="tap" />
-          <Sfx at={st.dot} name={i === 2 ? "success" : "soft_pop"} />
-          {st.line > 0 && <Sfx at={st.line} name="swipe" gain={0.6} />}
-        </React.Fragment>
-      ))}
-      {[0, 1, 2, 3, 4].map((i) => (
-        <Sfx key={i} at={T.stars + i * 4} name="tick" gain={0.9} />
-      ))}
-      <Sfx at={T.stars + 2} name="sparkle" />
       <Sfx at={cfg.duration - 16} name="riser" gain={0.7} />
     </AbsoluteFill>
   );

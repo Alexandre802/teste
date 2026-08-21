@@ -1,33 +1,41 @@
 # Três Estrelas — vídeo vertical 1080×1920 (Remotion)
 
 Vídeo de 36s em 9:16 para Reels / TikTok / Stories, montado em
-[Remotion](https://remotion.dev) + React, a partir das 6 artes de referência
-em `referencias/imagens/`.
+[Remotion](https://remotion.dev) + React sobre as 6 artes de
+`referencias/imagens/`.
 
 **Sem narração** — a trilha é só de efeitos sonoros, sincronizados com a
 animação.
 
 ```bash
 npm install
-npm run studio          # abre o editor visual do Remotion
+npm run studio          # editor visual do Remotion
 npm run build           # renderiza out/tres-estrelas.mp4
 ```
 
-## A ideia
+## A regra do projeto
 
-A identidade visual da Três Estrelas é preservada **pixel a pixel**: nada foi
-redesenhado. Cada arte é fatiada em camadas independentes (celulares, cards,
-palavras, bolinhas, gráficos, caixas) e o fundo é reconstruído por baixo, de
-modo que qualquer peça pode se mover sem deixar "fantasma" do original.
+**A arte não é tocada.** Nenhum pixel é recortado, recriado, borrado ou
+apagado, e nenhuma peça aparece duas vezes. O que roda no vídeo é sempre o
+arquivo original (`public/art/sN.jpg`, apenas redimensionado de 941×1672
+para 1080×1920).
 
-A checagem `tools/verify.py` recompõe fundo + todos os sprites em repouso e
-compara com a arte original: **0% de pixels com desvio acima de 25** nas seis
-cenas — ou seja, parado o vídeo é idêntico à referência; o que muda é só o
-movimento.
+Toda a animação vem de quatro recursos, e só deles:
+
+| Recurso | O que faz |
+|---|---|
+| **Câmera** | transforma o quadro inteiro (zoom lento, aproximação dirigida) |
+| **Revelação por máscara** | a arte *surge* por uma varredura de borda suave — nunca é substituída |
+| **Cortina** | tapa uma superfície (tela de app, card) com uma cor lida da própria arte e recua, deixando o conteúdo original aparecer na ordem |
+| **Overlay de luz** | brilho, clarão e passada de luz em modo `screen`, por cima |
+
+Os realces (`<Piece>`) só escalam **para cima** e sempre dentro da janela do
+próprio elemento — assim ele cobre o próprio lugar e nunca abre buraco nem
+deixa cópia por baixo.
 
 ## Onde mexer
 
-Praticamente tudo que se costuma querer ajustar está em **`src/config.ts`**:
+Quase tudo que se costuma ajustar está em **`src/config.ts`**:
 
 | O quê | Onde |
 |---|---|
@@ -35,47 +43,42 @@ Praticamente tudo que se costuma querer ajustar está em **`src/config.ts`**:
 | Direção da transição | `SCENES[].from` |
 | Zoom lento de fundo | `SCENES[].bgZoom` |
 | Sobreposição entre cenas | `OVERLAP` |
-| Velocidade do texto palavra a palavra | `WORD_STEP` |
-| Cascata de listas e cards | `ROW_STEP`, `CARD_STEP` |
-| "Peso" das molas | `SPRING` |
 | Volume de cada efeito | `SFX_GAIN` |
 | Contagem da cena 2 | `COUNTER` |
+| Texto de cada região (referência) | `COPY` |
 
-O tempo de cada elemento dentro de uma cena fica no objeto `T` no topo do
-arquivo da cena (`src/scenes/SceneN.tsx`) — todos em quadros, a 30 fps.
+O tempo de cada elemento fica no objeto `T` no topo do arquivo da cena
+(`src/scenes/SceneN.tsx`), sempre em quadros, a 30 fps. As faixas que montam
+a cena ficam na lista `STEPS` logo abaixo.
 
 ## As seis cenas
 
 | # | Arte | O que anima |
 |---|---|---|
-| 1 | `35D3…` | Pedidos entrando um a um nas telas de Shopee / Mercado Livre / SHEIN; cards de notificação caindo como alerta de iPhone; título palavra a palavra |
-| 2 | `EA92…` | Contagem até 100.000 com os dígitos feitos da mesma textura de caixas; ao cravar o valor, funde no recorte original |
-| 3 | `F81E…` | Linha do rastreio descendo de *Pedido vendido* → *Separado* → *Enviado*, acendendo cada bolinha |
-| 4 | `657C…` | Zoom no mapa, rota Goiânia → São Paulo acendendo e a caixa atravessando o traçado |
-| 5 | `E524…` | Domo, caixa, escudo e os 4 cards entrando; depois a linha percorre até *ENTREGUE* com aproximação de câmera |
-| 6 | `4507…` | Encerramento: galpão sobe, nome bate na tela, tarja abre, notificações pipocam, sting de marca |
+| 1 | `35D3…` | Título palavra a palavra; depois uma cascata única desce e vai descobrindo, na ordem, os celulares, cada pedido nas listas de Shopee / Mercado Livre / SHEIN e cada card de notificação |
+| 2 | `EA92…` | O número da arte é descoberto casa a casa: 1 → 10 → 100 → 1.000 → 10.000 → 100.000. As caixas que formam os dígitos são as originais — nenhum dígito foi desenhado |
+| 3 | `F81E…` | O celular sobe e a cortina da tela recua em degraus: é a própria linha do rastreio descendo de *Pedido vendido* → *Separado* → *Enviado*, com um brilho acompanhando a borda |
+| 4 | `657C…` | Textos palavra a palavra, aproximação no mapa e um brilho percorrendo a rota **que já existe na arte** (nenhuma linha é desenhada por cima), com rastro de velocidade na caixa |
+| 5 | `E524…` | A imagem se monta inteira (título, centro subindo, 4 cards pelas laterais); depois a cortina do card recua até *ENTREGUE*, com a câmera fechando no percurso |
+| 6 | `4507…` | Galpão sobe, nome bate em duas batidas, tarja abre da esquerda para a direita, notificações nos quatro cantos, sting de marca |
 
-## Como as camadas são geradas
+## Ferramentas (todas somente-leitura sobre a arte)
 
 ```bash
-python3 tools/slice.py     # fatia as artes -> public/layers/ + src/layers.gen.ts
-python3 tools/digits.py    # dígitos 0-9 com a textura de caixas (cena 2)
+python3 tools/prep.py      # arte -> public/art/ (só redimensiona) + cor do palco
+python3 tools/regions.py   # geometria das regiões -> src/regions.gen.ts
 python3 tools/route.py     # rastreia a curva do mapa nos pixels (cena 4)
 python3 tools/sfx.py       # sintetiza os 18 efeitos -> public/sfx/
-python3 tools/verify.py    # confere que o recorte reconstrói a arte original
 ```
 
-`tools/specs.py` guarda a caixa de cada elemento. O fatiador cuida de:
+- `tools/detect.py` acha o limite real de cada elemento (a caixa cresce até a
+  tinta acabar) e separa as palavras dos títulos pelo perfil de contraste.
+- `tools/regions.py` também mede os **cantos reais** das telas dos celulares,
+  para a cortina acompanhar a inclinação da arte em vez de chutar rotação.
+- `tools/specs.py` guarda a caixa de partida de cada elemento.
 
-- **ordem de extração** — o que está na frente sai primeiro;
-- **reconstrução do fundo** — interpolação tipo Laplace a partir da moldura,
-  com percentil baixo (`dark=`) para o brilho do elemento não clarear o buraco;
-- **`grow_to_ink`** — a caixa cresce sozinha até a tinta acabar, então não
-  sobra rabo de texto;
-- **`fill="flat"` + `limit`** — nas telas de app, preenche com a "cor do papel"
-  medida na própria tela;
-- **`exclusive`** — marca regiões que já pertencem a outro sprite, para um
-  recorte posterior não carregar o remendo do vizinho.
+Nenhuma dessas ferramentas grava imagem alterada: só coordenadas, cores de
+apoio e os efeitos sonoros.
 
 ## Efeitos sonoros
 
