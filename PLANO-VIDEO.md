@@ -1,8 +1,8 @@
 # Três Estrelas — plano de produção do vídeo
 
 Documento gerado a partir da análise do que está em `referencias/`.
-Formato de entrega: **9:16 vertical (1080×1920)**. As 7 artes são 3:1, então
-entram recortadas — ver §6.
+Formato de entrega: **3840×1280 (3:1)** — a mesma proporção das 7 artes e dos
+vídeos de referência, então cada arte entra inteira, sem recorte nem barra.
 
 ---
 

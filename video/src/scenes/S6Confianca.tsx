@@ -1,81 +1,94 @@
 import React from 'react';
-import { AbsoluteFill, useCurrentFrame } from 'remotion';
-import { Stage } from '../components/Stage';
-import { KineticText } from '../components/Type';
-import { Dome, Stamp, Stars, StatusFlow } from '../components/Ui';
-import { beat, fade, fadeOut } from '../config/beat';
+import { AbsoluteFill, Img, interpolate, staticFile, useCurrentFrame } from 'remotion';
+import { beat, fade, fadeOut, overshoot, pulse } from '../config/beat';
+import { theme } from '../config/theme';
 
 /**
- * 20–27s — CONFIANÇA.
+ * 20–27s — CONFIANÇA. Da copy: a caixa protegida pela estrutura digital azul,
+ * as quatro palavras ao redor, o fluxo até ENTREGUE e as estrelas.
  *
- * Da copy, nesta ordem: a caixa protegida pela estrutura digital azul, as
- * quatro palavras ao redor dela, o fluxo "Pedido enviado → Em transporte →
- * ENTREGUE" com as estrelas logo em seguida e, só no fim, o texto
- * "ENTREGAR BEM TAMBÉM É VENDER."
- *
- * A caixa é a própria arte, flutuando no ambiente; domo, selos, fluxo e
- * estrelas são a camada animada.
+ * A arte entrega a caixa, os selos e o fluxo. O que anima aqui é a estrutura
+ * pulsando ao redor da caixa, um realce percorrendo os quatro selos e as
+ * estrelas acendendo uma a uma.
  */
+
+/** Centros dos quatro selos na arte, no espaço 3840×1280. */
+const SELOS = [
+  { x: 540, y: 560 },
+  { x: 500, y: 830 },
+  { x: 2320, y: 570 },
+  { x: 2320, y: 840 },
+];
+
 export const S6Confianca: React.FC<{ duration: number }> = ({ duration }) => {
   const frame = useCurrentFrame();
   const out = fadeOut(frame, duration, 0.6);
+  const scale = interpolate(frame, [0, duration], [1.0, 1.035]);
+  const glow = pulse(frame, 2);
 
   return (
-    <AbsoluteFill style={{ opacity: out }}>
-      <Stage scene="s6" duration={duration} push="in" />
-
-      {/* a estrutura digital ao redor da caixa */}
-      <div
-        style={{
-          position: 'absolute', top: 590, left: 0, right: 0,
-          display: 'flex', justifyContent: 'center', zIndex: 8,
-        }}
-      >
-        <Dome start={beat(0.5)} size={640} />
-      </div>
-
-      {/* as quatro palavras */}
-      <div style={{ position: 'absolute', top: 520, left: '3%', zIndex: 20 }}>
-        <Stamp start={beat(2)} icon="eye" lines={['Rastreamento', 'em tempo real']} from="left" />
-      </div>
-      <div style={{ position: 'absolute', top: 520, right: '3%', zIndex: 20 }}>
-        <Stamp start={beat(2.5)} icon="eye" lines={['Monitoramento', '24h']} from="right" />
-      </div>
-      <div style={{ position: 'absolute', top: 1060, left: '3%', zIndex: 20 }}>
-        <Stamp start={beat(3)} icon="shield" lines={['Carga', 'segurada']} from="left" />
-      </div>
-      <div style={{ position: 'absolute', top: 1060, right: '3%', zIndex: 20 }}>
-        <Stamp start={beat(3.5)} icon="shield" lines={['Gestão', 'de risco']} from="right" />
-      </div>
-
-      {/* o fluxo do pedido e a reputação, logo abaixo da caixa */}
-      <div
-        style={{
-          position: 'absolute', top: 1290, left: 0, right: 0,
-          display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 20,
-        }}
-      >
-        <StatusFlow start={beat(6)} />
-        <div style={{ marginTop: 20, opacity: fade(frame, beat(8.5), 0.4) }}>
-          <Stars start={beat(8.5)} size={46} />
-        </div>
-      </div>
-
-      {/* e só então a frase */}
-      <div
-        style={{
-          position: 'absolute', left: 0, right: 0, top: 118,
-          display: 'flex', justifyContent: 'center', zIndex: 25,
-        }}
-      >
-        <KineticText
-          lines={['Entregar bem', 'também é vender.']}
-          start={beat(9.5)}
-          size={92}
-          align="center"
-          accent={[1]}
+    <AbsoluteFill style={{ opacity: out, overflow: 'hidden', backgroundColor: theme.navy }}>
+      <AbsoluteFill style={{ transform: `scale(${scale})` }}>
+        <Img
+          src={staticFile('plates/s6_confianca.png')}
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
         />
-      </div>
+
+        {/* a estrutura digital respirando ao redor da caixa */}
+        <div
+          style={{
+            position: 'absolute', left: 1440, top: 220, width: 900, height: 900,
+            borderRadius: '50%',
+            border: `3px solid ${theme.cyan}${Math.round(60 + glow * 80).toString(16)}`,
+            boxShadow: `0 0 ${60 + glow * 70}px ${theme.cyan}55, inset 0 0 ${80 + glow * 60}px ${theme.cyan}33`,
+            opacity: fade(frame, beat(0.5), 1) * 0.85,
+          }}
+        />
+
+        {/* o realce percorre os quatro selos, um por tempo */}
+        {SELOS.map((s, i) => {
+          const at = beat(2 + i * 0.75);
+          const p = overshoot(frame, at, 1);
+          const hold = interpolate(frame, [at, at + beat(1.2)], [1, 0], {
+            extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
+          });
+          return (
+            <div
+              key={i}
+              style={{
+                position: 'absolute',
+                left: s.x, top: s.y,
+                width: 340, height: 120,
+                transform: `translate(-50%, -50%) scale(${interpolate(p, [0, 1], [0.9, 1])})`,
+                borderRadius: 18,
+                boxShadow: `0 0 ${40 * hold}px ${theme.cyan}`,
+                border: `2px solid ${theme.cyan}${Math.round(hold * 200).toString(16).padStart(2, '0')}`,
+                opacity: hold,
+              }}
+            />
+          );
+        })}
+      </AbsoluteFill>
+
+      {/* as estrelas da arte acendem uma a uma, por trás */}
+      {[2981, 3115, 3249, 3383, 3517].map((x, i) => {
+        const at = beat(8.5 + i * 0.25);
+        const on = fade(frame, at, 0.25);
+        return (
+          <div
+            key={x}
+            style={{
+              position: 'absolute', left: x, top: 1015,
+              width: 92, height: 92, borderRadius: '50%',
+              transform: 'translate(-50%, -50%)',
+              background: `radial-gradient(circle, ${theme.amber}cc 0%, transparent 68%)`,
+              opacity: on * 0.85,
+              mixBlendMode: 'screen',
+              zIndex: 20,
+            }}
+          />
+        );
+      })}
     </AbsoluteFill>
   );
 };

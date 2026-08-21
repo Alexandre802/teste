@@ -11,7 +11,7 @@ export const HudFrame: React.FC = () => {
   const corner = (style: React.CSSProperties) => (
     <div
       style={{
-        position: 'absolute', width: 74, height: 74,
+        position: 'absolute', width: 190, height: 190,
         borderColor: `${theme.cyan}${Math.round(90 + glow * 70).toString(16)}`,
         borderStyle: 'solid', borderWidth: 0,
         ...style,
@@ -20,10 +20,10 @@ export const HudFrame: React.FC = () => {
   );
   return (
     <AbsoluteFill style={{ pointerEvents: 'none', opacity: 0.75 }}>
-      {corner({ top: 40, left: 40, borderTopWidth: 3, borderLeftWidth: 3, borderTopLeftRadius: 10 })}
-      {corner({ top: 40, right: 40, borderTopWidth: 3, borderRightWidth: 3, borderTopRightRadius: 10 })}
-      {corner({ bottom: 40, left: 40, borderBottomWidth: 3, borderLeftWidth: 3, borderBottomLeftRadius: 10 })}
-      {corner({ bottom: 40, right: 40, borderBottomWidth: 3, borderRightWidth: 3, borderBottomRightRadius: 10 })}
+      {corner({ top: 84, left: 84, borderTopWidth: 5, borderLeftWidth: 5, borderTopLeftRadius: 18 })}
+      {corner({ top: 84, right: 84, borderTopWidth: 5, borderRightWidth: 5, borderTopRightRadius: 18 })}
+      {corner({ bottom: 84, left: 84, borderBottomWidth: 5, borderLeftWidth: 5, borderBottomLeftRadius: 18 })}
+      {corner({ bottom: 84, right: 84, borderBottomWidth: 5, borderRightWidth: 5, borderBottomRightRadius: 18 })}
       <Ruler side="left" />
       <Ruler side="right" />
     </AbsoluteFill>
@@ -33,14 +33,14 @@ export const HudFrame: React.FC = () => {
 const Ruler: React.FC<{ side: 'left' | 'right' }> = ({ side }) => {
   const frame = useCurrentFrame();
   return (
-    <div style={{ position: 'absolute', [side]: 22, top: '30%', height: '40%', width: 12 }}>
+    <div style={{ position: 'absolute', [side]: 52, top: '28%', height: '44%', width: 26 }}>
       {new Array(14).fill(0).map((_, i) => {
         const on = Math.floor(frame / (BEAT / 2)) % 14 === i;
         return (
           <div
             key={i}
             style={{
-              width: on ? 12 : 6, height: 2, marginBottom: 20,
+              width: on ? 26 : 13, height: 4, marginBottom: 30,
               background: theme.cyan,
               opacity: on ? 0.9 : 0.25,
               marginLeft: side === 'left' ? 0 : 'auto',
@@ -60,11 +60,11 @@ export const Ticker: React.FC = () => {
     '+100.000 VOLUMES/MÊS', 'CARGA SEGURADA', 'MONITORAMENTO 24H', 'OPERAÇÃO DIÁRIA',
   ];
   const line = items.join('   •   ') + '   •   ';
-  const x = -((frame * 1.6) % 2400);
+  const x = -((frame * 3.2) % 4800);
   return (
     <div
       style={{
-        position: 'absolute', left: 0, right: 0, bottom: 46, height: 34,
+        position: 'absolute', left: 0, right: 0, bottom: 92, height: 62,
         overflow: 'hidden', display: 'flex', alignItems: 'center',
         opacity: 0.5,
         maskImage: 'linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent)',
@@ -74,7 +74,7 @@ export const Ticker: React.FC = () => {
       <div
         style={{
           whiteSpace: 'nowrap', transform: `translateX(${x}px)`,
-          fontFamily: font.body, fontSize: 19, fontWeight: 700,
+          fontFamily: font.body, fontSize: 36, fontWeight: 700,
           letterSpacing: '0.24em', color: theme.cyanSoft,
         }}
       >
@@ -91,8 +91,8 @@ export const SceneMark: React.FC = () => {
   return (
     <div
       style={{
-        position: 'absolute', top: 52, right: 62,
-        fontFamily: font.body, fontSize: 20, fontWeight: 800,
+        position: 'absolute', top: 112, right: 130,
+        fontFamily: font.body, fontSize: 40, fontWeight: 800,
         letterSpacing: '0.2em', color: theme.cyanSoft, opacity: 0.55,
       }}
     >

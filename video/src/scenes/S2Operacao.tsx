@@ -10,8 +10,8 @@ import { theme } from '../config/theme';
  * 5–8s — Da copy: "Os pedidos se afastam e revelam caminhões e CD da Três
  * Estrelas 3D".
  *
- * A revelação vira um seletor: a frota passa de lado, um veículo por vez,
- * no mesmo gesto da sessão de marketplaces da cena anterior.
+ * A revelação vira um seletor: a frota passa de lado, um veículo por vez. Em
+ * 3:1 cabem três cartões lado a lado, com o do centro cheio.
  */
 export const S2Operacao: React.FC<{ duration: number }> = ({ duration }) => {
   const frame = useCurrentFrame();
@@ -28,17 +28,17 @@ export const S2Operacao: React.FC<{ duration: number }> = ({ duration }) => {
     <AbsoluteFill style={{ opacity: out }}>
       <Stage scene="s2" duration={duration} push="out" />
 
-      <div style={{ position: 'absolute', top: 430, left: 0, right: 0, zIndex: 10 }}>
-        <VehicleSwiper items={frota} start={0} width={640} height={820} gap={44} everyBeats={2} />
+      <div style={{ position: 'absolute', top: 130, left: 0, right: 0, zIndex: 10 }}>
+        <VehicleSwiper items={frota} start={0} width={780} height={940} gap={70} everyBeats={2} />
       </div>
 
       <div
         style={{
-          position: 'absolute', left: 0, right: 0, bottom: 170,
+          position: 'absolute', left: 0, right: 0, bottom: 118,
           display: 'flex', justifyContent: 'center', zIndex: 25,
         }}
       >
-        <Sub start={beat(3)} align="center" size={34} color={theme.cyan}>
+        <Sub start={beat(3)} align="center" size={44} color={theme.cyan}>
           Frota própria. Centro de distribuição. Operação diária.
         </Sub>
       </div>

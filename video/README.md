@@ -1,6 +1,8 @@
-# Três Estrelas — reel vertical
+# Três Estrelas — filme institucional
 
-Peça de 30s em 9:16 (1080×1920), construída em Remotion. O motion segue a
+Peça de 30s em **3840×1280 (3:1)**, construída em Remotion. É a mesma
+proporção das artes do cliente (2172×724) e dos vídeos de referência, então
+cada arte entra inteira no quadro: sem barra lateral e sem recorte. O motion segue a
 linguagem extraída dos dois vídeos de referência em `referencias/audio/` e os
 tempos saem das marcações da copy em `referencias/copy/`; a leitura completa
 dessa análise está em `PLANO-VIDEO.md`, na raiz.
@@ -41,26 +43,25 @@ nos seis limites de cena:
 inteira, sem tocar nas cenas. Os cortes das cenas seguem a copy — ESCALA em
 8–12s, A GRANDE PROMESSA em 16–20s e a ASSINATURA em 27–30s.
 
-## As artes no quadro vertical
+## As artes no quadro
 
-As artes do repositório são 3:1 e o quadro é 9:16, então o corte vertical
-mostra cerca de 19% da largura de cada arte. `src/config/plates.ts` define
-por onde cortar:
+Em 3:1 a arte coincide com o quadro: entra inteira, sem recorte e sem barra.
+`focal` e `pan` em `src/config/plates.ts` deixam de recortar; só o `veil`
+segue em uso, para rebaixar a arte onde a camada animada precisa de espaço.
 
-- `focal` é a **fração horizontal da arte** que fica no centro do quadro.
-  A conversão para `objectPosition` está em `Plate.tsx` — com `object-fit:
-  cover` a porcentagem distribui o excedente, não aponta o pixel, e tratar
-  as duas como a mesma coisa faz o recorte escorregar para cima do texto
-  embutido na arte.
-- `mode: 'inset'` faz a arte flutuar menor sobre o ambiente em código, com
-  bordas esfumadas — é como a caixa protegida aparece na cena 6.
-- `veil` é o quanto a arte é rebaixada. As artes ainda trazem a tipografia
-  embutida, e os recortes foram escolhidos em regiões sem texto.
+Como as artes vêm achatadas, com a tipografia embutida, a camada animada
+**não redesenha o que a arte já entrega**. Ela anima por cima:
 
-Quando os plates limpos (sem texto) chegarem:
+- as listas dentro das três telas da cena 1, medidas com grade sobre a arte;
+- as notificações chegando nas colunas laterais, num espaço aberto por um
+  degradê que apaga os cards embutidos;
+- os marcadores do rastreio acendendo em sequência na cena 4 — o aparelho
+  está em perspectiva na arte, então nada de retângulo reto por cima;
+- a rota e a caixa atravessando o mapa na cena 5;
+- a estrutura pulsando ao redor da caixa e as estrelas acendendo na cena 6.
 
-1. substitua o arquivo em `public/plates/`;
-2. vire `baked` para `false` naquela cena e leve `veil` para perto de zero.
+Quando os plates limpos (sem texto) chegarem, substitua o arquivo em
+`public/plates/` e vire `baked` para `false` naquela cena.
 
 ## Áudio
 

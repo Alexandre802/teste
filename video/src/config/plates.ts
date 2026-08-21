@@ -34,23 +34,17 @@ export type PlateDef = {
   insetRatio?: number;
 };
 
-/** Pátio e frota da arte de assinatura: o ambiente limpo da marca. */
-const AMBIENTE = staticFile('plates/s7_assinatura.png');
-
+/**
+ * Em 3:1 as artes coincidem com o quadro: entram inteiras, sem recorte e sem
+ * barra. `focal` e `pan` deixam de recortar e só sobra o `veil`, que rebaixa
+ * a arte onde a camada animada precisa de espaço limpo.
+ */
 export const plates: Record<SceneId, PlateDef> = {
-  // a arte de abertura é a própria cena: a câmera atravessa a composição da
-  // esquerda (os três marketplaces) até a direita (a frase e o pátio)
-  s1: { src: staticFile('plates/s1_phones.png'), focal: 0.49, pan: 58, baked: true, veil: 0.05 },
-  // a revelação: o CD e a frota ficam à mostra quando os pedidos recuam
-  s2: { src: AMBIENTE, focal: 0.83, pan: 7, baked: true, veil: 0.46 },
-  // borda da arte de escala: só o campo de caixas em movimento
-  s3: { src: staticFile('plates/s3_escala.png'), focal: 0.04, pan: 6, baked: true, veil: 0.34 },
-  // rastros e frota atrás do mockup de rastreio
-  s4: { src: AMBIENTE, focal: 0.93, pan: -4, baked: true, veil: 0.52 },
-  // ambiente neutro: o mapa e a rota são desenhados por cima
-  s5: { src: AMBIENTE, focal: 0.80, pan: 4, baked: true, veil: 0.58 },
-  // a caixa protegida é o próprio herói da arte, recortada no centro
-  s6: { src: staticFile('plates/s6_confianca.png'), focal: 0.45, pan: 3, baked: true, veil: 0.16, mode: 'inset', insetHeight: 0.52, insetRatio: 0.72 },
-  // volta ao pátio operando, emendando com a primeira cena
-  s7: { src: AMBIENTE, focal: 0.90, pan: -6, baked: true, veil: 0.54 },
+  s1: { src: staticFile('plates/s1_phones.png'),     focal: 0.5, pan: 0, baked: true, veil: 0 },
+  s2: { src: staticFile('plates/s2_operacao.png'),   focal: 0.5, pan: 0, baked: true, veil: 0.5 },
+  s3: { src: staticFile('plates/s3_escala.png'),     focal: 0.5, pan: 0, baked: true, veil: 0 },
+  s4: { src: staticFile('plates/s4_urgencia.png'),   focal: 0.5, pan: 0, baked: true, veil: 0 },
+  s5: { src: staticFile('plates/s5_mapa.png'),       focal: 0.5, pan: 0, baked: true, veil: 0 },
+  s6: { src: staticFile('plates/s6_confianca.png'),  focal: 0.5, pan: 0, baked: true, veil: 0 },
+  s7: { src: staticFile('plates/s7_assinatura.png'), focal: 0.5, pan: 0, baked: true, veil: 0 },
 };
