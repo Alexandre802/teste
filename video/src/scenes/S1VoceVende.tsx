@@ -1,27 +1,29 @@
 import React from 'react';
 import { AbsoluteFill, useCurrentFrame } from 'remotion';
-import { PhoneSpinRow } from '../components/Carousel';
+import { PhoneSwiper } from '../components/Carousel';
+import { NotificationStack } from '../components/NotifStack';
 import { Stage } from '../components/Stage';
 import { KineticText } from '../components/Type';
-import { ToastPair, Wordmark } from '../components/Ui';
+import { Wordmark } from '../components/Ui';
 import { beat, fadeOut } from '../config/beat';
+import { theme } from '../config/theme';
 
 /**
  * 0–5s — VOCÊ VENDE. A GENTE FAZ CHEGAR.
  *
- * Da copy: "3 iphones, cada um com um marketplace... notificações de novas
- * compras dentro de cada celular de forma individual", "texto gigante ao
- * lado" e "Logo Três Estrelas pequeno".
+ * Os três marketplaces ficam numa sessão que desliza: o aparelho não gira,
+ * a fileira passa para o lado e o próximo app assume o centro.
  *
- * Os três aparelhos giram no próprio eixo e as notificações entram aos pares
- * — os dois lados no mesmo quadro, um par por tempo.
+ * As notificações seguem a referência do cliente — caem de cima e empilham,
+ * cada nova empurrando as anteriores para baixo — e chegam aos pares, os dois
+ * lados no mesmo quadro.
  */
 export const S1VoceVende: React.FC<{ duration: number }> = ({ duration }) => {
   const frame = useCurrentFrame();
   const out = fadeOut(frame, duration, 0.6);
 
-  // a ordem na tela segue a arte: Shopee, Mercado Livre, Shein
-  const slots = [
+  // a fileira repete as marcas para o swipe seguir adiante sem salto
+  const base = [
     {
       brand: 'shopee' as const,
       orders: [
@@ -47,55 +49,53 @@ export const S1VoceVende: React.FC<{ duration: number }> = ({ duration }) => {
       ],
     },
   ];
+  const slots = [...base, ...base];
 
-  const pares = [
-    {
-      at: 2, top: '12%',
-      left: { title: 'Novo pedido #98254', subtitle: 'Shopee · São Paulo - SP', accent: '#ee4d2d' },
-      right: { title: 'Novo pedido #98731', subtitle: 'Mercado Livre · Curitiba', accent: '#ffe600' },
-    },
-    {
-      at: 3, top: '19%',
-      left: { title: 'Novo pedido #98199', subtitle: 'Shein · Salvador - BA', accent: '#111827' },
-      right: { title: 'Novo pedido #71206', subtitle: 'Shopee · Recife - PE', accent: '#ee4d2d' },
-    },
-    {
-      at: 4, top: '26%',
-      left: { title: 'Novo pedido #45120', subtitle: 'Mercado Livre · Manaus', accent: '#ffe600' },
-      right: { title: 'Novo pedido #45118', subtitle: 'Shein · Fortaleza - CE', accent: '#111827' },
-    },
+  const esquerda = [
+    { app: 'Shopee', accent: '#ee4d2d', time: 'agora', body: <>Novo pedido <b>#98254</b> · São Paulo - SP</> },
+    { app: 'Mercado Livre', accent: '#ffe600', time: 'agora', body: <>Pagamento aprovado <b>#200982</b> · Curitiba</> },
+    { app: 'Shein', accent: '#111827', time: 'agora', body: <>Novo pedido <b>#3H48E11</b> · Fortaleza - CE</> },
+  ];
+  const direita = [
+    { app: 'Mercado Livre', accent: '#ffe600', time: 'agora', body: <>Nova venda <b>#200981</b> · Salvador - BA</> },
+    { app: 'Shopee', accent: '#ee4d2d', time: 'agora', body: <>Novo pedido <b>#71206</b> · Recife - PE</> },
+    { app: 'Shein', accent: '#111827', time: 'agora', body: <>Novo pedido <b>#3H45830</b> · Manaus - AM</> },
   ];
 
   return (
     <AbsoluteFill style={{ opacity: out }}>
       <Stage scene="s1" duration={duration} push="in" />
 
-      <div style={{ position: 'absolute', top: 96, left: 0, right: 0, display: 'flex', justifyContent: 'center', zIndex: 25 }}>
+      <div style={{ position: 'absolute', top: 96, left: 0, right: 0, display: 'flex', justifyContent: 'center', zIndex: 30 }}>
         <Wordmark start={beat(0.5)} />
       </div>
 
-      {pares.map((p, i) => (
-        <ToastPair key={i} start={beat(p.at)} top={p.top} left={p.left} right={p.right} width={292} inset="2%" />
-      ))}
+      {/* os dois lados recebem no mesmo quadro */}
+      <div style={{ position: 'absolute', top: 210, left: 24, zIndex: 20 }}>
+        <NotificationStack items={esquerda} start={beat(2)} everyBeats={1.5} width={496} exitAt={beat(9.2)} />
+      </div>
+      <div style={{ position: 'absolute', top: 210, right: 24, zIndex: 20 }}>
+        <NotificationStack items={direita} start={beat(2)} everyBeats={1.5} width={496} exitAt={beat(9.2)} />
+      </div>
 
-      <div style={{ position: 'absolute', top: 600, left: 0, right: 0, display: 'flex', justifyContent: 'center', zIndex: 10 }}>
-        <PhoneSpinRow
-          slots={slots}
-          start={beat(0.5)}
-          width={296}
-          gap={24}
-          turnBeats={8}
-          ordersStart={beat(2)}
-        />
+      <div style={{ position: 'absolute', top: 690, left: 0, right: 0, zIndex: 10 }}>
+        <PhoneSwiper slots={slots} start={beat(0.5)} width={300} gap={54} everyBeats={2} ordersStart={beat(2)} />
       </div>
 
       <div
         style={{
-          position: 'absolute', left: 0, right: 0, top: 1330,
-          display: 'flex', justifyContent: 'center', zIndex: 25,
+          position: 'absolute', left: 0, right: 0, top: 1360,
+          display: 'flex', justifyContent: 'center', zIndex: 30,
         }}
       >
-        <KineticText lines={['Você vende.', 'A gente', 'faz chegar.']} start={beat(5)} size={118} align="center" />
+        <KineticText
+          lines={['Você vende.', 'A gente', 'faz chegar.']}
+          start={beat(5)}
+          size={118}
+          align="center"
+          accent={[2]}
+          accentColor={theme.cyan}
+        />
       </div>
     </AbsoluteFill>
   );

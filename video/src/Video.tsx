@@ -1,6 +1,8 @@
 import React from 'react';
 import { AbsoluteFill, Sequence, useCurrentFrame } from 'remotion';
 import { Flash, FxDefs, Grain, RgbSplit, splitAmount } from './components/Fx';
+import { HudFrame, SceneMark, Sweep, Ticker } from './components/Hud';
+import { SfxTrack } from './components/Sfx';
 import { scenes } from './config/timeline';
 import { theme } from './config/theme';
 import { ensureFonts } from './fonts';
@@ -47,9 +49,15 @@ export const TresEstrelas: React.FC = () => {
         </AbsoluteFill>
       </RgbSplit>
 
+      {boundaries.map((b) => <Sweep key={`sw-${b}`} at={b} />)}
       {boundaries.map((b) => <Flash key={b} at={b} />)}
 
+      <HudFrame />
+      <Ticker />
+      <SceneMark />
       <Grain />
+
+      <SfxTrack />
     </AbsoluteFill>
   );
 };
