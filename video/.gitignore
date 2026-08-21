@@ -3,5 +3,4 @@ node_modules/
 out/*
 !out/.gitkeep
 # o corte final fica versionado, como nos outros projetos do repositório
-!out/tres-estrelas.mp4
 !out/tres-estrelas-3840x1280.mp4

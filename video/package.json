@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "remotion studio",
-    "build": "remotion render TresEstrelas out/tres-estrelas.mp4 --concurrency=2"
+    "build": "remotion render TresEstrelas out/tres-estrelas-3840x1280.mp4 --concurrency=2"
   },
   "dependencies": {
     "@fontsource/anton": "^5.3.0",
