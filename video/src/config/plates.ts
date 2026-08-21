@@ -41,7 +41,7 @@ export const plates: Record<SceneId, PlateDef> = {
   // pátio ao fundo; os celulares e as notificações são a camada animada
   s1: { src: AMBIENTE, focal: 0.88, pan: -5, baked: true, veil: 0.64 },
   // a revelação: o CD e a frota ficam à mostra quando os pedidos recuam
-  s2: { src: AMBIENTE, focal: 0.83, pan: 7, baked: true, veil: 0.22 },
+  s2: { src: AMBIENTE, focal: 0.83, pan: 7, baked: true, veil: 0.46 },
   // borda da arte de escala: só o campo de caixas em movimento
   s3: { src: staticFile('plates/s3_escala.png'), focal: 0.04, pan: 6, baked: true, veil: 0.34 },
   // rastros e frota atrás do mockup de rastreio
@@ -51,5 +51,5 @@ export const plates: Record<SceneId, PlateDef> = {
   // a caixa protegida é o próprio herói da arte, recortada no centro
   s6: { src: staticFile('plates/s6_confianca.png'), focal: 0.45, pan: 3, baked: true, veil: 0.16, mode: 'inset', insetHeight: 0.52, insetRatio: 0.72 },
   // volta ao pátio operando, emendando com a primeira cena
-  s7: { src: AMBIENTE, focal: 0.86, pan: -6, baked: true, veil: 0.34 },
+  s7: { src: AMBIENTE, focal: 0.90, pan: -6, baked: true, veil: 0.54 },
 };
