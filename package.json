@@ -1,0 +1,23 @@
+{
+  "name": "tres-estrelas-video",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Video vertical 1080x1920 em Remotion - Tres Estrelas Transporte e Turismo",
+  "scripts": {
+    "studio": "remotion studio",
+    "build": "remotion render TresEstrelas out/tres-estrelas.mp4"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.515",
+    "@remotion/media-utils": "^4.0.515",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "remotion": "^4.0.515"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "typescript": "^7.0.2"
+  }
+}
