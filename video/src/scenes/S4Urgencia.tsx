@@ -1,99 +1,44 @@
 import React from 'react';
-import { AbsoluteFill, interpolate, useCurrentFrame } from 'remotion';
-import { ArtBuild, plateSrc } from '../components/ArtBuild';
-import { beat, fade, fadeOut, overshoot, pulse } from '../config/beat';
+import { AbsoluteFill, useCurrentFrame } from 'remotion';
+import { Stage } from '../components/Stage';
+import { TextBand } from '../components/TextBand';
+import { KineticText, Sub } from '../components/Type';
+import { beat, fadeOut } from '../config/beat';
 import { theme } from '../config/theme';
 
 /**
  * 12–16s — URGÊNCIA. Da copy: "Pedido vendido → separado → enviado. A
- * interface começa a mostrar o prazo."
- *
- * O aparelho da arte está em perspectiva, então nada de retângulo reto por
- * cima: o que anima são os marcadores do rastreio acendendo em sequência,
- * com a linha ligando um ao outro, e o prazo destacado no fim.
+ * interface começa a mostrar o prazo." Depois a frase e, rápido, "Carga
+ * urgente. Operação diária."
  */
-
-/** Marcadores das etapas na arte, no espaço 3840×1280. */
-const ETAPAS = [
-  { x: 755, y: 562 },
-  { x: 755, y: 715 },
-  { x: 761, y: 884 },
-];
-/** Faixa do prazo estimado. */
-const PRAZO = { x: 690, y: 1190, w: 470, h: 96 };
-
 export const S4Urgencia: React.FC<{ duration: number }> = ({ duration }) => {
   const frame = useCurrentFrame();
   const out = fadeOut(frame, duration, 0.6);
-  const glow = pulse(frame, 2);
 
   return (
     <AbsoluteFill style={{ opacity: out }}>
-      <ArtBuild
-        src={plateSrc('s4_urgencia.png')}
-        duration={duration}
-        push={[1.0, 1.035]}
-        bands={[
-          { from: 0.00, to: 0.36, at: beat(0), dir: -1 },   // o aparelho com o rastreio
-          { from: 0.36, to: 1.00, at: beat(2.5), dir: 1 },  // a frase e a frota
-        ]}
+      <Stage scene="s4" duration={duration} push="in" />
+
+      <TextBand from={0.375} to={1.0} top={0.04} bottom={0.78} feather={5} />
+
+      <AbsoluteFill
+        style={{
+          alignItems: 'flex-end', justifyContent: 'center',
+          paddingRight: 170, paddingLeft: '38%', zIndex: 25,
+        }}
       >
-
-        {/* a linha desce ligando as etapas */}
-        {ETAPAS.slice(0, -1).map((e, i) => {
-          const at = beat(1 + i * 1.5);
-          const grow = interpolate(frame, [at, at + beat(1)], [0, 1], {
-            extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
-          });
-          const next = ETAPAS[i + 1];
-          return (
-            <div
-              key={`l${i}`}
-              style={{
-                position: 'absolute',
-                left: e.x - 3, top: e.y,
-                width: 6, height: (next.y - e.y) * grow,
-                background: theme.blueBright,
-                boxShadow: `0 0 18px ${theme.cyan}`,
-                opacity: 0.9,
-              }}
-            />
-          );
-        })}
-
-        {/* cada etapa acende no seu tempo */}
-        {ETAPAS.map((e, i) => {
-          const at = beat(1 + i * 1.5);
-          const p = overshoot(frame, at, 1);
-          const on = fade(frame, at, 0.4);
-          return (
-            <div
-              key={i}
-              style={{
-                position: 'absolute',
-                left: e.x, top: e.y,
-                width: 62, height: 62, borderRadius: '50%',
-                transform: `translate(-50%, -50%) scale(${interpolate(p, [0, 1], [0.4, 1])})`,
-                border: `5px solid ${theme.cyanSoft}`,
-                boxShadow: `0 0 ${26 + glow * 22}px ${theme.cyan}`,
-                opacity: on * 0.95,
-              }}
-            />
-          );
-        })}
-
-        {/* o prazo aparece por último */}
-        <div
-          style={{
-            position: 'absolute',
-            left: PRAZO.x, top: PRAZO.y, width: PRAZO.w, height: PRAZO.h,
-            borderRadius: 16,
-            border: `3px solid ${theme.cyan}`,
-            boxShadow: `0 0 ${30 + glow * 26}px ${theme.cyan}66`,
-            opacity: fade(frame, beat(5.5), 0.6) * 0.9,
-          }}
+        <KineticText
+          lines={['Quem vende mais', 'não pode esperar mais.']}
+          start={beat(1)}
+          size={182}
+          align="right"
         />
-      </ArtBuild>
+        <div style={{ marginTop: 40 }}>
+          <Sub start={beat(5)} align="right" size={58} color={theme.cyan}>
+            Carga urgente. Operação diária.
+          </Sub>
+        </div>
+      </AbsoluteFill>
     </AbsoluteFill>
   );
 };

@@ -1,6 +1,6 @@
 import React from 'react';
 import { AbsoluteFill, Sequence, useCurrentFrame } from 'remotion';
-import { Flash, FxDefs, Grain, RgbSplit, splitAmount } from './components/Fx';
+import { Flash, FxDefs, Grain, RgbSplit, ScenePush, splitAmount } from './components/Fx';
 import { HudFrame, SceneMark, Sweep, Ticker } from './components/Hud';
 import { SfxTrack } from './components/Sfx';
 import { scenes } from './config/timeline';
@@ -38,11 +38,13 @@ export const TresEstrelas: React.FC = () => {
 
       <RgbSplit amount={split}>
         <AbsoluteFill>
-          {scenes.map((s) => {
+          {scenes.map((s, i) => {
             const Comp = SCENE_MAP[s.id];
             return (
               <Sequence key={s.id} from={s.from} durationInFrames={s.duration} name={s.id}>
-                <Comp duration={s.duration} />
+                <ScenePush duration={s.duration} dir={i % 2 === 0 ? 1 : -1}>
+                  <Comp duration={s.duration} />
+                </ScenePush>
               </Sequence>
             );
           })}

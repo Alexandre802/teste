@@ -1,6 +1,6 @@
 import React from 'react';
-import { AbsoluteFill, interpolate, useCurrentFrame } from 'remotion';
-import { BEAT } from '../config/beat';
+import { AbsoluteFill, interpolate, spring, useCurrentFrame } from 'remotion';
+import { BEAT, FPS } from '../config/beat';
 
 /** Filtros de isolamento de canal, usados pela separação RGB da virada. */
 export const FxDefs: React.FC = () => (
@@ -28,8 +28,8 @@ export const RgbSplit: React.FC<{ amount: number; children: React.ReactNode }> =
   children,
 }) => {
   if (amount <= 0.01) return <>{children}</>;
-  const d = amount * 26;
-  const blur = amount * 7;
+  const d = amount * 40;
+  const blur = amount * 11;
   const layer = (filter: string, dx: number): React.CSSProperties => ({
     filter: `url(#${filter}) blur(${blur}px)`,
     transform: `translateX(${dx}px)`,
@@ -66,7 +66,7 @@ export const splitAmount = (frame: number, boundaries: number[]) => {
   for (const b of boundaries) {
     const a = interpolate(
       frame,
-      [b - BEAT * 0.4, b, b + BEAT * 0.5],
+      [b - BEAT * 0.5, b, b + BEAT * 0.7],
       [0, 1, 0],
       { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
     );
@@ -88,5 +88,45 @@ export const Grain: React.FC = () => {
         backgroundSize: '120px 120px',
       }}
     />
+  );
+};
+
+/**
+ * Empurrão de cena. A que sai recua e desliza; a que entra chega de fora com
+ * escala e assenta. É o que dá corpo à virada — só o flash com separação RGB
+ * deixava o corte mole, sem sensação de movimento.
+ */
+export const ScenePush: React.FC<{
+  duration: number;
+  /** Direção da entrada: 1 vem da direita, −1 da esquerda. */
+  dir?: 1 | -1;
+  children: React.ReactNode;
+}> = ({ duration, dir = 1, children }) => {
+  const frame = useCurrentFrame();
+
+  const inP = spring({
+    frame,
+    fps: FPS,
+    durationInFrames: BEAT,
+    config: { damping: 16, mass: 0.7, stiffness: 140 },
+  });
+  const outP = interpolate(frame, [duration - BEAT * 0.7, duration], [0, 1], {
+    extrapolateLeft: 'clamp',
+    extrapolateRight: 'clamp',
+  });
+
+  const x = interpolate(inP, [0, 1], [dir * 150, 0]) - outP * dir * 90;
+  const scale = interpolate(inP, [0, 1], [1.07, 1]) * (1 - outP * 0.035);
+  const blur = (1 - inP) * 9 + outP * 7;
+
+  return (
+    <AbsoluteFill
+      style={{
+        transform: `translateX(${x}px) scale(${scale})`,
+        filter: blur > 0.4 ? `blur(${blur}px)` : undefined,
+      }}
+    >
+      {children}
+    </AbsoluteFill>
   );
 };

@@ -35,13 +35,15 @@ export type PlateDef = {
 };
 
 /**
- * Em 3:1 as artes coincidem com o quadro: entram inteiras, sem recorte e sem
- * barra. `focal` e `pan` deixam de recortar e só sobra o `veil`, que rebaixa
- * a arte onde a camada animada precisa de espaço limpo.
+ * Em 3:1 a arte coincide com o quadro e entra inteira, em força total.
+ *
+ * Quem abre espaço para a tipografia animada é o `TextBand`, que cobre só a
+ * faixa onde a arte traz o texto embutido. Rebaixar a arte inteira com `veil`
+ * resolvia a disputa, mas apagava caminhões, selos e pátio junto.
  */
 export const plates: Record<SceneId, PlateDef> = {
   s1: { src: staticFile('plates/s1_phones.png'),     focal: 0.5, pan: 0, baked: true, veil: 0 },
-  s2: { src: staticFile('plates/s2_operacao.png'),   focal: 0.5, pan: 0, baked: true, veil: 0.5 },
+  s2: { src: staticFile('plates/s2_operacao.png'),   focal: 0.5, pan: 0, baked: true, veil: 0 },
   s3: { src: staticFile('plates/s3_escala.png'),     focal: 0.5, pan: 0, baked: true, veil: 0 },
   s4: { src: staticFile('plates/s4_urgencia.png'),   focal: 0.5, pan: 0, baked: true, veil: 0 },
   s5: { src: staticFile('plates/s5_mapa.png'),       focal: 0.5, pan: 0, baked: true, veil: 0 },

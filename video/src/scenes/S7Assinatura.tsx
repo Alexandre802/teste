@@ -1,31 +1,40 @@
 import React from 'react';
-import { AbsoluteFill } from 'remotion';
-import { ArtBuild, plateSrc } from '../components/ArtBuild';
+import { AbsoluteFill, useCurrentFrame } from 'remotion';
 import { BoxField } from '../components/SceneFx';
-import { beat } from '../config/beat';
+import { Stage } from '../components/Stage';
+import { TextBand } from '../components/TextBand';
+import { KineticText, Sub } from '../components/Type';
+import { beat, fade } from '../config/beat';
+import { theme } from '../config/theme';
 
 /**
  * 27–30s — ASSINATURA SEM FINAL. Da copy: "Caixas continuam entrando e
  * saindo... e ao fundo surge novamente o fluxo de pedidos da primeira cena."
  *
- * Os pedidos que voltam são os da própria arte, trazidos pela faixa da
- * esquerda — desenhar outros por cima duplicava cada cartão. Sem fade de
- * saída: o último quadro entrega o movimento cheio para emendar no primeiro.
+ * Sem fade de saída: o último quadro entrega o movimento cheio para emendar
+ * no primeiro.
  */
-export const S7Assinatura: React.FC<{ duration: number }> = ({ duration }) => (
-  <AbsoluteFill>
-    <ArtBuild
-      src={plateSrc('s7_assinatura.png')}
-      duration={duration}
-      push={[1.04, 1.0]}
-      bands={[
-        { from: 0.28, to: 0.68, at: beat(0), dir: 0 },    // TRÊS ESTRELAS
-        { from: 0.68, to: 1.00, at: beat(1), dir: 1 },    // o pátio operando
-        { from: 0.00, to: 0.28, at: beat(1.5), dir: -1 }, // o fluxo de pedidos volta
-      ]}
-    >
+export const S7Assinatura: React.FC<{ duration: number }> = ({ duration }) => {
+  const frame = useCurrentFrame();
+
+  return (
+    <AbsoluteFill>
+      <Stage scene="s7" duration={duration} push="out" />
+
       {/* as caixas seguem atravessando: nada encerra */}
-      <BoxField start={0} duration={duration} count={60} converge={false} />
-    </ArtBuild>
-  </AbsoluteFill>
-);
+      <BoxField start={0} duration={duration} count={70} converge={false} />
+
+      {/* os cards de pedido são os da arte; só a assinatura é animada */}
+      <TextBand from={0.27} to={0.70} top={0.16} bottom={0.76} feather={6} />
+
+      <AbsoluteFill style={{ alignItems: 'center', justifyContent: 'center', zIndex: 25 }}>
+        <KineticText lines={['Três Estrelas']} start={beat(0.5)} size={250} align="center" />
+        <div style={{ marginTop: 34, opacity: fade(frame, beat(2), 0.6) }}>
+          <Sub start={beat(2)} size={64} color={theme.white} weight={600} align="center">
+            Logística para quem vende grande.
+          </Sub>
+        </div>
+      </AbsoluteFill>
+    </AbsoluteFill>
+  );
+};
