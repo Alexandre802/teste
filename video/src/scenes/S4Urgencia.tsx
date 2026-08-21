@@ -1,5 +1,6 @@
 import React from 'react';
-import { AbsoluteFill, Img, interpolate, staticFile, useCurrentFrame } from 'remotion';
+import { AbsoluteFill, interpolate, useCurrentFrame } from 'remotion';
+import { ArtBuild, plateSrc } from '../components/ArtBuild';
 import { beat, fade, fadeOut, overshoot, pulse } from '../config/beat';
 import { theme } from '../config/theme';
 
@@ -24,16 +25,19 @@ const PRAZO = { x: 690, y: 1190, w: 470, h: 96 };
 export const S4Urgencia: React.FC<{ duration: number }> = ({ duration }) => {
   const frame = useCurrentFrame();
   const out = fadeOut(frame, duration, 0.6);
-  const scale = interpolate(frame, [0, duration], [1.0, 1.035]);
   const glow = pulse(frame, 2);
 
   return (
-    <AbsoluteFill style={{ opacity: out, overflow: 'hidden', backgroundColor: theme.navy }}>
-      <AbsoluteFill style={{ transform: `scale(${scale})` }}>
-        <Img
-          src={staticFile('plates/s4_urgencia.png')}
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-        />
+    <AbsoluteFill style={{ opacity: out }}>
+      <ArtBuild
+        src={plateSrc('s4_urgencia.png')}
+        duration={duration}
+        push={[1.0, 1.035]}
+        bands={[
+          { from: 0.00, to: 0.36, at: beat(0), dir: -1 },   // o aparelho com o rastreio
+          { from: 0.36, to: 1.00, at: beat(2.5), dir: 1 },  // a frase e a frota
+        ]}
+      >
 
         {/* a linha desce ligando as etapas */}
         {ETAPAS.slice(0, -1).map((e, i) => {
@@ -89,7 +93,7 @@ export const S4Urgencia: React.FC<{ duration: number }> = ({ duration }) => {
             opacity: fade(frame, beat(5.5), 0.6) * 0.9,
           }}
         />
-      </AbsoluteFill>
+      </ArtBuild>
     </AbsoluteFill>
   );
 };

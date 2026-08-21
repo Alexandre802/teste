@@ -64,9 +64,9 @@ export const Ticker: React.FC = () => {
   return (
     <div
       style={{
-        position: 'absolute', left: 0, right: 0, bottom: 92, height: 62,
+        position: 'absolute', left: 0, right: 0, bottom: 26, height: 56,
         overflow: 'hidden', display: 'flex', alignItems: 'center',
-        opacity: 0.5,
+        opacity: 0.34,
         maskImage: 'linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent)',
         WebkitMaskImage: 'linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent)',
       }}

@@ -1,25 +1,22 @@
 import React from 'react';
-import { AbsoluteFill, Img, interpolate, staticFile, useCurrentFrame } from 'remotion';
-import { NotificationStack } from '../components/NotifStack';
+import { AbsoluteFill, useCurrentFrame } from 'remotion';
+import { ArtBuild, plateSrc } from '../components/ArtBuild';
 import { ScreenList } from '../components/ScreenList';
-import { beat, fadeOut, pulse } from '../config/beat';
-import { theme } from '../config/theme';
+import { beat, fadeOut } from '../config/beat';
 
 /**
  * 0–5s — VOCÊ VENDE. A GENTE FAZ CHEGAR.
  *
- * Em 3:1 a arte-chave coincide com o quadro e entra inteira: os três
- * marketplaces com Mercado Livre no meio, Shopee à esquerda e Shein à
- * direita, a frase gigante ao lado, o logo pequeno e o pátio ao fundo.
+ * A composição se remonta em faixas: primeiro os três aparelhos, depois as
+ * notificações de cada lado e por fim a frase com o pátio. Como cada faixa é
+ * um recorte da própria arte, as notificações chegam sem que eu precise
+ * redesenhá-las — era daí que vinham os cards duplicados.
  *
- * Sobre ela animam as listas dentro das três telas e as notificações
- * chegando pelas laterais.
+ * O que é redesenhado é só a lista dentro de cada tela, que a arte entrega
+ * parada.
  */
 
-/**
- * Retângulos das listas, medidos sobre a arte (2172×724) e convertidos para
- * 3840×1280. Começam abaixo do cabeçalho de cada app, que fica sendo o da arte.
- */
+/** Retângulos das listas, medidos sobre a arte e convertidos para 3840×1280. */
 const TELAS = {
   shopee: { x: 499, y: 460, w: 401, h: 524 },
   mercadolivre: { x: 948, y: 455, w: 476, h: 589 },
@@ -29,39 +26,20 @@ const TELAS = {
 export const S1VoceVende: React.FC<{ duration: number }> = ({ duration }) => {
   const frame = useCurrentFrame();
   const out = fadeOut(frame, duration, 0.6);
-  const glow = pulse(frame, 3);
-
-  // respiração lenta de câmera: a arte nunca fica parada
-  const scale = interpolate(frame, [0, duration], [1.0, 1.035]);
-
-  const esquerda = [
-    { app: 'Pedido #72519', accent: '#ee4d2d', glyph: 'S', time: 'agora', body: 'Novo pedido recebido' },
-    { app: 'Pedido #72520', accent: '#ee4d2d', glyph: 'S', time: 'agora', body: 'Novo pedido recebido' },
-    { app: 'Pedido #72521', accent: '#ee4d2d', glyph: 'S', time: 'agora', body: 'Novo pedido recebido' },
-  ];
-  const direita = [
-    { app: 'Pedido #SH45822', accent: '#111827', glyph: 'S', time: 'agora', body: 'Novo pedido recebido' },
-    { app: 'Pedido #SH45823', accent: '#111827', glyph: 'S', time: 'agora', body: 'Novo pedido recebido' },
-    { app: 'Pedido #SH45820', accent: '#111827', glyph: 'S', time: 'agora', body: 'Novo pedido recebido' },
-  ];
 
   return (
-    <AbsoluteFill style={{ opacity: out, overflow: 'hidden', backgroundColor: theme.navy }}>
-      <AbsoluteFill style={{ transform: `scale(${scale})` }}>
-        <Img
-          src={staticFile('plates/s1_phones.png')}
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-        />
-
-        {/* apaga os cards embutidos nas duas colunas onde as notificações animadas chegam */}
-        <AbsoluteFill
-          style={{
-            background:
-              `linear-gradient(90deg, ${theme.navyDeep} 0%, ${theme.navyDeep}f0 8%, transparent 13%), ` +
-              `linear-gradient(90deg, transparent 47%, ${theme.navyDeep}f0 51%, ${theme.navyDeep}f0 61%, transparent 65%)`,
-          }}
-        />
-
+    <AbsoluteFill style={{ opacity: out }}>
+      <ArtBuild
+        src={plateSrc('s1_phones.png')}
+        duration={duration}
+        push={[1.0, 1.035]}
+        bands={[
+          { from: 0.11, to: 0.50, at: beat(0), dir: 0 },    // os três aparelhos
+          { from: 0.00, to: 0.11, at: beat(2), dir: -1 },   // notificações à esquerda
+          { from: 0.50, to: 0.63, at: beat(2), dir: 1 },    // notificações à direita
+          { from: 0.63, to: 1.00, at: beat(3.5), dir: 1 },  // a frase e o pátio
+        ]}
+      >
         <ScreenList
           rect={TELAS.shopee}
           start={beat(1)}
@@ -96,42 +74,7 @@ export const S1VoceVende: React.FC<{ duration: number }> = ({ duration }) => {
             { id: 'Pedido #SH45819', status: 'Novo pedido recebido', city: 'Porto Alegre - RS' },
           ]}
         />
-      </AbsoluteFill>
-
-      {/* as notificações chegam nas duas colunas, aos pares */}
-      <div style={{ position: 'absolute', top: 150, left: 26, zIndex: 20 }}>
-        <NotificationStack
-          items={esquerda}
-          start={beat(2)}
-          everyBeats={1.5}
-          width={410}
-          cardHeight={112}
-          gap={40}
-          tone="light"
-          side="left"
-        />
-      </div>
-      <div style={{ position: 'absolute', top: 150, left: 1935, zIndex: 20 }}>
-        <NotificationStack
-          items={direita}
-          start={beat(2)}
-          everyBeats={1.5}
-          width={410}
-          cardHeight={112}
-          gap={40}
-          tone="light"
-          side="left"
-        />
-      </div>
-
-      <AbsoluteFill
-        style={{
-          background:
-            `radial-gradient(ellipse 46% 70% at 30% 50%, ` +
-            `${theme.cyan}${Math.round(6 + glow * 10).toString(16).padStart(2, '0')} 0%, transparent 70%)`,
-          mixBlendMode: 'screen',
-        }}
-      />
+      </ArtBuild>
     </AbsoluteFill>
   );
 };

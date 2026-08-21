@@ -1,65 +1,48 @@
 import React from 'react';
-import { AbsoluteFill, Img, interpolate, staticFile, useCurrentFrame } from 'remotion';
-import { evolvePath, getLength, getPointAtLength } from '@remotion/paths';
-import { IconBox } from '../components/Icons';
-import { beat, fadeOut, pulse } from '../config/beat';
+import { AbsoluteFill, interpolate, useCurrentFrame } from 'remotion';
+import { ArtBuild, plateSrc } from '../components/ArtBuild';
+import { beat, fadeOut } from '../config/beat';
 import { theme } from '../config/theme';
 
 /**
- * 16–20s — A GRANDE PROMESSA. Da copy: "Uma caixa atravessa o mapa
- * rapidamente." A rota é desenhada sobre o traçado da própria arte e a caixa
- * corre por cima dela, de Goiânia a São Paulo.
+ * 16–20s — A GRANDE PROMESSA.
+ *
+ * A arte já traz o mapa, a rota e a caixa atravessando. Desenhar outra rota
+ * por cima criava duas linhas e duas caixas no mesmo quadro — o que anima
+ * aqui é a própria arte: o texto entra pela esquerda, o mapa pela direita, e
+ * um brilho corre no sentido Goiânia → São Paulo.
  */
-
-/** Traçado da rota sobre a arte, no espaço 3840×1280. */
-const ROTA = 'M 2560 690 C 2790 560, 3080 560, 3300 700';
-
 export const S5Promessa: React.FC<{ duration: number }> = ({ duration }) => {
   const frame = useCurrentFrame();
   const out = fadeOut(frame, duration, 0.6);
-  const scale = interpolate(frame, [0, duration], [1.03, 1.0]);
 
-  const t = interpolate(frame, [beat(1), beat(4)], [0, 1], {
+  // o brilho percorre o trecho do mapa, acompanhando a rota da arte
+  const run = interpolate(frame, [beat(1.5), beat(5)], [0, 1], {
     extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
   });
-  const evolved = evolvePath(t, ROTA);
-  const pt = getPointAtLength(ROTA, t * getLength(ROTA));
-  const glow = pulse(frame, 2);
 
   return (
-    <AbsoluteFill style={{ opacity: out, overflow: 'hidden', backgroundColor: theme.navy }}>
-      <AbsoluteFill style={{ transform: `scale(${scale})` }}>
-        <Img
-          src={staticFile('plates/s5_mapa.png')}
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-        />
-
-        <svg width={3840} height={1280} style={{ position: 'absolute', inset: 0, overflow: 'visible' }}>
-          <path
-            d={ROTA}
-            stroke={theme.cyanSoft}
-            strokeWidth={7}
-            fill="none"
-            strokeLinecap="round"
-            strokeDasharray={evolved.strokeDasharray}
-            strokeDashoffset={evolved.strokeDashoffset}
-            style={{ filter: `drop-shadow(0 0 ${16 + glow * 16}px ${theme.cyan})` }}
-          />
-        </svg>
-
-        {pt && t > 0 && t < 1.02 ? (
-          <div
+    <AbsoluteFill style={{ opacity: out }}>
+      <ArtBuild
+        src={plateSrc('s5_mapa.png')}
+        duration={duration}
+        push={[1.03, 1.0]}
+        bands={[
+          { from: 0.00, to: 0.46, at: beat(0), dir: -1 },   // FULL DE VERDADE
+          { from: 0.46, to: 1.00, at: beat(1), dir: 1 },    // o mapa e a rota
+        ]}
+      >
+        {run > 0 && run < 1 ? (
+          <AbsoluteFill
             style={{
-              position: 'absolute',
-              left: pt.x, top: pt.y,
-              transform: 'translate(-50%, -50%)',
-              filter: `drop-shadow(0 0 26px ${theme.cyan})`,
+              background:
+                `radial-gradient(ellipse 14% 40% at ${interpolate(run, [0, 1], [64, 92])}% 56%, ` +
+                `${theme.cyanSoft}66 0%, transparent 70%)`,
+              mixBlendMode: 'screen',
             }}
-          >
-            <IconBox size={92} color={theme.white} />
-          </div>
+          />
         ) : null}
-      </AbsoluteFill>
+      </ArtBuild>
     </AbsoluteFill>
   );
 };

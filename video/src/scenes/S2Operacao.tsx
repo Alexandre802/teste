@@ -1,17 +1,18 @@
 import React from 'react';
 import { AbsoluteFill, staticFile, useCurrentFrame } from 'remotion';
+import { Bg } from '../components/Bg';
 import { VehicleSwiper } from '../components/Carousel';
-import { Stage } from '../components/Stage';
 import { Sub } from '../components/Type';
 import { beat, fadeOut } from '../config/beat';
 import { theme } from '../config/theme';
 
 /**
  * 5–8s — Da copy: "Os pedidos se afastam e revelam caminhões e CD da Três
- * Estrelas 3D".
+ * Estrelas 3D". A revelação vira um seletor: a frota passa de lado, um
+ * veículo por vez.
  *
- * A revelação vira um seletor: a frota passa de lado, um veículo por vez. Em
- * 3:1 cabem três cartões lado a lado, com o do centro cheio.
+ * O fundo aqui é construído em código, não a arte de operação: rebaixada, ela
+ * deixava a frase "VOCÊ VENDE" legível atrás dos cartões.
  */
 export const S2Operacao: React.FC<{ duration: number }> = ({ duration }) => {
   const frame = useCurrentFrame();
@@ -26,7 +27,7 @@ export const S2Operacao: React.FC<{ duration: number }> = ({ duration }) => {
 
   return (
     <AbsoluteFill style={{ opacity: out }}>
-      <Stage scene="s2" duration={duration} push="out" />
+      <Bg duration={duration} drift={26} trails={34} glowAt={[50, 52]} />
 
       <div style={{ position: 'absolute', top: 130, left: 0, right: 0, zIndex: 10 }}>
         <VehicleSwiper items={frota} start={0} width={780} height={940} gap={70} everyBeats={2} />
@@ -34,7 +35,7 @@ export const S2Operacao: React.FC<{ duration: number }> = ({ duration }) => {
 
       <div
         style={{
-          position: 'absolute', left: 0, right: 0, bottom: 118,
+          position: 'absolute', left: 0, right: 0, bottom: 210,
           display: 'flex', justifyContent: 'center', zIndex: 25,
         }}
       >

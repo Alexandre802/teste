@@ -8,9 +8,8 @@ import { theme } from '../config/theme';
  * 8–12s — ESCALA. Da copy: "Milhares de pequenas caixas atravessam a tela e
  * formam o número: +100.000 / VOLUMES TODOS OS MESES."
  *
- * A arte já traz o número construído de caixas. O enxame atravessa o quadro e
- * o número se forma por trás dele, revelado por uma máscara que abre do
- * centro — é a formação que a copy pede, sem redesenhar o que a arte entrega.
+ * O número da arte é feito de caixas, então ele se forma por máscara enquanto
+ * o enxame atravessa — nada de desenhar um segundo número por cima.
  */
 export const S3Escala: React.FC<{ duration: number }> = ({ duration }) => {
   const frame = useCurrentFrame();
@@ -24,6 +23,9 @@ export const S3Escala: React.FC<{ duration: number }> = ({ duration }) => {
     extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
   });
 
+  const mask =
+    `radial-gradient(ellipse ${22 + reveal * 105}% ${30 + reveal * 105}% at 50% 48%, #000 44%, transparent 78%)`;
+
   return (
     <AbsoluteFill style={{ opacity: out, overflow: 'hidden', backgroundColor: theme.navy }}>
       <AbsoluteFill style={{ transform: `scale(${interpolate(form, [0, 1], [1.12, 1.0])})` }}>
@@ -31,10 +33,7 @@ export const S3Escala: React.FC<{ duration: number }> = ({ duration }) => {
           src={staticFile('plates/s3_escala.png')}
           style={{
             width: '100%', height: '100%', objectFit: 'cover',
-            maskImage:
-              `radial-gradient(ellipse ${24 + reveal * 100}% ${34 + reveal * 100}% at 50% 48%, #000 42%, transparent 76%)`,
-            WebkitMaskImage:
-              `radial-gradient(ellipse ${24 + reveal * 100}% ${34 + reveal * 100}% at 50% 48%, #000 42%, transparent 76%)`,
+            maskImage: mask, WebkitMaskImage: mask,
           }}
         />
       </AbsoluteFill>
@@ -43,7 +42,9 @@ export const S3Escala: React.FC<{ duration: number }> = ({ duration }) => {
 
       <AbsoluteFill
         style={{
-          background: `radial-gradient(ellipse 40% 60% at 50% 46%, ${theme.cyan}${Math.round(bloom * 60).toString(16).padStart(2, '0')} 0%, transparent 70%)`,
+          background:
+            `radial-gradient(ellipse 40% 60% at 50% 46%, ` +
+            `${theme.cyan}${Math.round(bloom * 60).toString(16).padStart(2, '0')} 0%, transparent 70%)`,
           mixBlendMode: 'screen',
         }}
       />
