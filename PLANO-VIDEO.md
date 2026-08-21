@@ -1,7 +1,8 @@
 # Três Estrelas — plano de produção do vídeo
 
 Documento gerado a partir da análise do que está em `referencias/`.
-Formato-alvo: **banner wide 3:1** (mesma proporção das 7 artes e do vídeo de referência).
+Formato de entrega: **9:16 vertical (1080×1920)**. As 7 artes são 3:1, então
+entram recortadas — ver §6.
 
 ---
 

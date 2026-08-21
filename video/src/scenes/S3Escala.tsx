@@ -1,65 +1,44 @@
 import React from 'react';
-import { AbsoluteFill, Img, interpolate, useCurrentFrame } from 'remotion';
+import { AbsoluteFill, interpolate, useCurrentFrame } from 'remotion';
 import { BoxField } from '../components/SceneFx';
+import { Stage } from '../components/Stage';
 import { Counter, KineticText } from '../components/Type';
 import { beat, fade, fadeOut, overshoot } from '../config/beat';
-import { plates } from '../config/plates';
 import { theme } from '../config/theme';
 
 /**
- * 8–12s — ESCALA. Milhares de caixas atravessam o quadro e formam o número.
- * Cena de um número só: é para parar o olho.
- *
- * Enquanto a arte vier achatada, quem entrega o número é a própria imagem,
- * revelada por máscara conforme as caixas convergem. Com o plate limpo, o
- * número passa a ser desenhado em código e contado até 100.000.
+ * 8–12s — ESCALA. Da copy: "Milhares de pequenas caixas atravessam a tela e
+ * formam o número: +100.000 / VOLUMES TODOS OS MESES. Sem mais texto.
+ * É um número para parar o olho."
  */
 export const S3Escala: React.FC<{ duration: number }> = ({ duration }) => {
   const frame = useCurrentFrame();
   const out = fadeOut(frame, duration, 0.6);
-  const baked = plates.s3.baked;
 
-  // a arte "se forma": entra escalada e assenta no tempo forte
   const form = overshoot(frame, beat(1), 2.5);
-  const scale = interpolate(form, [0, 1], [1.18, 1.02]);
-  const reveal = interpolate(frame, [beat(1), beat(3.5)], [0, 1], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
+  const bloom = interpolate(frame, [beat(4.6), beat(5)], [0, 1], {
+    extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
   });
 
   return (
-    <AbsoluteFill style={{ opacity: out, backgroundColor: theme.navy, overflow: 'hidden' }}>
-      <AbsoluteFill style={{ transform: `scale(${scale})` }}>
-        <Img
-          src={plates.s3.src}
-          style={{
-            width: '100%', height: '100%', objectFit: 'cover',
-            opacity: baked ? reveal : 0.55,
-            maskImage: baked
-              ? `radial-gradient(ellipse ${30 + reveal * 90}% ${40 + reveal * 90}% at 50% 45%, #000 40%, transparent 78%)`
-              : undefined,
-            WebkitMaskImage: baked
-              ? `radial-gradient(ellipse ${30 + reveal * 90}% ${40 + reveal * 90}% at 50% 45%, #000 40%, transparent 78%)`
-              : undefined,
-          }}
-        />
-      </AbsoluteFill>
+    <AbsoluteFill style={{ opacity: out }}>
+      <Stage scene="s3" duration={duration} push="in" />
 
-      <BoxField start={0} duration={duration} count={110} converge />
-
-      {baked ? null : (
-        <AbsoluteFill style={{ alignItems: 'center', justifyContent: 'center', paddingBottom: 60 }}>
-          <Counter to={100000} start={beat(1)} durationInBeats={4} prefix="+" size={252} />
-        </AbsoluteFill>
-      )}
+      <BoxField start={0} duration={duration} count={130} converge />
 
       <AbsoluteFill
         style={{
-          alignItems: 'center', justifyContent: 'flex-end',
-          paddingBottom: 58, opacity: fade(frame, beat(4), 0.6),
+          alignItems: 'center', justifyContent: 'center', zIndex: 10,
+          transform: `scale(${interpolate(form, [0, 1], [1.25, 1])})`,
+          opacity: fade(frame, beat(1), 0.8),
         }}
       >
-        <KineticText lines={['Volumes todos os meses'] } start={beat(4)} size={46} align="center" />
+        <div style={{ filter: `drop-shadow(0 0 ${34 + bloom * 70}px ${theme.cyan})` }}>
+          <Counter to={100000} start={beat(1)} durationInBeats={3.6} prefix="+" size={196} />
+        </div>
+        <div style={{ marginTop: 34 }}>
+          <KineticText lines={['Volumes', 'todos os meses']} start={beat(5)} size={62} align="center" />
+        </div>
       </AbsoluteFill>
     </AbsoluteFill>
   );

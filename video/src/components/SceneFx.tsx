@@ -1,9 +1,10 @@
 import React from 'react';
 import { AbsoluteFill, interpolate, random, useCurrentFrame } from 'remotion';
-import { evolvePath, getPointAtLength } from '@remotion/paths';
+import { evolvePath, getLength, getPointAtLength } from '@remotion/paths';
 import { beat, fade, overshoot, pulse } from '../config/beat';
 import { font, theme } from '../config/theme';
-import { IconBox, IconPin } from './Icons';
+import { CITIES } from './World';
+import { IconBox } from './Icons';
 
 /**
  * Enxame de caixas atravessando o quadro. Alimenta a cena de escala: o roteiro
@@ -64,54 +65,54 @@ export const BoxField: React.FC<{
   );
 };
 
-const ROUTE = 'M 120 250 C 340 140, 620 120, 860 210';
+const ROUTE = 'M 619 556 C 700 592, 732 662, 684 732';
 
 /**
- * Rota Goiânia → São Paulo: a linha se desenha, a caixa corre por cima dela
- * e os dois pontos pulsam. A caixa chega junto com o tempo forte.
+ * Rota Goiânia → São Paulo. Desenha no mesmo espaço 1000×1000 do mapa, então
+ * sobrepor os dois componentes com o mesmo `size` alinha rota e território.
+ * A linha se desenha, a caixa corre por cima e os dois pontos pulsam.
  */
-export const RouteMap: React.FC<{ start: number; width: number; height: number }> = ({
-  start, width, height,
-}) => {
+export const RouteMap: React.FC<{ start: number; size: number }> = ({ start, size }) => {
   const frame = useCurrentFrame();
   const t = interpolate(frame, [start, start + beat(3)], [0, 1], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });
   const evolved = evolvePath(t, ROUTE);
-  const pt = getPointAtLength(ROUTE, t * 1000);
+  const pt = getPointAtLength(ROUTE, t * getLength(ROUTE));
   const glow = pulse(frame, 2);
+  const k = size / 1000;
 
   return (
-    <div style={{ position: 'relative', width, height }}>
-      <svg viewBox="0 0 1000 400" width={width} height={height} style={{ overflow: 'visible' }}>
-        <path d={ROUTE} stroke={`${theme.cyan}33`} strokeWidth={3} fill="none" />
+    <div style={{ position: 'relative', width: size, height: size }}>
+      <svg viewBox="0 0 1000 1000" width={size} height={size} style={{ overflow: 'visible' }}>
+        <path d={ROUTE} stroke={`${theme.cyan}30`} strokeWidth={5} fill="none" />
         <path
           d={ROUTE}
           stroke={theme.cyan}
-          strokeWidth={4}
+          strokeWidth={6}
           fill="none"
           strokeLinecap="round"
           strokeDasharray={evolved.strokeDasharray}
           strokeDashoffset={evolved.strokeDashoffset}
-          style={{ filter: `drop-shadow(0 0 ${8 + glow * 10}px ${theme.cyan})` }}
+          style={{ filter: `drop-shadow(0 0 ${10 + glow * 12}px ${theme.cyan})` }}
         />
       </svg>
 
-      <City name="GOIÂNIA" x={120} y={250} w={width} h={height} start={start} />
-      <City name="SÃO PAULO" x={860} y={210} w={width} h={height} start={start + beat(3)} />
+      <City city={CITIES.goiania} k={k} start={start} side="left" />
+      <City city={CITIES.saopaulo} k={k} start={start + beat(3)} side="right" />
 
       {pt && t > 0 && t < 1.02 ? (
         <div
           style={{
             position: 'absolute',
-            left: (pt.x / 1000) * width,
-            top: (pt.y / 400) * height,
+            left: pt.x * k,
+            top: pt.y * k,
             transform: 'translate(-50%, -50%)',
-            filter: `drop-shadow(0 0 16px ${theme.cyan})`,
+            filter: `drop-shadow(0 0 18px ${theme.cyan})`,
           }}
         >
-          <IconBox size={44} color={theme.white} />
+          <IconBox size={46} color={theme.white} />
         </div>
       ) : null}
     </div>
@@ -119,8 +120,11 @@ export const RouteMap: React.FC<{ start: number; width: number; height: number }
 };
 
 const City: React.FC<{
-  name: string; x: number; y: number; w: number; h: number; start: number;
-}> = ({ name, x, y, w, h, start }) => {
+  city: { x: number; y: number; name: string };
+  k: number;
+  start: number;
+  side: 'left' | 'right';
+}> = ({ city, k, start, side }) => {
   const frame = useCurrentFrame();
   const p = overshoot(frame, start, 1);
   const glow = pulse(frame, 2);
@@ -128,29 +132,31 @@ const City: React.FC<{
     <div
       style={{
         position: 'absolute',
-        left: (x / 1000) * w,
-        top: (y / 400) * h,
-        transform: `translate(-50%, -50%) scale(${interpolate(p, [0, 1], [0.4, 1])})`,
+        left: city.x * k,
+        top: city.y * k,
+        transform: `translate(${side === 'left' ? '-100%' : '0'}, -50%) scale(${interpolate(p, [0, 1], [0.4, 1])})`,
         opacity: fade(frame, start, 0.4),
-        display: 'flex', alignItems: 'center', gap: 8,
+        display: 'flex', alignItems: 'center', gap: 10,
+        flexDirection: side === 'left' ? 'row' : 'row-reverse',
+        paddingLeft: side === 'right' ? 0 : 0,
       }}
     >
       <div
         style={{
-          width: 16, height: 16, borderRadius: '50%',
-          background: theme.cyan,
-          boxShadow: `0 0 ${12 + glow * 16}px ${theme.cyan}`,
-        }}
-      />
-      <div
-        style={{
-          fontFamily: font.body, fontSize: 20, fontWeight: 800,
+          fontFamily: font.body, fontSize: 22, fontWeight: 800,
           color: theme.white, letterSpacing: '0.06em',
-          textShadow: '0 2px 12px rgba(0,0,0,0.7)', whiteSpace: 'nowrap',
+          textShadow: '0 2px 14px rgba(0,0,0,0.8)', whiteSpace: 'nowrap',
         }}
       >
-        {name}
+        {city.name}
       </div>
+      <div
+        style={{
+          width: 18, height: 18, borderRadius: '50%',
+          background: theme.cyan, flexShrink: 0,
+          boxShadow: `0 0 ${14 + glow * 18}px ${theme.cyan}`,
+        }}
+      />
     </div>
   );
 };

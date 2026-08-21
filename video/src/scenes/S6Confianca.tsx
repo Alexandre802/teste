@@ -1,14 +1,20 @@
 import React from 'react';
 import { AbsoluteFill, useCurrentFrame } from 'remotion';
-import { Plate } from '../components/Plate';
+import { Stage } from '../components/Stage';
 import { KineticText } from '../components/Type';
 import { Dome, Stamp, Stars, StatusFlow } from '../components/Ui';
 import { beat, fade, fadeOut } from '../config/beat';
-import { plates } from '../config/plates';
 
 /**
- * 20–26s — CONFIANÇA. A caixa aparece protegida, os quatro diferenciais
- * entram em sequência e o fluxo de status termina em ENTREGUE + cinco estrelas.
+ * 20–27s — CONFIANÇA.
+ *
+ * Da copy, nesta ordem: a caixa protegida pela estrutura digital azul, as
+ * quatro palavras ao redor dela, o fluxo "Pedido enviado → Em transporte →
+ * ENTREGUE" com as estrelas logo em seguida e, só no fim, o texto
+ * "ENTREGAR BEM TAMBÉM É VENDER."
+ *
+ * A caixa é a própria arte, flutuando no ambiente; domo, selos, fluxo e
+ * estrelas são a camada animada.
  */
 export const S6Confianca: React.FC<{ duration: number }> = ({ duration }) => {
   const frame = useCurrentFrame();
@@ -16,39 +22,59 @@ export const S6Confianca: React.FC<{ duration: number }> = ({ duration }) => {
 
   return (
     <AbsoluteFill style={{ opacity: out }}>
-      <Plate plate={plates.s6} duration={duration} push="in" />
+      <Stage scene="s6" duration={duration} push="in" />
 
-      <AbsoluteFill style={{ alignItems: 'center', justifyContent: 'center' }}>
-        <Dome start={beat(1)} size={470} />
-      </AbsoluteFill>
-
-      <AbsoluteFill
+      {/* a estrutura digital ao redor da caixa */}
+      <div
         style={{
-          alignItems: 'flex-start', justifyContent: 'flex-start',
-          paddingLeft: 78, paddingRight: '64%', paddingTop: 54,
+          position: 'absolute', top: 590, left: 0, right: 0,
+          display: 'flex', justifyContent: 'center', zIndex: 8,
         }}
       >
-        <KineticText lines={['Entregar bem', 'também é vender.']} start={beat(0.5)} size={104} align="left" accent={[1]} />
-      </AbsoluteFill>
-
-      <div style={{ position: 'absolute', left: '17%', top: '40%' }}>
-        <Stamp start={beat(3)} icon="eye" lines={['Rastreamento', 'em tempo real']} from="left" />
-      </div>
-      <div style={{ position: 'absolute', left: '15%', top: '68%' }}>
-        <Stamp start={beat(4)} icon="shield" lines={['Carga', 'segurada']} from="left" />
-      </div>
-      <div style={{ position: 'absolute', left: '55%', top: '40%' }}>
-        <Stamp start={beat(3.5)} icon="eye" lines={['Monitoramento', '24h']} from="right" />
-      </div>
-      <div style={{ position: 'absolute', left: '55%', top: '68%' }}>
-        <Stamp start={beat(4.5)} icon="shield" lines={['Gestão', 'de risco']} from="right" />
+        <Dome start={beat(0.5)} size={640} />
       </div>
 
-      <div style={{ position: 'absolute', right: '4%', top: '20%' }}>
+      {/* as quatro palavras */}
+      <div style={{ position: 'absolute', top: 520, left: '3%', zIndex: 20 }}>
+        <Stamp start={beat(2)} icon="eye" lines={['Rastreamento', 'em tempo real']} from="left" />
+      </div>
+      <div style={{ position: 'absolute', top: 520, right: '3%', zIndex: 20 }}>
+        <Stamp start={beat(2.5)} icon="eye" lines={['Monitoramento', '24h']} from="right" />
+      </div>
+      <div style={{ position: 'absolute', top: 1060, left: '3%', zIndex: 20 }}>
+        <Stamp start={beat(3)} icon="shield" lines={['Carga', 'segurada']} from="left" />
+      </div>
+      <div style={{ position: 'absolute', top: 1060, right: '3%', zIndex: 20 }}>
+        <Stamp start={beat(3.5)} icon="shield" lines={['Gestão', 'de risco']} from="right" />
+      </div>
+
+      {/* o fluxo do pedido e a reputação, logo abaixo da caixa */}
+      <div
+        style={{
+          position: 'absolute', top: 1290, left: 0, right: 0,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 20,
+        }}
+      >
         <StatusFlow start={beat(6)} />
-        <div style={{ marginTop: 18, opacity: fade(frame, beat(9), 0.4) }}>
-          <Stars start={beat(9)} size={38} />
+        <div style={{ marginTop: 20, opacity: fade(frame, beat(8.5), 0.4) }}>
+          <Stars start={beat(8.5)} size={46} />
         </div>
+      </div>
+
+      {/* e só então a frase */}
+      <div
+        style={{
+          position: 'absolute', left: 0, right: 0, top: 118,
+          display: 'flex', justifyContent: 'center', zIndex: 25,
+        }}
+      >
+        <KineticText
+          lines={['Entregar bem', 'também é vender.']}
+          start={beat(9.5)}
+          size={92}
+          align="center"
+          accent={[1]}
+        />
       </div>
     </AbsoluteFill>
   );

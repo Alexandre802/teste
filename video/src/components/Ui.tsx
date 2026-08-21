@@ -146,7 +146,10 @@ export const Stars: React.FC<{ start: number; size?: number }> = ({ start, size 
   );
 };
 
-/** Contorno de celular com conteúdo livre na tela. */
+/**
+ * Contorno de celular com as duas faces. A traseira existe para o giro no
+ * próprio eixo não virar uma folha de papel quando o aparelho passa de perfil.
+ */
 export const Phone: React.FC<{
   start: number;
   width?: number;
@@ -156,26 +159,56 @@ export const Phone: React.FC<{
   const frame = useCurrentFrame();
   const p = overshoot(frame, start, 1.4);
   const h = width * 2.02;
+  const shell: React.CSSProperties = {
+    position: 'absolute', inset: 0,
+    borderRadius: width * 0.14,
+    overflow: 'hidden',
+    backfaceVisibility: 'hidden',
+    WebkitBackfaceVisibility: 'hidden',
+  };
+
   return (
     <div
       style={{
-        width, height: h, borderRadius: width * 0.14,
-        background: '#05060f',
-        border: '3px solid #23283d',
-        boxShadow: `0 30px 70px rgba(0,0,0,0.55), 0 0 60px ${theme.cyan}22`,
-        overflow: 'hidden',
+        width, height: h,
         position: 'relative',
+        transformStyle: 'preserve-3d',
+        borderRadius: width * 0.14,
+        boxShadow: `0 ${width * 0.1}px ${width * 0.24}px rgba(0,0,0,0.55), 0 0 ${width * 0.2}px ${theme.cyan}22`,
         opacity: fade(frame, start, 0.5),
         transform: `translateY(${interpolate(p, [0, 1], [delayFrom, 0])}px) scale(${interpolate(p, [0, 1], [0.94, 1])})`,
       }}
     >
+      {/* frente */}
+      <div style={{ ...shell, background: '#05060f', border: '3px solid #23283d' }}>
+        {children}
+        <div
+          style={{
+            position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)',
+            width: width * 0.3, height: width * 0.075, borderRadius: 999, background: '#000', zIndex: 3,
+          }}
+        />
+      </div>
+
+      {/* traseira */}
       <div
         style={{
-          position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)',
-          width: width * 0.3, height: width * 0.075, borderRadius: 999, background: '#000', zIndex: 3,
+          ...shell,
+          transform: 'rotateY(180deg)',
+          background: 'linear-gradient(150deg, #1a2140 0%, #0a0e22 55%, #151a33 100%)',
+          border: '3px solid #23283d',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}
-      />
-      {children}
+      >
+        <div
+          style={{
+            position: 'absolute', top: width * 0.07, left: width * 0.07,
+            width: width * 0.26, height: width * 0.26, borderRadius: width * 0.07,
+            background: '#0c1024', border: '1px solid #262c48',
+          }}
+        />
+        <div style={{ fontFamily: font.display, fontSize: width * 0.1, color: '#2b3358' }}>3</div>
+      </div>
     </div>
   );
 };
@@ -195,5 +228,61 @@ export const Dome: React.FC<{ start: number; size: number }> = ({ start, size })
         transform: `scale(${interpolate(p, [0, 1], [0.7, 1])})`,
       }}
     />
+  );
+};
+
+/**
+ * Par de notificações: esquerda e direita entram no mesmo quadro, e os pares
+ * se sucedem um por tempo. É o "uma por uma, porém junta acompanhando os dois
+ * lados" do briefing.
+ */
+export const ToastPair: React.FC<{
+  start: number;
+  top: string;
+  left: { title: string; subtitle: string; accent?: string };
+  right: { title: string; subtitle: string; accent?: string };
+  width?: number;
+  inset?: string;
+}> = ({ start, top, left, right, width = 300, inset = '2%' }) => (
+  <>
+    <div style={{ position: 'absolute', top, left: inset, zIndex: 20 }}>
+      <Toast start={start} title={left.title} subtitle={left.subtitle} accent={left.accent} from="left" width={width} />
+    </div>
+    <div style={{ position: 'absolute', top, right: inset, zIndex: 20 }}>
+      <Toast start={start} title={right.title} subtitle={right.subtitle} accent={right.accent} from="right" width={width} />
+    </div>
+  </>
+);
+
+/** Assinatura pequena da marca, como a copy pede na primeira cena. */
+export const Wordmark: React.FC<{ start: number; size?: number }> = ({ start, size = 1 }) => {
+  const frame = useCurrentFrame();
+  const p = overshoot(frame, start, 1);
+  return (
+    <div
+      style={{
+        display: 'inline-flex', alignItems: 'center', gap: 14 * size,
+        opacity: fade(frame, start, 0.5),
+        transform: `translateY(${interpolate(p, [0, 1], [-24, 0])}px)`,
+      }}
+    >
+      <div
+        style={{
+          width: 54 * size, height: 54 * size, borderRadius: 12 * size,
+          background: `linear-gradient(140deg, ${theme.red}, ${theme.amber})`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontFamily: font.display, fontSize: 30 * size, color: theme.white,
+          boxShadow: `0 0 ${24 * size}px ${theme.amber}66`,
+        }}
+      >
+        3
+      </div>
+      <div style={{ fontFamily: font.display, lineHeight: 1, color: theme.white }}>
+        <div style={{ fontSize: 30 * size, letterSpacing: '0.06em' }}>TRÊS ESTRELAS</div>
+        <div style={{ fontFamily: font.body, fontSize: 13 * size, fontWeight: 600, letterSpacing: '0.22em', color: theme.cyanSoft }}>
+          TRANSPORTE E TURISMO
+        </div>
+      </div>
+    </div>
   );
 };

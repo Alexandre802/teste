@@ -2,24 +2,54 @@ import { staticFile } from 'remotion';
 import type { SceneId } from './timeline';
 
 /**
- * As artes atuais são composições achatadas, com o texto embutido na imagem.
- * Enquanto `baked` for true, cada cena desenha um véu suave sob a tipografia
- * animada para cobrir o texto original. Quando os plates limpos chegarem,
- * basta trocar o arquivo e virar `baked` para false — nada mais muda.
+ * As artes do repositório entram como fundo. Elas são 3:1 e o quadro é 9:16,
+ * então cada cena escolhe por onde cortar: `focal` é a fração horizontal da
+ * arte que fica no centro do quadro, e a câmera passeia em torno dela.
+ *
+ * Os recortes foram escolhidos em regiões sem tipografia embutida — o corte
+ * vertical mostra só cerca de 19% da largura da arte, o que permite pegar
+ * ambiente limpo (pátio, frota, rastros) e deixar o texto de fora.
  */
+export const ART_ENABLED = true;
+
 export type PlateDef = {
   src: string;
+  /** Recorte horizontal em foco, 0 = borda esquerda da arte, 1 = direita. */
+  focal: number;
+  /** Passeio horizontal ao longo da cena, em pontos percentuais. */
+  pan: number;
+  /** As artes ainda trazem tipografia embutida; com plates limpos, vire para false. */
   baked: boolean;
-  /** Região coberta pelo véu, em fração do quadro: [x, y, largura, altura]. */
-  scrim?: [number, number, number, number];
+  /** Quanto rebaixar a arte, 0 = arte cheia, 1 = quase apagada. */
+  veil: number;
+  /**
+   * `cover` preenche o quadro com um recorte da arte. `inset` faz a arte
+   * flutuar, menor e com bordas esfumadas, sobre o ambiente em código —
+   * para quando o assunto precisa caber inteiro.
+   */
+  mode?: 'cover' | 'inset';
+  /** Altura da arte no modo `inset`, em fração do quadro. */
+  insetHeight?: number;
+  /** Largura da janela `inset`, como proporção da altura. */
+  insetRatio?: number;
 };
 
+/** Pátio e frota da arte de assinatura: o ambiente limpo da marca. */
+const AMBIENTE = staticFile('plates/s7_assinatura.png');
+
 export const plates: Record<SceneId, PlateDef> = {
-  s1: { src: staticFile('plates/s1_phones.png'),     baked: true, scrim: [0.52, 0.10, 0.48, 0.80] },
-  s2: { src: staticFile('plates/s2_operacao.png'),   baked: true, scrim: [0.52, 0.10, 0.48, 0.80] },
-  s3: { src: staticFile('plates/s3_escala.png'),     baked: true, scrim: [0.00, 0.05, 1.00, 0.95] },
-  s4: { src: staticFile('plates/s4_urgencia.png'),   baked: true, scrim: [0.40, 0.08, 0.60, 0.80] },
-  s5: { src: staticFile('plates/s5_mapa.png'),       baked: true, scrim: [0.00, 0.08, 0.52, 0.80] },
-  s6: { src: staticFile('plates/s6_confianca.png'),  baked: true, scrim: [0.00, 0.00, 1.00, 1.00] },
-  s7: { src: staticFile('plates/s7_assinatura.png'), baked: true, scrim: [0.20, 0.10, 0.60, 0.70] },
+  // pátio ao fundo; os celulares e as notificações são a camada animada
+  s1: { src: AMBIENTE, focal: 0.88, pan: -5, baked: true, veil: 0.64 },
+  // a revelação: o CD e a frota ficam à mostra quando os pedidos recuam
+  s2: { src: AMBIENTE, focal: 0.83, pan: 7, baked: true, veil: 0.22 },
+  // borda da arte de escala: só o campo de caixas em movimento
+  s3: { src: staticFile('plates/s3_escala.png'), focal: 0.04, pan: 6, baked: true, veil: 0.34 },
+  // rastros e frota atrás do mockup de rastreio
+  s4: { src: AMBIENTE, focal: 0.93, pan: -4, baked: true, veil: 0.52 },
+  // ambiente neutro: o mapa e a rota são desenhados por cima
+  s5: { src: AMBIENTE, focal: 0.80, pan: 4, baked: true, veil: 0.58 },
+  // a caixa protegida é o próprio herói da arte, recortada no centro
+  s6: { src: staticFile('plates/s6_confianca.png'), focal: 0.45, pan: 3, baked: true, veil: 0.16, mode: 'inset', insetHeight: 0.52, insetRatio: 0.72 },
+  // volta ao pátio operando, emendando com a primeira cena
+  s7: { src: AMBIENTE, focal: 0.86, pan: -6, baked: true, veil: 0.34 },
 };
