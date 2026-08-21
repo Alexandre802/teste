@@ -31,11 +31,18 @@ for (const s of scenes.slice(1)) {
 }
 
 // ------------------------------------------- s1 · arte de abertura ---
-cue(at('s1', 0.5), 'whoosh_short', 0.6);
-cue(at('s1', 0.5), 'logo_sting', 0.3);
-[2, 3.5, 5].forEach((b) => cue(at('s1', b), 'notification_pop', 0.5));
-[1, 4, 7].forEach((b) => cue(at('s1', b), 'tick', 0.3));
-cue(at('s1', 6), 'sparkle', 0.34);
+cue(at('s1', 0.5), 'whoosh_short', 0.55);
+cue(at('s1', 0.5), 'logo_sting', 0.28);
+// cada pedido entrando nas três telas
+[0.5, 1.25, 2.0].forEach((b) => cue(at('s1', b), 'soft_pop', 0.4));     // Mercado Livre
+[1.0, 1.75, 2.5].forEach((b) => cue(at('s1', b), 'tick', 0.32));        // Shopee
+[1.5, 2.25, 3.0].forEach((b) => cue(at('s1', b), 'digital_click', 0.3)); // Shein
+// as notificações chegando pelas laterais, aos pares
+[2, 3.5, 5].forEach((b) => {
+  cue(at('s1', b), 'notification_pop', 0.68);
+  cue(at('s1', b) + 2, 'soft_pop', 0.34);
+});
+cue(at('s1', 6.5), 'sparkle', 0.32);
 
 // -------------------------------------------------- s2 · a frota passa ---
 cue(at('s2', 0.5), 'whoosh_short', 0.6);

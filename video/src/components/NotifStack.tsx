@@ -9,7 +9,12 @@ export type NotifItem = {
   accent: string;
   time: string;
   body: React.ReactNode;
+  /** Glifo do ícone: usa o da marca quando informado. */
+  glyph?: string;
 };
+
+/** `light` reproduz o card claro das artes; `dark` é o card de vidro escuro. */
+export type NotifTone = 'dark' | 'light';
 
 /**
  * Pilha de notificações no gesto da referência do cliente: cada card novo
@@ -29,9 +34,13 @@ export const NotificationStack: React.FC<{
   spread?: number;
   /** Quadro em que a pilha começa a sair de cena. */
   exitAt?: number;
+  tone?: NotifTone;
+  /** De que lado a carta entra, para o leque abrir na direção certa. */
+  side?: 'left' | 'right';
 }> = ({
   items, start, everyBeats = 1.5, width,
   cardHeight = 118, gap = 14, spread = 2.4, exitAt,
+  tone = 'dark', side = 'left',
 }) => {
   const frame = useCurrentFrame();
 
@@ -67,8 +76,9 @@ export const NotificationStack: React.FC<{
 
         // leque: ângulo e deslocamento crescem com a distância até o centro
         const off = i - center;
-        const angle = off * spread * Math.min(1, opened / 2);
-        const x = off * 11;
+        const dir = side === 'left' ? 1 : -1;
+        const angle = off * spread * dir * Math.min(1, opened / 2);
+        const x = off * 6 * dir;
         const depth = 1 - Math.abs(off) * 0.018;
         const float = Math.sin((frame + i * 24) / (BEAT * 3)) * 2.5;
 
@@ -87,7 +97,7 @@ export const NotificationStack: React.FC<{
               zIndex: i + 1,
             }}
           >
-            <NotifCard item={item} height={cardHeight} />
+            <NotifCard item={item} height={cardHeight} tone={tone} />
           </div>
         );
       })}
@@ -95,38 +105,46 @@ export const NotificationStack: React.FC<{
   );
 };
 
-const NotifCard: React.FC<{ item: NotifItem; height: number }> = ({ item, height }) => (
-  <div
-    style={{
-      height,
-      display: 'flex', alignItems: 'center', gap: 18,
-      padding: '0 24px',
-      borderRadius: 26,
-      background: 'rgba(12,22,58,0.84)',
-      border: '1px solid rgba(150,190,255,0.3)',
-      backdropFilter: 'blur(14px)',
-      boxShadow: '0 22px 50px rgba(0,0,0,0.5)',
-      fontFamily: font.body,
-    }}
-  >
+const NotifCard: React.FC<{ item: NotifItem; height: number; tone: NotifTone }> = ({
+  item, height, tone,
+}) => {
+  const light = tone === 'light';
+  const k = height / 118;
+  return (
     <div
       style={{
-        width: 62, height: 62, borderRadius: 15, flexShrink: 0,
-        background: item.accent,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 30,
+        height,
+        display: 'flex', alignItems: 'center', gap: 14 * k,
+        padding: `0 ${20 * k}px`,
+        borderRadius: 20 * k,
+        background: light ? 'rgba(232,240,255,0.93)' : 'rgba(12,22,58,0.84)',
+        border: `1px solid ${light ? 'rgba(255,255,255,0.9)' : 'rgba(150,190,255,0.3)'}`,
+        backdropFilter: 'blur(14px)',
+        boxShadow: light
+          ? '0 16px 34px rgba(0,0,0,0.42)'
+          : '0 22px 50px rgba(0,0,0,0.5)',
+        fontFamily: font.body,
       }}
     >
-      🤝
-    </div>
-    <div style={{ minWidth: 0, flex: 1 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12 }}>
-        <div style={{ fontSize: 25, fontWeight: 700, color: theme.white }}>{item.app}</div>
-        <div style={{ fontSize: 19, color: 'rgba(200,220,255,0.65)' }}>{item.time}</div>
+      <div
+        style={{
+          width: 46 * k, height: 46 * k, borderRadius: 11 * k, flexShrink: 0,
+          background: item.accent,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 24 * k, fontWeight: 800,
+          color: item.accent === '#ffe600' ? '#2d3277' : '#ffffff',
+        }}
+      >
+        {item.glyph ?? 'S'}
       </div>
-      <div style={{ fontSize: 21, color: 'rgba(226,238,255,0.92)', lineHeight: 1.3, marginTop: 2 }}>
-        {item.body}
+      <div style={{ minWidth: 0, flex: 1, lineHeight: 1.25 }}>
+        <div style={{ fontSize: 21 * k, fontWeight: 700, color: light ? '#0b1020' : theme.white }}>
+          {item.app}
+        </div>
+        <div style={{ fontSize: 18 * k, color: light ? '#3c4763' : 'rgba(226,238,255,0.92)' }}>
+          {item.body}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
