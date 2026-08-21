@@ -34,10 +34,12 @@ export const S1VoceVende: React.FC<{ duration: number }> = ({ duration }) => {
         duration={duration}
         push={[1.0, 1.035]}
         bands={[
-          { from: 0.11, to: 0.50, at: beat(0), dir: 0 },    // os três aparelhos
-          { from: 0.00, to: 0.11, at: beat(2), dir: -1 },   // notificações à esquerda
-          { from: 0.50, to: 0.63, at: beat(2), dir: 1 },    // notificações à direita
-          { from: 0.63, to: 1.00, at: beat(3.5), dir: 1 },  // a frase e o pátio
+          // a primeira faixa começa antes do quadro zero: o vídeo abre com os
+          // aparelhos já em cena, assentando, em vez de abrir no escuro
+          { from: 0.11, to: 0.50, at: -beat(0.8), dir: 0 }, // os três aparelhos
+          { from: 0.00, to: 0.11, at: beat(1), dir: -1 },   // notificações à esquerda
+          { from: 0.50, to: 0.63, at: beat(1.25), dir: 1 }, // notificações à direita
+          { from: 0.63, to: 1.00, at: beat(2), dir: 1 },    // a frase e o pátio
         ]}
       >
         <ScreenList
