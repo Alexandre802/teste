@@ -10,8 +10,10 @@ type Slot = {
 };
 
 /**
- * Sessão de marketplaces: os aparelhos não giram: a fileira desliza para o
- * lado e o próximo app assume o centro, como um swipe de carrossel. O que
+ * Sessão de marketplaces: os aparelhos não giram — a fileira desliza para o
+ * lado e o próximo app assume o centro, como um swipe de carrossel. A cena
+ * abre com o Mercado Livre no meio, Shopee à esquerda e Shein à direita,
+ * como a copy pede. O que
  * está no centro fica cheio; os vizinhos recuam em escala, brilho e leve
  * rotação, dando profundidade sem tirar o layout original de cena.
  */
@@ -22,8 +24,10 @@ export const PhoneSwiper: React.FC<{
   gap?: number;
   /** Tempos musicais entre uma troca e a seguinte. */
   everyBeats?: number;
+  /** Qual aparelho abre a cena no centro. */
+  initialIndex?: number;
   ordersStart: number;
-}> = ({ slots, start, width, gap = 46, everyBeats = 2, ordersStart }) => {
+}> = ({ slots, start, width, gap = 46, everyBeats = 2, initialIndex = 0, ordersStart }) => {
   const frame = useCurrentFrame();
   const step = width + gap;
 
@@ -37,7 +41,7 @@ export const PhoneSwiper: React.FC<{
     durationInFrames: beat(1.1),
     config: { damping: 15, mass: 0.9, stiffness: 110 },
   });
-  const active = (current + progress) % slots.length;
+  const active = initialIndex + current + progress;
 
   const enter = spring({
     frame: frame - start,

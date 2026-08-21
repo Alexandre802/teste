@@ -12,9 +12,10 @@ export type NotifItem = {
 };
 
 /**
- * Pilha de notificações, exatamente como na referência do cliente: o card cai
- * de cima, assenta, e cada nova chegada empurra as anteriores para baixo.
- * Nada some — a pilha cresce e continua flutuando de leve.
+ * Pilha de notificações no gesto da referência do cliente: cada card novo
+ * **sobe por baixo** e assenta abaixo do anterior, e o conjunto vai se
+ * abrindo como um leque — as cartas espalham em ângulo e deslocamento à
+ * medida que a pilha cresce.
  */
 export const NotificationStack: React.FC<{
   items: NotifItem[];
@@ -24,9 +25,14 @@ export const NotificationStack: React.FC<{
   width: number;
   cardHeight?: number;
   gap?: number;
+  /** Abertura do leque: graus por carta a partir do centro. */
+  spread?: number;
   /** Quadro em que a pilha começa a sair de cena. */
   exitAt?: number;
-}> = ({ items, start, everyBeats = 1.5, width, cardHeight = 118, gap = 14, exitAt }) => {
+}> = ({
+  items, start, everyBeats = 1.5, width,
+  cardHeight = 118, gap = 14, spread = 2.4, exitAt,
+}) => {
   const frame = useCurrentFrame();
 
   const arrival = (i: number) => start + beat(i * everyBeats);
@@ -35,8 +41,12 @@ export const NotificationStack: React.FC<{
       frame: frame - at,
       fps: FPS,
       durationInFrames: beat(1.2),
-      config: { damping: 14, mass: 0.8, stiffness: 130 },
+      config: { damping: 15, mass: 0.85, stiffness: 125 },
     });
+
+  // quantas cartas já chegaram, de forma contínua: é o que abre o leque
+  const opened = items.reduce((acc, _, i) => acc + settle(arrival(i)), 0);
+  const center = (opened - 1) / 2;
 
   const exiting = exitAt !== undefined
     ? interpolate(frame, [exitAt, exitAt + beat(1)], [0, 1], {
@@ -50,27 +60,31 @@ export const NotificationStack: React.FC<{
         const at = arrival(i);
         if (frame < at - 3) return null;
 
-        // cada chegada posterior empurra este card mais para baixo
-        let push = 0;
-        for (let j = i + 1; j < items.length; j++) {
-          push += (cardHeight + gap) * settle(arrival(j));
-        }
-
         const enter = settle(at);
-        const y = interpolate(enter, [0, 1], [-(cardHeight + 60), 0]) + push;
-        const float = Math.sin((frame + i * 21) / (BEAT * 3)) * 3;
+        // sobe por baixo até o próprio lugar na pilha
+        const baseY = i * (cardHeight + gap);
+        const y = baseY + interpolate(enter, [0, 1], [cardHeight + 70, 0]);
+
+        // leque: ângulo e deslocamento crescem com a distância até o centro
+        const off = i - center;
+        const angle = off * spread * Math.min(1, opened / 2);
+        const x = off * 11;
+        const depth = 1 - Math.abs(off) * 0.018;
+        const float = Math.sin((frame + i * 24) / (BEAT * 3)) * 2.5;
 
         return (
           <div
             key={i}
             style={{
               position: 'absolute', top: 0, left: 0, right: 0,
+              transformOrigin: '50% 140%',
               transform:
-                `translateY(${y + float + exiting * 90}px) ` +
-                `scale(${interpolate(enter, [0, 1], [0.9, 1]) * (1 - exiting * 0.08)})`,
+                `translate(${x}px, ${y + float + exiting * 70}px) ` +
+                `rotate(${angle}deg) ` +
+                `scale(${depth * interpolate(enter, [0, 1], [0.88, 1]) * (1 - exiting * 0.08)})`,
               opacity: fade(frame, at, 0.4) * (1 - exiting),
               filter: exiting > 0 ? `blur(${exiting * 10}px)` : undefined,
-              zIndex: items.length - i,
+              zIndex: i + 1,
             }}
           >
             <NotifCard item={item} height={cardHeight} />
@@ -88,8 +102,8 @@ const NotifCard: React.FC<{ item: NotifItem; height: number }> = ({ item, height
       display: 'flex', alignItems: 'center', gap: 18,
       padding: '0 24px',
       borderRadius: 26,
-      background: 'rgba(12,22,58,0.82)',
-      border: '1px solid rgba(150,190,255,0.28)',
+      background: 'rgba(12,22,58,0.84)',
+      border: '1px solid rgba(150,190,255,0.3)',
       backdropFilter: 'blur(14px)',
       boxShadow: '0 22px 50px rgba(0,0,0,0.5)',
       fontFamily: font.body,

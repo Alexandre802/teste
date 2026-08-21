@@ -14,9 +14,9 @@ import { theme } from '../config/theme';
  * Os três marketplaces ficam numa sessão que desliza: o aparelho não gira,
  * a fileira passa para o lado e o próximo app assume o centro.
  *
- * As notificações seguem a referência do cliente — caem de cima e empilham,
- * cada nova empurrando as anteriores para baixo — e chegam aos pares, os dois
- * lados no mesmo quadro.
+ * As notificações seguem a referência do cliente: cada card sobe por baixo e
+ * assenta abaixo do anterior, e a pilha vai se abrindo como um leque. Chegam
+ * aos pares, os dois lados no mesmo quadro.
  */
 export const S1VoceVende: React.FC<{ duration: number }> = ({ duration }) => {
   const frame = useCurrentFrame();
@@ -79,7 +79,15 @@ export const S1VoceVende: React.FC<{ duration: number }> = ({ duration }) => {
       </div>
 
       <div style={{ position: 'absolute', top: 690, left: 0, right: 0, zIndex: 10 }}>
-        <PhoneSwiper slots={slots} start={beat(0.5)} width={300} gap={54} everyBeats={2} ordersStart={beat(2)} />
+        <PhoneSwiper
+          slots={slots}
+          start={beat(0.5)}
+          width={300}
+          gap={54}
+          everyBeats={2}
+          initialIndex={1}
+          ordersStart={beat(2)}
+        />
       </div>
 
       <div
