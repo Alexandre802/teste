@@ -38,8 +38,9 @@ export type PlateDef = {
 const AMBIENTE = staticFile('plates/s7_assinatura.png');
 
 export const plates: Record<SceneId, PlateDef> = {
-  // pátio ao fundo; os celulares e as notificações são a camada animada
-  s1: { src: AMBIENTE, focal: 0.88, pan: -5, baked: true, veil: 0.64 },
+  // a arte de abertura é a própria cena: a câmera atravessa a composição da
+  // esquerda (os três marketplaces) até a direita (a frase e o pátio)
+  s1: { src: staticFile('plates/s1_phones.png'), focal: 0.49, pan: 58, baked: true, veil: 0.05 },
   // a revelação: o CD e a frota ficam à mostra quando os pedidos recuam
   s2: { src: AMBIENTE, focal: 0.83, pan: 7, baked: true, veil: 0.46 },
   // borda da arte de escala: só o campo de caixas em movimento

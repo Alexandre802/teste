@@ -30,24 +30,21 @@ for (const s of scenes.slice(1)) {
   cue(s.from + 1, 'glitch', 0.34);
 }
 
-// --------------------------------------------------- s1 · marketplaces ---
+// ------------------------------------------- s1 · arte de abertura ---
 cue(at('s1', 0.5), 'whoosh_short', 0.6);
-cue(at('s1', 0.5), 'logo_sting', 0.34);          // assinatura pequena entrando
-[2, 3.5, 5].forEach((b) => {                      // os pares caem na pilha
-  cue(at('s1', b), 'notification_pop', 0.72);
-  cue(at('s1', b) + 2, 'soft_pop', 0.4);
-});
-[1, 3, 5, 7, 9].forEach((b) => cue(at('s1', b), 'swipe_fast', 0.5)); // a sessão desliza
-[1.2, 3.2, 5.2, 7.2, 9.2].forEach((b) => cue(at('s1', b), 'tap', 0.42));
-cue(at('s1', 9.2), 'whoosh_short', 0.45);         // a pilha sai de cena
-cue(at('s1', 5), 'whoosh_short', 0.62);           // tipografia
-cue(at('s1', 5.5), 'impact', 0.5);
+cue(at('s1', 0.5), 'logo_sting', 0.3);
+[2, 3.5, 5].forEach((b) => cue(at('s1', b), 'notification_pop', 0.5));
+[1, 4, 7].forEach((b) => cue(at('s1', b), 'tick', 0.3));
+cue(at('s1', 6), 'sparkle', 0.34);
 
-// ------------------------------------------------------ s2 · a operação ---
-cue(at('s2', 0.5), 'swipe_fast', 0.5);
-cue(at('s2', 1.5), 'whoosh_short', 0.6);
-cue(at('s2', 2), 'sub_boom', 0.5);
-cue(at('s2', 4), 'pop_ui', 0.5);
+// -------------------------------------------------- s2 · a frota passa ---
+cue(at('s2', 0.5), 'whoosh_short', 0.6);
+[0.5, 2.5, 4.5].forEach((b) => {                  // cada troca do seletor
+  cue(at('s2', b), 'swipe_fast', 0.6);
+  cue(at('s2', b) + 3, 'tap', 0.42);
+});
+cue(at('s2', 1), 'sub_boom', 0.45);
+cue(at('s2', 3), 'pop_ui', 0.5);
 
 // ---------------------------------------------------------- s3 · escala ---
 cue(at('s3', 1), 'riser', 0.42);
