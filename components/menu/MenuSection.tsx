@@ -8,6 +8,7 @@ import CategoryTabs from './CategoryTabs';
 import ProductCard from './ProductCard';
 import ProductModal from './ProductModal';
 import { Reveal } from '../ui/Reveal';
+import { SplitHeading } from '../ui/Motion';
 
 /**
  * Seção de pedidos.
@@ -34,15 +35,13 @@ export default function MenuSection() {
           <p className="text-xs font-extrabold uppercase tracking-[0.35em] text-white/75">
             Produtos
           </p>
-          <h2 className="mt-3 text-[clamp(2rem,5.5vw,3.6rem)] font-extrabold leading-none tracking-tight text-white">
-            Nossos Lanches
-          </h2>
+          <SplitHeading text="Nossos Lanches" className="mt-3 text-[clamp(2rem,5.5vw,3.6rem)] font-extrabold leading-none tracking-tight text-white" />
           <p className="mx-auto mt-3 max-w-lg text-white/90">
             Escolha seu favorito e peça do seu jeito.
           </p>
         </Reveal>
 
-        <div className="mt-8">
+        <div className="sticky top-[4.75rem] z-30 mx-auto mt-8 w-fit max-w-full rounded-full border border-white/30 bg-ember-deep/85 px-2 py-2 shadow-[0_12px_30px_-12px_rgba(90,32,5,0.8)] backdrop-blur-xl">
           <CategoryTabs active={active} onChange={setActive} />
         </div>
 

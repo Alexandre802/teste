@@ -1,6 +1,7 @@
 import { business, whatsappUrl } from '@/lib/business';
 import { WhatsAppIcon } from '../ui/Icons';
 import { Reveal } from '../ui/Reveal';
+import { SplitHeading } from '../ui/Motion';
 
 /**
  * Estrutura pronta para promoções. Enquanto `promocoes` estiver vazio, a
@@ -23,9 +24,7 @@ export default function Promocoes() {
           <p className="text-xs font-extrabold uppercase tracking-[0.35em] text-white/75">
             Promoções
           </p>
-          <h2 className="mt-3 text-[clamp(2rem,5.5vw,3.5rem)] font-extrabold leading-none tracking-tight text-white">
-            O que está rolando
-          </h2>
+          <SplitHeading text="O que está rolando" className="mt-3 text-[clamp(2rem,5.5vw,3.5rem)] font-extrabold leading-none tracking-tight text-white" />
         </Reveal>
 
         {promocoes.length === 0 ? (

@@ -4,6 +4,7 @@ import { featuredProducts, formatPrice } from '@/lib/catalog';
 import { useShop } from '@/lib/store';
 import { ProductImage } from '../ui/ProductImage';
 import { Reveal } from '../ui/Reveal';
+import { SplitHeading } from '../ui/Motion';
 import { ArrowRight } from '../ui/Icons';
 
 export default function Featured() {
@@ -19,9 +20,7 @@ export default function Featured() {
           <p className="text-xs font-extrabold uppercase tracking-[0.35em] text-white/75">
             Destaques
           </p>
-          <h2 id="favoritos-titulo" className="mt-3 text-[clamp(2rem,5.5vw,3.5rem)] font-extrabold leading-none tracking-tight text-white">
-            Os favoritos da casa
-          </h2>
+          <SplitHeading id="favoritos-titulo" text="Os favoritos da casa" className="mt-3 text-[clamp(2rem,5.5vw,3.5rem)] font-extrabold leading-none tracking-tight text-white" />
           <p className="mt-4 max-w-xl text-muted">
             Os pedidos que mais saem e os que mais aparecem nas avaliações — o{' '}
             <strong className="font-bold text-white">Bacon Cheddar</strong> é citado nominalmente

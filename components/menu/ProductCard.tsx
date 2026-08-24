@@ -1,8 +1,10 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { formatPrice, type Product } from '@/lib/catalog';
 import { ProductImage } from '../ui/ProductImage';
+import { useTilt } from '../ui/Motion';
 
 /**
  * Card compacto. A grade mostra 2 no celular e até 5 no desktop, então tudo
@@ -19,6 +21,20 @@ export default function ProductCard({
   onAdd: (product: Product) => void;
 }) {
   const reduce = useReducedMotion();
+  const { ref: tiltRef, onMove, onLeave, rotateX, rotateY } = useTilt(6);
+  const [feito, setFeito] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => {
+    if (timer.current) clearTimeout(timer.current);
+  }, []);
+
+  const adicionar = () => {
+    onAdd(product);
+    setFeito(true);
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(() => setFeito(false), 1100);
+  };
 
   return (
     <motion.article
@@ -27,7 +43,12 @@ export default function ProductCard({
       animate={{ opacity: 1, y: 0 }}
       exit={reduce ? undefined : { opacity: 0 }}
       transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-      className="glass group flex flex-col overflow-hidden rounded-[var(--radius-card)] transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-[0_22px_44px_-18px_rgba(110,40,5,0.7)]"
+      ref={tiltRef}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      style={{ rotateX, rotateY, transformPerspective: 900 }}
+      whileHover={reduce ? undefined : { y: -6 }}
+      className="glass group flex flex-col overflow-hidden rounded-[var(--radius-card)] shadow-[0_10px_26px_-16px_rgba(110,40,5,0.6)] transition-shadow duration-300 hover:shadow-[0_26px_50px_-18px_rgba(110,40,5,0.8)]"
     >
       <button
         type="button"
@@ -62,11 +83,13 @@ export default function ProductCard({
 
         <button
           type="button"
-          onClick={() => onAdd(product)}
+          onClick={adicionar}
           disabled={!product.available}
-          className="mt-auto w-full rounded-full bg-white px-3 py-2 text-xs font-extrabold text-ember transition-colors duration-200 hover:bg-white/90 disabled:cursor-not-allowed disabled:bg-white/20 disabled:text-white/55"
+          className={`mt-auto w-full rounded-full px-3 py-2 text-xs font-extrabold transition-colors duration-200 disabled:cursor-not-allowed disabled:bg-white/20 disabled:text-white/55 ${
+            feito ? 'bg-ember-deep text-white' : 'bg-white text-ember hover:bg-white/90'
+          }`}
         >
-          {product.available ? 'Adicionar' : 'Indisponível'}
+          {!product.available ? 'Indisponível' : feito ? 'Na sacola ✓' : 'Adicionar'}
         </button>
       </div>
     </motion.article>

@@ -7,6 +7,7 @@ import {
 } from '@/lib/business';
 import { PhoneIcon, PinIcon, WhatsAppIcon } from '../ui/Icons';
 import { Reveal } from '../ui/Reveal';
+import { SplitHeading } from '../ui/Motion';
 
 export default function Location() {
   return (
@@ -16,9 +17,7 @@ export default function Location() {
           <p className="text-xs font-extrabold uppercase tracking-[0.35em] text-white/75">
             Contato
           </p>
-          <h2 className="mt-3 text-[clamp(2rem,5.5vw,3.5rem)] font-extrabold leading-none tracking-tight text-white">
-            Vem pra Michel
-          </h2>
+          <SplitHeading text="Vem pra Michel" className="mt-3 text-[clamp(2rem,5.5vw,3.5rem)] font-extrabold leading-none tracking-tight text-white" />
         </Reveal>
 
         <div className="mt-10 grid gap-6 lg:grid-cols-[1fr_1.15fr]">

@@ -40,13 +40,13 @@ def camadas_lanche() -> list[dict]:
     """As 8 fatias da foto de referência, já como data URI."""
     META = [
         ("1-pao-superior", "Pão superior", 0, 186, 0),
-        ("2-tomate", "Tomate", 186, 156, -36),
-        ("3-alface", "Alface", 342, 134, -130),
-        ("4-queijo-cima", "Queijo", 476, 144, -194),
-        ("5-carne-cima", "Carne", 620, 150, -260),
-        ("6-queijo-baixo", "Queijo", 770, 114, -305),
-        ("7-carne-baixo", "Carne", 884, 164, -359),
-        ("8-pao-inferior", "Pão inferior", 1048, 136, -418),
+        ("2-tomate", "Tomate", 186, 156, -62),
+        ("3-alface", "Alface", 342, 134, -168),
+        ("4-queijo-cima", "Queijo", 476, 144, -252),
+        ("5-carne-cima", "Carne", 620, 150, -336),
+        ("6-queijo-baixo", "Queijo", 770, 114, -402),
+        ("7-carne-baixo", "Carne", 884, 164, -474),
+        ("8-pao-inferior", "Pão inferior", 1048, 136, -556),
     ]
     out = []
     for slug, alt, top, h, shift in META:
@@ -334,10 +334,46 @@ dialog::backdrop{{background:rgb(168 56 10/.72);backdrop-filter:blur(4px)}}
 .note::placeholder{{color:rgb(255 255 255/.6)}}
 .aviso{{margin-top:1rem;border-radius:1rem;border:1px solid rgb(255 255 255/.45);background:rgb(255 255 255/.16);padding:1rem;font-size:.8rem;line-height:1.6;color:rgb(255 247 240/.9)}}
 
+
+/* ── grão: gradiente puro dá aspecto plástico; o ruído devolve textura ── */
+.grain{{position:fixed;inset:0;z-index:60;pointer-events:none;opacity:.14;mix-blend-mode:overlay;
+  background-size:140px 140px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E")}}
+/* ── barra de progresso da leitura ── */
+.prog{{position:fixed;inset:0 0 auto;height:3px;z-index:70;background:rgb(255 255 255/.9);transform-origin:left;transform:scaleX(0)}}
+/* ── marquise: cara de lanchonete de rua, não de template ── */
+.mq{{position:relative;overflow:hidden;border-block:1px solid rgb(255 255 255/.25);background:rgb(255 255 255/.1);padding-block:.75rem}}
+.mqTrack{{display:flex;white-space:nowrap;font-size:.8rem;font-weight:800;letter-spacing:.2em;text-transform:uppercase;gap:2rem;will-change:transform}}
+.mqTrack span{{flex:none}}
+/* ── abas fixas do cardápio ── */
+.tabsWrap{{position:sticky;top:4.75rem;z-index:30;margin:2rem auto 0;width:fit-content;max-width:100%;
+  border:1px solid rgb(255 255 255/.3);background:rgb(168 56 10/.85);backdrop-filter:blur(18px);
+  border-radius:999px;padding:.5rem;box-shadow:0 12px 30px -12px rgb(90 32 5/.8)}}
+/* ── revelação de título palavra a palavra ── */
+.rv{{display:inline-block;overflow:hidden;vertical-align:bottom}}
+.rv > i{{display:inline-block;font-style:inherit;transform:translateY(110%);opacity:0;transition:transform .6s cubic-bezier(.22,1,.36,1),opacity .6s}}
+.on .rv > i{{transform:none;opacity:1}}
+/* ── entrada dos cards ── */
+.prod{{opacity:0;transform:translateY(16px);transition:opacity .45s ease,transform .45s cubic-bezier(.22,1,.36,1),box-shadow .3s}}
+.prod.on{{opacity:1;transform:none}}
+.prod:hover{{transform:translateY(-6px)}}
+.add.feito{{background:var(--ember-deep);color:#fff}}
+/* ── bebidas: carrossel de arrastar ── */
+.drinks{{display:flex;gap:1rem;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:.5rem;scrollbar-width:none}}
+.drinks::-webkit-scrollbar{{display:none}}
+.drink{{flex:none;width:9.5rem;scroll-snap-align:start}}
+@media(min-width:640px){{.drink{{width:11rem}}}}
+.drink .shot{{aspect-ratio:1}}
+.navBtn{{display:grid;place-items:center;width:2.75rem;height:2.75rem;border-radius:999px;border:1px solid rgb(255 255 255/.45);color:#fff;transition:background .2s,color .2s}}
+.navBtn:hover{{background:#fff;color:var(--ember)}}
+
 /* faixa de preview */
 .pv{{position:fixed;inset:auto 0 0;z-index:60;background:var(--gold);color:var(--cocoa);font-size:.75rem;font-weight:700;text-align:center;padding:.5rem 1rem;display:none}}
 @media(prefers-reduced-motion:reduce){{*,*::before,*::after{{animation-duration:.001ms!important;transition-duration:.001ms!important}}}}
 </style>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="prog" id="prog" aria-hidden="true"></div>
 
 <header id="hdr">
   <div class="wrap bar">
@@ -374,6 +410,8 @@ dialog::backdrop{{background:rgb(168 56 10/.72);backdrop-filter:blur(4px)}}
     </div>
   </section>
 
+  <div class="mq" aria-hidden="true"><div class="mqTrack" id="mq1"></div></div>
+
   <section id="cardapio">
     <div class="wrap">
       <div style="text-align:center">
@@ -381,9 +419,28 @@ dialog::backdrop{{background:rgb(168 56 10/.72);backdrop-filter:blur(4px)}}
         <h2 class="big">Nossos Lanches</h2>
         <p style="margin:1rem auto 0;max-width:32rem;color:var(--muted)">Escolha seu favorito e peça do seu jeito.</p>
       </div>
-      <div class="tabs" role="tablist" aria-label="Categorias do cardápio" id="tabs" style="margin-top:2.5rem"></div>
+      <div class="tabsWrap"><div class="tabs" role="tablist" aria-label="Categorias do cardápio" id="tabs"></div></div>
       <p id="blurb" style="text-align:center;margin-top:1.25rem;font-size:.875rem;color:var(--muted)" aria-live="polite"></p>
       <div id="grid" class="grupos"></div>
+    </div>
+  </section>
+
+  <div class="mq" aria-hidden="true"><div class="mqTrack" id="mq2"></div></div>
+
+  <section aria-labelledby="bebidas-titulo">
+    <div class="wrap">
+      <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:1rem">
+        <div>
+          <p class="eyebrow">Para acompanhar</p>
+          <h2 class="big" id="bebidas-titulo">Bebidas geladas</h2>
+          <p style="margin-top:.75rem;color:rgb(255 255 255/.85)">Lata, garrafa ou 2 litros — arraste para ver tudo.</p>
+        </div>
+        <div style="display:flex;gap:.5rem">
+          <button class="navBtn" id="drinkPrev" aria-label="Bebidas anteriores"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+          <button class="navBtn" id="drinkNext" aria-label="Próximas bebidas"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+        </div>
+      </div>
+      <div class="drinks" id="drinks" style="margin-top:2rem"></div>
     </div>
   </section>
 
@@ -397,15 +454,6 @@ dialog::backdrop{{background:rgb(168 56 10/.72);backdrop-filter:blur(4px)}}
         <p class="lead">{d["aboutText"]}</p>
         <ul class="diffs">{diffs_html}</ul>
       </div>
-    </div>
-  </section>
-
-  <section>
-    <div class="wrap" style="text-align:center">
-      <p class="eyebrow">Avaliações</p>
-      <h2 class="big">Quem prova, recomenda</h2>
-      <div class="card ratingBox"><b>4,8</b><span style="color:var(--muted);font-size:.875rem">/ 5</span><span class="stars">★★★★★</span><span style="color:var(--muted);font-size:.875rem">46 avaliações no Google</span></div>
-      <ul class="revs" style="text-align:left">{reviews_html}</ul>
     </div>
   </section>
 
@@ -457,6 +505,15 @@ dialog::backdrop{{background:rgb(168 56 10/.72);backdrop-filter:blur(4px)}}
       <div class="busca">{busca_html}</div>
     </div>
   </section>
+  <section>
+    <div class="wrap" style="text-align:center">
+      <p class="eyebrow">Avaliações</p>
+      <h2 class="big">Quem prova, recomenda</h2>
+      <div class="card ratingBox"><b>4,8</b><span style="color:var(--muted);font-size:.875rem">/ 5</span><span class="stars">★★★★★</span><span style="color:var(--muted);font-size:.875rem">46 avaliações no Google</span></div>
+      <ul class="revs" style="text-align:left">{reviews_html}</ul>
+    </div>
+  </section>
+
 </main>
 
 <footer>
@@ -606,7 +663,16 @@ function setQty(id,q){{
 }}
 
 document.addEventListener('click', e => {{
-  const a = e.target.closest('[data-add]'); if (a) {{ add(a.dataset.add); return; }}
+  const a = e.target.closest('[data-add]');
+  if (a) {{
+    add(a.dataset.add);
+    // retorno imediato: o botão confirma antes de o olho procurar a sacola
+    a.classList.add('feito');
+    const antes = a.textContent;
+    a.textContent = 'Na sacola ✓';
+    setTimeout(() => {{ a.classList.remove('feito'); a.textContent = antes; }}, 1100);
+    return;
+  }}
   const o = e.target.closest('[data-open]'); if (o) {{ openProd(o.dataset.open); return; }}
   if (e.target.closest('[data-close]')) e.target.closest('dialog').close();
 }});
@@ -674,6 +740,101 @@ document.getElementById('cBody').addEventListener('click', e => {{
   else if (e.target.id==='clear') {{ cart=[]; save(); syncFab(); renderCart(); }}
 }});
 syncFab();
+
+/* ── bebidas: carrossel de arrastar ── */
+(function(){{
+  const trilho = document.getElementById('drinks');
+  const bebidas = D.products.filter(p => p.category === 'bebidas');
+  trilho.innerHTML = bebidas.map(p => `
+    <article class="card prod drink on">
+      <button class="shot" data-open="${{p.id}}" aria-label="Ver ${{p.name}}">
+        ${{shot(p)}}${{p.available?'':'<span class="eso">Esgotado</span>'}}
+      </button>
+      <div class="body">
+        <h3 style="font-size:.8rem">${{p.name}}</h3>
+        <p class="price" style="font-size:.95rem"><sup>R$</sup>${{BRL(p.price).replace('R$','').trim()}}</p>
+        <button class="add" data-add="${{p.id}}" ${{p.available?'':'disabled'}}>${{p.available?'Adicionar':'Indisponível'}}</button>
+      </div>
+    </article>`).join('');
+  const passo = () => trilho.clientWidth * 0.6;
+  document.getElementById('drinkPrev').onclick = () => trilho.scrollBy({{left:-passo(),behavior:'smooth'}});
+  document.getElementById('drinkNext').onclick = () => trilho.scrollBy({{left: passo(),behavior:'smooth'}});
+}})();
+
+/* ── barra de progresso da leitura ── */
+(function(){{
+  const bar = document.getElementById('prog');
+  const paint = () => {{
+    const max = document.documentElement.scrollHeight - innerHeight;
+    bar.style.transform = `scaleX(${{max > 0 ? scrollY / max : 0}})`;
+  }};
+  paint(); addEventListener('scroll', paint, {{passive:true}});
+}})();
+
+/* ── marquises: direção e velocidade reagem ao scroll ── */
+(function(){{
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const FRASES = {{
+    mq1: ['Lanches bem servidos','Delivery em Jacareí','Abre às 19h','Bandeira Branca I','Retirada na porta'],
+    mq2: ['Geladas','Coca-Cola','Guaranita','Fanta','Sucos naturais','Açaí'],
+  }};
+  const faixas = [];
+  for (const [id, frases] of Object.entries(FRASES)) {{
+    const el = document.getElementById(id);
+    if (!el) continue;
+    const bloco = frases.map(f => `<span>${{f}}</span><span style="opacity:.5">✦</span>`).join('');
+    el.innerHTML = bloco + bloco + bloco + bloco;
+    faixas.push({{ el, x: 0, largura: 0 }});
+  }}
+  const medir = () => faixas.forEach(f => {{ f.largura = f.el.scrollWidth / 4; }});
+  medir(); addEventListener('resize', medir, {{passive:true}});
+
+  let ultimo = scrollY, vel = 0, t0 = performance.now();
+  addEventListener('scroll', () => {{ vel = scrollY - ultimo; ultimo = scrollY; }}, {{passive:true}});
+  const loop = (t) => {{
+    const dt = Math.min(64, t - t0); t0 = t;
+    const dir = vel < -1 ? -1 : 1;
+    const extra = Math.min(6, Math.abs(vel) / 12);
+    vel *= 0.9;
+    for (const f of faixas) {{
+      f.x -= dir * (0.035 + extra * 0.04) * dt;
+      if (f.largura) f.x = ((f.x % f.largura) + f.largura) % f.largura - f.largura;
+      f.el.style.transform = `translateX(${{f.x}}px)`;
+    }}
+    requestAnimationFrame(loop);
+  }};
+  requestAnimationFrame(loop);
+}})();
+
+/* ── revelações: títulos palavra a palavra, cards em cascata ── */
+(function(){{
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  for (const h of document.querySelectorAll('h2.big')) {{
+    if (reduce) {{ h.classList.add('on'); continue; }}
+    const palavras = h.textContent.trim().split(' ');
+    h.innerHTML = palavras
+      .map((p,i) => `<span class="rv"><i style="transition-delay:${{i*70}}ms">${{p}}</i></span>`)
+      .join(' ');
+  }}
+  const io = new IntersectionObserver((es) => {{
+    for (const e of es) if (e.isIntersecting) {{ e.target.classList.add('on'); io.unobserve(e.target); }}
+  }}, {{ threshold: 0.2, rootMargin: '-40px' }});
+  document.querySelectorAll('h2.big').forEach(el => io.observe(el));
+
+  // cards entram em cascata quando a grade aparece
+  const ioCards = new IntersectionObserver((es) => {{
+    for (const e of es) {{
+      if (!e.isIntersecting) continue;
+      const cards = [...e.target.querySelectorAll('.prod:not(.on)')];
+      cards.forEach((c,i) => setTimeout(() => c.classList.add('on'), reduce ? 0 : Math.min(i,10) * 45));
+      ioCards.unobserve(e.target);
+    }}
+  }}, {{ threshold: 0.05 }});
+  const observarGrades = () => document.querySelectorAll('.grid, .drinks').forEach(g => ioCards.observe(g));
+  observarGrades();
+  // a grade é reconstruída ao trocar de categoria
+  new MutationObserver(observarGrades).observe(document.getElementById('grid'), {{childList:true}});
+}})();
 </script>
 '''
 

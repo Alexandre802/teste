@@ -1,6 +1,9 @@
+'use client';
+
 import { business, reviews } from '@/lib/business';
 import { StarIcon } from '../ui/Icons';
 import { Reveal } from '../ui/Reveal';
+import { CountUp, SplitHeading } from '../ui/Motion';
 
 function Stars({ value, className = 'h-4 w-4' }: { value: number; className?: string }) {
   return (
@@ -20,18 +23,16 @@ export default function Reviews() {
           <p className="text-xs font-extrabold uppercase tracking-[0.35em] text-white/75">
             Avaliações
           </p>
-          <h2 id="avaliacoes-titulo" className="mt-3 text-[clamp(2rem,5.5vw,3.5rem)] font-extrabold leading-none tracking-tight text-white">
-            Quem prova, recomenda
-          </h2>
+          <SplitHeading id="avaliacoes-titulo" text="Quem prova, recomenda" className="mt-3 text-[clamp(2rem,5.5vw,3.5rem)] font-extrabold leading-none tracking-tight text-white" />
 
           <div className="mt-7 inline-flex flex-wrap items-center justify-center gap-x-4 gap-y-2 rounded-full glass px-7 py-4">
-            <span className="text-4xl font-extrabold leading-none text-white">
-              {business.rating.value.toString().replace('.', ',')}
+            <span className="text-4xl font-extrabold leading-none text-white tabular-nums">
+              <CountUp to={business.rating.value} decimals={1} />
             </span>
             <span className="text-sm text-muted">/ 5</span>
             <Stars value={business.rating.value} className="h-5 w-5" />
-            <span className="text-sm text-muted">
-              {business.rating.count} avaliações no {business.rating.source}
+            <span className="text-sm text-white/85">
+              <CountUp to={business.rating.count} /> avaliações no {business.rating.source}
             </span>
           </div>
         </Reveal>

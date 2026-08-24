@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { AnimatePresence, motion } from 'framer-motion';
 import { galleryPhotos } from '@/lib/photos';
 import { Reveal } from '../ui/Reveal';
+import { SplitHeading } from '../ui/Motion';
 import { CloseIcon } from '../ui/Icons';
 
 /** Galeria com lightbox. Fotos reais da casa, sem rótulo de produto. */
@@ -18,9 +19,7 @@ export default function Gallery() {
           <p className="text-xs font-extrabold uppercase tracking-[0.35em] text-white/75">
             Galeria
           </p>
-          <h2 id="galeria-titulo" className="mt-3 text-[clamp(2rem,5.5vw,3.5rem)] font-extrabold leading-none tracking-tight text-white">
-            Direto da chapa
-          </h2>
+          <SplitHeading id="galeria-titulo" text="Direto da chapa" className="mt-3 text-[clamp(2rem,5.5vw,3.5rem)] font-extrabold leading-none tracking-tight text-white" />
         </Reveal>
 
         <ul className="mt-9 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
