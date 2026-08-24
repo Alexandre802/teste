@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { formatPrice, type Product } from '@/lib/catalog';
+import { formatPrice, resumo, type Product } from '@/lib/catalog';
 import { ProductImage } from '../ui/ProductImage';
 import { useTilt } from '../ui/Motion';
 
@@ -76,8 +76,8 @@ export default function ProductCard({
         </p>
 
         {product.description && (
-          <p className="line-clamp-2 text-[0.75rem] leading-snug text-white/80">
-            {product.description}
+          <p className="text-[0.75rem] leading-snug text-white/80">
+            {resumo(product.description)}
           </p>
         )}
 

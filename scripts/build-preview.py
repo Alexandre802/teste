@@ -73,8 +73,13 @@ def embutir_fotos(dados: dict) -> None:
 d = carregar_dados()
 embutir_fotos(d)
 LANCHE = camadas_lanche()
+LOGO = "data:image/png;base64," + base64.b64encode(
+    (ROOT / "public" / "marca" / "logo-512.png").read_bytes()
+).decode()
 B = d["business"]
 SRC_W, SRC_H = 941, 1204
+ULTIMA = LANCHE[-1]
+CENTRALIZA = (SRC_H - (ULTIMA["top"] + ULTIMA["h"] + ULTIMA["shift"])) / 2
 
 DATA = json.dumps({
     "products": d["products"],
@@ -161,6 +166,7 @@ header.on{{padding-block:.6rem;background:rgb(216 73 10/.78);backdrop-filter:blu
 header .bar{{display:flex;align-items:center;justify-content:space-between;gap:1.5rem}}
 .brand{{display:flex;align-items:center;gap:.75rem;font-weight:800;font-size:1.05rem}}
 .brand svg{{width:2rem;height:2rem;color:#fff}}
+.logo{{width:2.75rem;height:2.75rem;border-radius:999px;box-shadow:0 4px 14px -4px rgb(90 32 5/.6);flex:none}}
 nav.main{{display:none;gap:2rem}}
 @media(min-width:1024px){{nav.main{{display:flex}}}}
 nav.main a{{font-size:.875rem;font-weight:700;color:rgb(255 255 255/.85);padding-block:.25rem;border-bottom:2px solid transparent}}
@@ -238,7 +244,7 @@ h1{{font-size:clamp(2.6rem,9vw,6.5rem);font-weight:800;line-height:.9;letter-spa
 .body h3{{font-size:.9rem;font-weight:800;line-height:1.2}}
 .price{{font-size:1.05rem;font-weight:800;color:#fff;font-variant-numeric:tabular-nums}}
 .price sup{{font-size:.68rem;vertical-align:baseline;margin-right:.12rem;opacity:.85}}
-.desc{{font-size:.72rem;line-height:1.4;color:rgb(255 255 255/.8);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
+.desc{{font-size:.72rem;line-height:1.4;color:rgb(255 255 255/.8)}}
 .add{{margin-top:auto;width:100%;border-radius:999px;padding:.5rem .75rem;font-size:.72rem;font-weight:800;color:var(--ember);background:#fff;transition:background .2s}}
 .add:hover:not(:disabled){{background:rgb(255 255 255/.9)}}
 .add:disabled{{cursor:not-allowed;background:rgb(255 255 255/.2);color:rgb(255 255 255/.55);box-shadow:none}}
@@ -367,6 +373,12 @@ dialog::backdrop{{background:rgb(168 56 10/.72);backdrop-filter:blur(4px)}}
 .navBtn{{display:grid;place-items:center;width:2.75rem;height:2.75rem;border-radius:999px;border:1px solid rgb(255 255 255/.45);color:#fff;transition:background .2s,color .2s}}
 .navBtn:hover{{background:#fff;color:var(--ember)}}
 
+.lema{{display:flex;flex-direction:column;align-items:center;gap:1.5rem;text-align:center;max-width:56rem;margin-inline:auto;padding:3rem 1.5rem;border-radius:2rem}}
+@media(min-width:640px){{.lema{{padding:4rem 3rem}}}}
+.lema blockquote p{{max-width:42rem;font-size:clamp(1rem,2vw,1.25rem);line-height:1.7;color:rgb(255 255 255/.9)}}
+.lema figcaption{{font-size:.72rem;font-weight:800;letter-spacing:.28em;text-transform:uppercase;color:rgb(255 255 255/.7)}}
+.lemaHr{{width:4rem;height:1px;background:rgb(255 255 255/.4)}}
+
 /* faixa de preview */
 .pv{{position:fixed;inset:auto 0 0;z-index:60;background:var(--gold);color:var(--cocoa);font-size:.75rem;font-weight:700;text-align:center;padding:.5rem 1rem;display:none}}
 @media(prefers-reduced-motion:reduce){{*,*::before,*::after{{animation-duration:.001ms!important;transition-duration:.001ms!important}}}}
@@ -377,7 +389,7 @@ dialog::backdrop{{background:rgb(168 56 10/.72);backdrop-filter:blur(4px)}}
 
 <header id="hdr">
   <div class="wrap bar">
-    <a href="#inicio" class="brand">{MARK}<span>{B["name"]}</span></a>
+    <a href="#inicio" class="brand"><img class="logo" src="{LOGO}" alt="Logo da {B["name"]}" width="88" height="88"><span>{B["name"]}</span></a>
     <nav class="main">
       <a href="#inicio">Início</a><a href="#cardapio">Cardápio</a><a href="#sobre">Sobre nós</a><a href="#promocoes">Promoções</a><a href="#contato">Contato</a>
     </nav>
@@ -392,10 +404,9 @@ dialog::backdrop{{background:rgb(168 56 10/.72);backdrop-filter:blur(4px)}}
       <div class="wrap heroGrid">
         <div class="heroTxt">
           <h1>Michel<br>Food House</h1>
-          <div class="rule"><span></span>{MARK}<span></span></div>
           <p class="slogan">O sabor que impressiona na <strong>primeira mordida</strong>.</p>
           <div class="ctas">
-            <a class="cta solid" href="#cardapio"><span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 3v7a3 3 0 0 0 3 3v8M7 3v6M10 3v6M17 3c-1.7 1.5-2.5 3.6-2.5 6 0 1.7.8 2.8 2.5 3v9"/></svg></span>Coma aqui</a>
+            <a class="cta solid" href="#cardapio"><span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 3v7a3 3 0 0 0 3 3v8M7 3v6M10 3v6M17 3c-1.7 1.5-2.5 3.6-2.5 6 0 1.7.8 2.8 2.5 3v9"/></svg></span>Peça aqui</a>
             <a class="cta outline" href="https://wa.me/{B["whatsapp"]}?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Michel%20Food%20House%20e%20gostaria%20de%20fazer%20um%20pedido." target="_blank" rel="noopener">{WA}WhatsApp</a>
           </div>
           <p class="meta"><b>★ 4,8</b><span>46 avaliações no Google</span><span aria-hidden="true">·</span><span>Abre às 19:00</span></p>
@@ -454,6 +465,18 @@ dialog::backdrop{{background:rgb(168 56 10/.72);backdrop-filter:blur(4px)}}
         <p class="lead">{d["aboutText"]}</p>
         <ul class="diffs">{diffs_html}</ul>
       </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="lema-titulo">
+    <div class="wrap">
+      <figure class="card lema">
+        <img class="logo" src="{LOGO}" alt="" width="144" height="144" style="width:4.5rem;height:4.5rem">
+        <h2 class="big" id="lema-titulo">Deus é bom o tempo todo</h2>
+        <span class="lemaHr" aria-hidden="true"></span>
+        <blockquote><p>&ldquo;Tudo o que fizerem, façam-no de todo o coração, como para o Senhor, e não para os homens.&rdquo;</p></blockquote>
+        <figcaption>Colossenses 3:23</figcaption>
+      </figure>
     </div>
   </section>
 
@@ -520,11 +543,11 @@ dialog::backdrop{{background:rgb(168 56 10/.72);backdrop-filter:blur(4px)}}
   <div class="wrap">
     <div class="fgrid">
       <div>
-        <div class="brand">{MARK}<span>{B["name"]}</span></div>
+        <div class="brand"><img class="logo" src="{LOGO}" alt="Logo da {B["name"]}" width="104" height="104" style="width:3.25rem;height:3.25rem"><span>{B["name"]}</span></div>
         <p style="margin-top:.75rem;max-width:24rem">{B["slogan"]}</p>
         <p style="margin-top:1.25rem;font-size:.875rem">★ 4,8 · 46 avaliações no Google · {B["priceRange"]}</p>
       </div>
-      <div><h3>Endereço</h3><address>{B["address"]["street"]}<br>{B["address"]["district"]}<br>{B["address"]["city"]} - {B["address"]["state"]}</address><a href="tel:{B["phoneE164"]}" style="display:inline-block;margin-top:.75rem;font-weight:700;color:var(--cream)">{B["phoneDisplay"]}</a></div>
+      <div><h3>Endereço</h3><address>{B["address"]["street"]}<br>{B["address"]["district"]}<br>{B["address"]["city"]} - {B["address"]["state"]}, {B["address"]["postalCode"]}</address><a href="tel:{B["phoneE164"]}" style="display:inline-block;margin-top:.75rem;font-weight:700;color:var(--cream)">{B["phoneDisplay"]}</a></div>
       <div><h3>Navegar</h3><ul><li><a href="#inicio">Início</a></li><li><a href="#cardapio">Cardápio</a></li><li><a href="#sobre">Sobre</a></li><li><a href="#contato">Contato</a></li><li><a href="https://wa.me/{B["whatsapp"]}" target="_blank" rel="noopener">WhatsApp</a></li></ul></div>
     </div>
     <div class="fbot"><p>© <span id="ano"></span> {B["name"]}. Todos os direitos reservados.</p><p>Abre às 19:00</p></div>
@@ -539,6 +562,17 @@ dialog::backdrop{{background:rgb(168 56 10/.72);backdrop-filter:blur(4px)}}
 <script>
 const D = {DATA};
 const BRL = n => n.toLocaleString('pt-BR',{{style:'currency',currency:'BRL'}});
+/* corte por CSS parte no meio da palavra ("queijo, batat…") e lê como texto
+   faltando; aqui o corte cai sempre num limite de palavra */
+const resumo = (t, max = 68) => {{
+  const s = (t || '').trim();
+  if (s.length <= max) return s;
+  const corte = s.slice(0, max);
+  const esp = corte.lastIndexOf(' ');
+  const base = esp > max * 0.5 ? corte.slice(0, esp) : corte;
+  // conjunção solta no fim ("maionese e…") lê pior que a frase mais curta
+  return base.replace(/[\s,;.…]+$/, '').replace(/\s+(e|ou|com|de|da|do)$/i, '') + '…';
+}};
 const byId = Object.fromEntries(D.products.map(p=>[p.id,p]));
 document.getElementById('ano').textContent = new Date().getFullYear();
 
@@ -551,6 +585,9 @@ document.getElementById('ano').textContent = new Date().getFullYear();
   const box  = document.getElementById('burger');
   const parts = [...box.querySelectorAll('.layer,.ing')];
   const SRC_H = {SRC_H};
+  /* fechado, as camadas sobem e o lanche ocupa só a parte de cima da caixa —
+     este deslocamento recentraliza o conjunto e zera conforme abre */
+  const CENTRALIZA = {CENTRALIZA};
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   let start=0, span=1, h=1, ticking=false;
   const measure = () => {{
@@ -562,6 +599,7 @@ document.getElementById('ano').textContent = new Date().getFullYear();
   const paint = () => {{
     const t = Math.min(1, Math.max(0, (scrollY - start) / span));
     const k = (h / SRC_H) * (1 - t);
+    box.style.transform = `translateY(${{CENTRALIZA * k}}px)`;
     for (const el of parts) {{
       const d = parseFloat(el.dataset.shift) * k;
       if (el.classList.contains('ing')) {{
@@ -602,7 +640,7 @@ function cardHtml(p){{
       <div class="body">
         <h3>${{p.name}}</h3>
         <p class="price"><sup>R$</sup>${{BRL(p.price).replace('R$','').trim()}}</p>
-        ${{p.description?`<p class="desc">${{p.description}}</p>`:''}}
+        ${{p.description?`<p class="desc">${{resumo(p.description)}}</p>`:''}}
         <button class="add" data-add="${{p.id}}" ${{p.available?'':'disabled'}}>${{p.available?'Adicionar':'Indisponível'}}</button>
       </div>
     </article>`;

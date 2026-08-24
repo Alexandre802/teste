@@ -14,6 +14,16 @@ import {
 import { BURGER_LAYERS, SOURCE, type BurgerLayer } from './BurgerLayers';
 
 /**
+ * Ao fechar, todas as camadas sobem, e o lanche montado passa a ocupar só a
+ * parte de cima da caixa — visualmente ele "sobe" e desalinha do título. Este
+ * é o deslocamento que recentraliza o conjunto: metade do vazio que sobra
+ * embaixo quando fechado, zerando conforme abre.
+ */
+const ULTIMA = BURGER_LAYERS[BURGER_LAYERS.length - 1];
+const ALTURA_MONTADO = ULTIMA.top + ULTIMA.height + ULTIMA.shift;
+const CENTRALIZA = (SOURCE.h - ALTURA_MONTADO) / 2;
+
+/**
  * O lanche do hero se abre conforme a página rola.
  *
  * Em scroll = 0 as camadas estão encaixadas e o lanche parece montado; em
@@ -110,12 +120,18 @@ export default function ExplodedBurger({ targetRef }: Props) {
   });
   const progress = useSpring(raw, { stiffness: 110, damping: 26, mass: 0.25 });
   const still = useMotionValue(0);
+  const andamento = reduce ? still : progress;
+
+  // recentraliza o lanche montado dentro da caixa
+  const centro = useTransform([andamento, boxHeight], ([p, h]: number[]) =>
+    CENTRALIZA * (h / SOURCE.h) * (1 - p),
+  );
 
   return (
-    <div
+    <motion.div
       ref={boxRef}
-      className="relative mx-auto w-full max-w-[13.5rem] sm:max-w-[20rem] lg:max-w-[32rem]"
-      style={{ aspectRatio: `${SOURCE.w} / ${SOURCE.h}` }}
+      style={{ aspectRatio: `${SOURCE.w} / ${SOURCE.h}`, y: centro }}
+      className="relative mx-auto w-full max-w-[13.5rem] sm:max-w-[20rem] lg:max-w-[31rem]"
       role="img"
       aria-label="Lanche da Michel Food House que se separa em pão, tomate, alface, queijo e carne conforme a página rola"
     >
@@ -124,12 +140,12 @@ export default function ExplodedBurger({ targetRef }: Props) {
           key={layer.src}
           layer={layer}
           // sem movimento: o lanche fica montado e imóvel
-          progress={reduce ? still : progress}
+          progress={andamento}
           boxHeight={boxHeight}
           showLabel={wide && !reduce}
           priority={i < 3}
         />
       ))}
-    </div>
+    </motion.div>
   );
 }

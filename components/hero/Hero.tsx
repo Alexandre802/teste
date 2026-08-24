@@ -2,7 +2,7 @@
 
 import { useRef } from 'react';
 import { business, whatsappUrl } from '@/lib/business';
-import { BurgerMark, CutleryIcon, WhatsAppIcon } from '../ui/Icons';
+import { CutleryIcon, WhatsAppIcon } from '../ui/Icons';
 import ExplodedBurger from './ExplodedBurger';
 
 /**
@@ -18,7 +18,7 @@ export default function Hero() {
   return (
     <section id="inicio" ref={sectionRef} className="relative h-[172svh] lg:h-[200svh]">
       <div className="sticky top-0 h-[100svh] overflow-hidden">
-        <div className="mx-auto grid h-full w-full max-w-[86rem] items-center gap-4 px-5 pt-24 pb-8 sm:px-8 lg:grid-cols-[1.05fr_1fr] lg:gap-8 lg:pt-20 lg:pb-0">
+        <div className="mx-auto grid h-full w-full max-w-[86rem] content-center items-center gap-1 px-5 pt-20 pb-8 sm:gap-3 sm:px-8 lg:grid-cols-[1.05fr_1fr] lg:content-stretch lg:gap-8 lg:pt-20 lg:pb-0">
           {/* ── texto e CTAs ── */}
           <div className="order-2 lg:order-1">
             <h1 className="text-[clamp(2.5rem,8.5vw,6.25rem)] font-extrabold leading-[0.9] tracking-[-0.035em] text-white drop-shadow-[0_6px_26px_rgba(150,55,5,0.35)]">
@@ -27,13 +27,7 @@ export default function Hero() {
               Food House
             </h1>
 
-            <div className="my-5 flex max-w-xl items-center gap-4 lg:my-7" aria-hidden="true">
-              <span className="h-px flex-1 bg-white/50" />
-              <BurgerMark className="h-7 w-7 shrink-0 text-white" />
-              <span className="h-px flex-1 bg-white/50" />
-            </div>
-
-            <p className="max-w-xl text-[clamp(1rem,2.3vw,1.4rem)] leading-snug text-white/95">
+            <p className="mt-6 max-w-xl text-[clamp(1rem,2.3vw,1.4rem)] leading-snug text-white/95 lg:mt-8">
               O sabor que impressiona na{' '}
               <strong className="font-extrabold text-white">primeira mordida</strong>.
             </p>
@@ -46,7 +40,7 @@ export default function Hero() {
                 <span className="grid h-9 w-9 place-items-center rounded-full bg-flame text-white">
                   <CutleryIcon className="h-4.5 w-4.5" />
                 </span>
-                Coma aqui
+                Peça aqui
               </a>
 
               <a

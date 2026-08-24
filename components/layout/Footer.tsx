@@ -1,4 +1,5 @@
 import { business, whatsappUrl } from '@/lib/business';
+import { Logo } from '../ui/Logo';
 import { BurgerMark, WhatsAppIcon } from '../ui/Icons';
 
 const LINKS = [
@@ -15,7 +16,7 @@ export default function Footer() {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3">
-              <BurgerMark className="h-9 w-9 text-white" />
+              <Logo size={52} />
               <span className="text-lg font-extrabold text-white">{business.name}</span>
             </div>
             <p className="mt-3 max-w-sm text-muted">{business.slogan}</p>
@@ -32,7 +33,7 @@ export default function Footer() {
               <br />
               {business.address.district}
               <br />
-              {business.address.city} - {business.address.state}
+              {business.address.city} - {business.address.state}, {business.address.postalCode}
             </address>
             <a
               href={`tel:${business.phoneE164}`}

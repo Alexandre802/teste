@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { business } from '@/lib/business';
-import { BurgerMark } from '../ui/Icons';
+import { Logo } from '../ui/Logo';
 
 const NAV = [
   { href: '#inicio', label: 'Início' },
@@ -51,7 +51,7 @@ export default function Header() {
     >
       <div className="mx-auto flex w-full max-w-[86rem] items-center justify-between gap-6 px-5 sm:px-8">
         <a href="#inicio" className="flex shrink-0 items-center gap-3 text-white">
-          <BurgerMark className={`text-white transition-all ${scrolled ? 'h-7 w-7' : 'h-9 w-9'}`} />
+          <Logo size={scrolled ? 36 : 44} className="transition-all duration-300" />
           <span className={`font-extrabold tracking-tight transition-all ${scrolled ? 'text-base' : 'text-lg'}`}>
             {business.name}
           </span>

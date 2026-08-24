@@ -243,6 +243,23 @@ export function groupsByCategory(id: CategoryId): ProductGroup[] {
   return [...byName].map(([name, items]) => ({ name, items }));
 }
 
+/**
+ * Resumo para o card. O corte por CSS (`line-clamp`) parte no meio da palavra
+ * — "queijo, batat…" — e lê como texto faltando. Aqui o corte cai sempre num
+ * limite de palavra, e a reticência nunca duplica com a que já vem do
+ * cardápio de origem.
+ */
+export function resumo(texto: string, max = 68): string {
+  const limpo = texto.trim();
+  if (limpo.length <= max) return limpo;
+  const corte = limpo.slice(0, max);
+  const espaco = corte.lastIndexOf(' ');
+  const base = espaco > max * 0.5 ? corte.slice(0, espaco) : corte;
+  // conjunção solta no fim ("maionese e…") lê pior que a frase mais curta
+  const limpa = base.replace(/[\s,;.…]+$/, '').replace(/\s+(e|ou|com|de|da|do)$/i, '');
+  return `${limpa}…`;
+}
+
 export function formatPrice(value: number): string {
   return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }

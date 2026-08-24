@@ -99,14 +99,26 @@ export default function Location() {
           </Reveal>
 
           <Reveal delay={0.1}>
-            <div className="glass h-full min-h-[22rem] overflow-hidden rounded-[var(--radius-card)] p-1.5">
+            <div className="glass relative h-full min-h-[26rem] overflow-hidden rounded-[var(--radius-card)] p-1.5 lg:min-h-[32rem]">
+              {/* Embed público do Google Maps: não precisa de chave de API e o
+                  mapa é navegável — dá para arrastar, aproximar e abrir a rota. */}
               <iframe
                 src={mapsEmbedUrl}
-                title={`Mapa — ${business.name}, ${fullAddress}`}
+                title={`Mapa interativo — ${business.name}, ${fullAddress}`}
                 loading="lazy"
+                allowFullScreen
                 referrerPolicy="no-referrer-when-downgrade"
-                className="h-full min-h-[21rem] w-full rounded-[1.3rem]"
+                className="h-full min-h-[25rem] w-full rounded-[1.3rem] lg:min-h-[31rem]"
               />
+              <a
+                href={mapsDirectionsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="absolute bottom-5 left-1/2 inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-extrabold text-cocoa shadow-[0_12px_28px_-10px_rgba(90,32,5,0.8)] transition-transform hover:-translate-x-1/2 hover:-translate-y-0.5"
+              >
+                <PinIcon className="h-4 w-4" />
+                Abrir rota no Google Maps
+              </a>
             </div>
           </Reveal>
         </div>

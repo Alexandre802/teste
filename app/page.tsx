@@ -9,6 +9,7 @@ import About from '@/components/sections/About';
 import Reviews from '@/components/sections/Reviews';
 import Gallery from '@/components/sections/Gallery';
 import Promocoes from '@/components/sections/Promocoes';
+import Versiculo from '@/components/sections/Versiculo';
 import Location from '@/components/sections/Location';
 import BuscaLocal from '@/components/sections/BuscaLocal';
 import CartFab from '@/components/cart/CartFab';
@@ -36,6 +37,7 @@ export default function Home() {
         <Bebidas />
         <Featured />
         <About />
+        <Versiculo />
         <Gallery />
         <Promocoes />
         <Location />
