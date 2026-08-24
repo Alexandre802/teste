@@ -23,12 +23,12 @@ export function ProductImage({
   if (!product.image) {
     return (
       <div
-        className={`flex h-full w-full items-center justify-center bg-[linear-gradient(145deg,#2a1207,#140802)] ${className}`}
+        className={`flex h-full w-full items-center justify-center bg-white/12 ${className}`}
         aria-hidden="true"
       >
-        <div className="flex flex-col items-center gap-2 opacity-30">
-          <BurgerMark className="h-12 w-12 text-flame" />
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-flame">
+        <div className="flex flex-col items-center gap-1.5 opacity-70">
+          <BurgerMark className="h-8 w-8 text-white/80" />
+          <span className="text-[9px] font-extrabold uppercase tracking-[0.18em] text-white/70">
             Michel Food House
           </span>
         </div>

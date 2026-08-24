@@ -66,7 +66,7 @@ export function Sheet({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 h-full w-full cursor-default bg-ink/80 backdrop-blur-sm"
+            className="absolute inset-0 h-full w-full cursor-default bg-ember-deep/70 backdrop-blur-sm"
           />
           <motion.div
             ref={panelRef}
@@ -80,17 +80,17 @@ export function Sheet({
             transition={{ type: 'spring', stiffness: 320, damping: 34 }}
             className={
               centered
-                ? 'glass-strong absolute inset-x-0 bottom-0 flex max-h-[92dvh] flex-col rounded-t-[2rem] outline-none sm:inset-0 sm:m-auto sm:h-fit sm:max-w-2xl sm:rounded-[2rem]'
-                : 'glass-strong absolute inset-x-0 bottom-0 flex max-h-[92dvh] flex-col rounded-t-[2rem] outline-none sm:inset-y-0 sm:left-auto sm:right-0 sm:max-h-none sm:w-[27rem] sm:rounded-l-[2rem] sm:rounded-tr-none'
+                ? 'panel absolute inset-x-0 bottom-0 flex max-h-[92dvh] flex-col rounded-t-[2rem] outline-none sm:inset-0 sm:m-auto sm:h-fit sm:max-w-2xl sm:rounded-[2rem]'
+                : 'panel absolute inset-x-0 bottom-0 flex max-h-[92dvh] flex-col rounded-t-[2rem] outline-none sm:inset-y-0 sm:left-auto sm:right-0 sm:max-h-none sm:w-[27rem] sm:rounded-l-[2rem] sm:rounded-tr-none'
             }
           >
-            <header className="flex items-center justify-between gap-4 border-b border-flame/20 px-6 py-5">
-              <h2 className="text-lg font-extrabold text-cream">{title}</h2>
+            <header className="flex items-center justify-between gap-4 border-b border-white/25 px-6 py-5">
+              <h2 className="text-lg font-extrabold text-white">{title}</h2>
               <button
                 type="button"
                 onClick={onClose}
                 aria-label="Fechar"
-                className="rounded-full p-2 text-muted transition-colors hover:bg-flame/15 hover:text-gold"
+                className="rounded-full p-2 text-white/80 transition-colors hover:bg-white/20 hover:text-white"
               >
                 <CloseIcon className="h-5 w-5" />
               </button>
@@ -98,7 +98,7 @@ export function Sheet({
 
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-5">{children}</div>
 
-            {footer && <footer className="border-t border-flame/20 px-6 py-5">{footer}</footer>}
+            {footer && <footer className="border-t border-white/25 px-6 py-5">{footer}</footer>}
           </motion.div>
         </div>
       )}

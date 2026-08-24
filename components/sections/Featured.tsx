@@ -16,15 +16,15 @@ export default function Featured() {
     <section aria-labelledby="favoritos-titulo" className="py-20 sm:py-24">
       <div className="mx-auto w-full max-w-[86rem] px-5 sm:px-8">
         <Reveal>
-          <p className="text-xs font-extrabold uppercase tracking-[0.35em] text-flame-soft">
+          <p className="text-xs font-extrabold uppercase tracking-[0.35em] text-white/75">
             Destaques
           </p>
-          <h2 id="favoritos-titulo" className="mt-3 text-[clamp(2rem,5.5vw,3.5rem)] font-extrabold leading-none tracking-tight text-cream">
+          <h2 id="favoritos-titulo" className="mt-3 text-[clamp(2rem,5.5vw,3.5rem)] font-extrabold leading-none tracking-tight text-white">
             Os favoritos da casa
           </h2>
           <p className="mt-4 max-w-xl text-muted">
             Os pedidos que mais saem e os que mais aparecem nas avaliações — o{' '}
-            <strong className="font-bold text-cream">Bacon Cheddar</strong> é citado nominalmente
+            <strong className="font-bold text-white">Bacon Cheddar</strong> é citado nominalmente
             por quem avalia a casa no Google.
           </p>
         </Reveal>
@@ -40,26 +40,26 @@ export default function Featured() {
                   className="transition-transform duration-700 group-hover:scale-105"
                 />
               </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/65 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-ember-deep/95 via-ember-deep/55 to-transparent" />
 
               <div className="relative flex h-full flex-col justify-end p-7 sm:p-9">
-                <span className="w-fit rounded-full bg-gold px-3.5 py-1.5 text-[11px] font-extrabold uppercase tracking-wider text-ink">
+                <span className="w-fit rounded-full bg-white px-3.5 py-1.5 text-[11px] font-extrabold uppercase tracking-wider text-cocoa">
                   Mais pedido
                 </span>
-                <h3 className="mt-4 text-[clamp(1.8rem,4.5vw,3rem)] font-extrabold leading-none text-cream">
+                <h3 className="mt-4 text-[clamp(1.8rem,4.5vw,3rem)] font-extrabold leading-none text-white">
                   {hero.name}
                 </h3>
                 {hero.description && (
-                  <p className="mt-3 max-w-lg text-sm leading-relaxed text-cream/80">
+                  <p className="mt-3 max-w-lg text-sm leading-relaxed text-white/85">
                     {hero.description}
                   </p>
                 )}
                 <div className="mt-5 flex flex-wrap items-center gap-4">
-                  <span className="text-3xl font-extrabold text-gold">{formatPrice(hero.price)}</span>
+                  <span className="text-3xl font-extrabold text-white">{formatPrice(hero.price)}</span>
                   <button
                     type="button"
                     onClick={() => add(hero.id, 1)}
-                    className="inline-flex items-center gap-2 rounded-full bg-cream px-6 py-3 text-sm font-extrabold text-ink transition-transform hover:-translate-y-0.5"
+                    className="inline-flex items-center gap-2 rounded-full bg-cream px-6 py-3 text-sm font-extrabold text-cocoa transition-transform hover:-translate-y-0.5"
                   >
                     Adicionar <ArrowRight className="h-4 w-4" />
                   </button>
@@ -81,14 +81,14 @@ export default function Featured() {
                     />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="font-extrabold leading-tight text-cream">{product.name}</h3>
-                    <p className="mt-1 text-xl font-extrabold text-gold">
+                    <h3 className="font-extrabold leading-tight text-white">{product.name}</h3>
+                    <p className="mt-1 text-xl font-extrabold text-white">
                       {formatPrice(product.price)}
                     </p>
                     <button
                       type="button"
                       onClick={() => add(product.id, 1)}
-                      className="mt-1.5 text-xs font-bold text-flame-soft underline underline-offset-2 hover:text-gold"
+                      className="mt-1.5 text-xs font-bold text-white/75 underline underline-offset-2 hover:text-white"
                     >
                       adicionar
                     </button>

@@ -8,10 +8,10 @@ const base =
 
 const variants: Record<Variant, string> = {
   primary:
-    'bg-cream text-ink shadow-[0_10px_30px_-10px_rgba(255,106,0,0.8)] hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_16px_38px_-10px_rgba(255,106,0,0.95)]',
+    'bg-white text-cocoa shadow-[0_12px_30px_-12px_rgba(110,40,5,0.7)] hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-12px_rgba(110,40,5,0.85)]',
   outline:
-    'border border-cream/35 text-cream hover:-translate-y-0.5 hover:border-gold hover:text-gold',
-  ghost: 'text-cream/85 hover:text-gold',
+    'border border-white/55 text-white hover:-translate-y-0.5 hover:bg-white hover:text-cocoa',
+  ghost: 'text-white/85 hover:text-white',
 };
 
 const sizes = {

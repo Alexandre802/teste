@@ -43,17 +43,17 @@ export default function ClienteDeVolta() {
     <section aria-label="Seus pedidos" className="py-14">
       <div className="mx-auto w-full max-w-[86rem] px-5 sm:px-8">
         <Reveal className="glass rounded-[var(--radius-card)] p-6 sm:p-9">
-          <p className="text-xs font-extrabold uppercase tracking-[0.3em] text-flame-soft">
+          <p className="text-xs font-extrabold uppercase tracking-[0.3em] text-white/75">
             Que bom te ver de novo
           </p>
-          <h2 className="mt-2 text-[clamp(1.6rem,4vw,2.5rem)] font-extrabold leading-tight text-cream">
+          <h2 className="mt-2 text-[clamp(1.6rem,4vw,2.5rem)] font-extrabold leading-tight text-white">
             Oi, {firstName}.
           </h2>
 
           <div className="mt-7 grid gap-6 lg:grid-cols-[1.1fr_1fr]">
             {/* último pedido */}
-            <div className="rounded-3xl bg-ink-2/70 p-5 ring-1 ring-inset ring-flame/20">
-              <h3 className="text-sm font-extrabold uppercase tracking-wider text-gold">
+            <div className="rounded-3xl bg-white/12 p-5 ring-1 ring-inset ring-white/30">
+              <h3 className="text-sm font-extrabold uppercase tracking-wider text-white">
                 Seu último pedido
               </h3>
               <p className="mt-1 text-xs text-muted">
@@ -64,7 +64,7 @@ export default function ClienteDeVolta() {
                 · {last.mode === 'entrega' ? 'Entrega' : 'Retirada'}
               </p>
 
-              <ul className="mt-4 flex flex-col gap-1.5 text-sm text-cream/90">
+              <ul className="mt-4 flex flex-col gap-1.5 text-sm text-white/90">
                 {last.lines.map((line) => {
                   const p = productsById.get(line.productId);
                   return p ? (
@@ -78,7 +78,7 @@ export default function ClienteDeVolta() {
                 })}
               </ul>
 
-              <p className="mt-3 border-t border-flame/15 pt-3 text-right text-lg font-extrabold text-gold">
+              <p className="mt-3 border-t border-white/20 pt-3 text-right text-lg font-extrabold text-white">
                 {formatPrice(last.total)}
               </p>
 
@@ -89,7 +89,7 @@ export default function ClienteDeVolta() {
 
             {/* mais pedidos + sugestão */}
             <div>
-              <h3 className="text-sm font-extrabold uppercase tracking-wider text-gold">
+              <h3 className="text-sm font-extrabold uppercase tracking-wider text-white">
                 O que você mais pede
               </h3>
               <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
@@ -100,31 +100,31 @@ export default function ClienteDeVolta() {
                       onClick={() => add(p.id, 1)}
                       className="group w-full text-left"
                     >
-                      <span className="relative block aspect-square overflow-hidden rounded-2xl ring-1 ring-inset ring-flame/20">
+                      <span className="relative block aspect-square overflow-hidden rounded-2xl ring-1 ring-inset ring-white/30">
                         <ProductImage product={p} sizes="120px" className="transition-transform duration-500 group-hover:scale-110" />
                       </span>
-                      <span className="mt-2 block text-xs font-bold leading-tight text-cream">
+                      <span className="mt-2 block text-xs font-bold leading-tight text-white">
                         {p.name}
                       </span>
-                      <span className="block text-xs text-gold">{formatPrice(p.price)}</span>
+                      <span className="block text-xs text-white">{formatPrice(p.price)}</span>
                     </button>
                   </li>
                 ))}
               </ul>
 
               {sugestao && (
-                <div className="mt-5 rounded-2xl border border-gold/30 bg-gold/8 p-4">
-                  <p className="text-xs font-extrabold uppercase tracking-wider text-gold">
+                <div className="mt-5 rounded-2xl border border-white/40 bg-white/12 p-4">
+                  <p className="text-xs font-extrabold uppercase tracking-wider text-white">
                     Já que você gosta dessa linha
                   </p>
-                  <p className="mt-1.5 text-sm text-cream">
+                  <p className="mt-1.5 text-sm text-white">
                     Experimenta o <strong className="font-extrabold">{sugestao.name}</strong> —{' '}
                     {formatPrice(sugestao.price)}.
                   </p>
                   <button
                     type="button"
                     onClick={() => add(sugestao.id, 1)}
-                    className="mt-2 text-xs font-bold text-gold underline underline-offset-2"
+                    className="mt-2 text-xs font-bold text-white underline underline-offset-2"
                   >
                     adicionar à sacola
                   </button>

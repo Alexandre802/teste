@@ -30,9 +30,9 @@ export default function CartFab() {
             <button
               type="button"
               onClick={() => setOpen(true)}
-              className="glass-strong flex w-full items-center justify-center gap-3 rounded-full px-7 py-4 font-extrabold text-cream shadow-[0_18px_50px_-12px_rgba(0,0,0,0.9),0_0_40px_-10px_rgba(255,106,0,0.7)] transition-transform hover:-translate-y-0.5 sm:w-auto"
+              className="flex w-full items-center justify-center gap-3 rounded-full bg-white px-7 py-4 font-extrabold text-cocoa shadow-[0_18px_46px_-12px_rgba(110,40,5,0.75)] transition-transform hover:-translate-y-0.5 sm:w-auto"
             >
-              <BagIcon className="h-5 w-5 text-gold" />
+              <BagIcon className="h-5 w-5 text-flame" />
               {cartSummary(lines)}
             </button>
           </motion.div>

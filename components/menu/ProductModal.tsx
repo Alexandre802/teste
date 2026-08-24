@@ -22,43 +22,43 @@ function ModalBody({ product, onClose }: { product: Product; onClose: () => void
         <ProductImage product={product} sizes="(max-width: 640px) 100vw, 42rem" priority />
       </div>
 
-      <p className="text-3xl font-extrabold text-gold">{formatPrice(product.price)}</p>
+      <p className="text-3xl font-extrabold text-white">{formatPrice(product.price)}</p>
 
       {product.description && (
         <p className="mt-3 leading-relaxed text-muted">{product.description}</p>
       )}
 
       {!product.available && (
-        <p className="mt-4 rounded-2xl bg-ember-deep/40 px-4 py-3 text-sm font-bold text-gold">
+        <p className="mt-4 rounded-2xl bg-ember-deep/45 px-4 py-3 text-sm font-bold text-white">
           Este item está esgotado no momento.
         </p>
       )}
 
       <div className="mt-6">
-        <span id="qty-label" className="mb-2 block text-sm font-bold text-cream">
+        <span id="qty-label" className="mb-2 block text-sm font-bold text-white">
           Quantidade
         </span>
         <div
           role="group"
           aria-labelledby="qty-label"
-          className="flex w-fit items-center gap-1 rounded-full bg-ink-3 p-1.5 ring-1 ring-inset ring-flame/25"
+          className="flex w-fit items-center gap-1 rounded-full bg-white/15 p-1.5 ring-1 ring-inset ring-white/35"
         >
           <button
             type="button"
             onClick={() => setQty((q) => Math.max(1, q - 1))}
             aria-label="Diminuir quantidade"
-            className="grid h-10 w-10 place-items-center rounded-full text-xl font-bold text-gold transition-colors hover:bg-flame/20"
+            className="grid h-10 w-10 place-items-center rounded-full text-xl font-bold text-white transition-colors hover:bg-white/25"
           >
             −
           </button>
-          <span aria-live="polite" className="w-10 text-center text-lg font-extrabold text-cream">
+          <span aria-live="polite" className="w-10 text-center text-lg font-extrabold text-white">
             {qty}
           </span>
           <button
             type="button"
             onClick={() => setQty((q) => Math.min(30, q + 1))}
             aria-label="Aumentar quantidade"
-            className="grid h-10 w-10 place-items-center rounded-full text-xl font-bold text-gold transition-colors hover:bg-flame/20"
+            className="grid h-10 w-10 place-items-center rounded-full text-xl font-bold text-white transition-colors hover:bg-white/25"
           >
             +
           </button>
@@ -66,7 +66,7 @@ function ModalBody({ product, onClose }: { product: Product; onClose: () => void
       </div>
 
       <div className="mt-5">
-        <label htmlFor="obs" className="mb-2 block text-sm font-bold text-cream">
+        <label htmlFor="obs" className="mb-2 block text-sm font-bold text-white">
           Observações <span className="font-normal text-muted">(opcional)</span>
         </label>
         <textarea
@@ -76,7 +76,7 @@ function ModalBody({ product, onClose }: { product: Product; onClose: () => void
           rows={3}
           maxLength={280}
           placeholder="Ex.: sem cebola, capricha no bacon, ponto da carne…"
-          className="w-full resize-none rounded-2xl bg-ink-3 px-4 py-3 text-sm text-cream placeholder:text-muted/55 ring-1 ring-inset ring-flame/25 focus:ring-2 focus:ring-gold"
+          className="w-full resize-none rounded-2xl bg-white/15 px-4 py-3 text-sm text-white placeholder:text-white/60 ring-1 ring-inset ring-white/35 focus:ring-2 focus:ring-white"
         />
       </div>
 

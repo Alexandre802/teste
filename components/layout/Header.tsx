@@ -46,12 +46,12 @@ export default function Header() {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-        scrolled ? 'glass border-b border-flame/20 py-2.5' : 'border-b border-transparent py-5'
+        scrolled ? 'border-b border-white/25 bg-ember/70 py-2.5 backdrop-blur-xl' : 'border-b border-transparent py-5'
       }`}
     >
       <div className="mx-auto flex w-full max-w-[86rem] items-center justify-between gap-6 px-5 sm:px-8">
-        <a href="#inicio" className="flex shrink-0 items-center gap-3 text-cream">
-          <BurgerMark className={`text-gold transition-all ${scrolled ? 'h-7 w-7' : 'h-9 w-9'}`} />
+        <a href="#inicio" className="flex shrink-0 items-center gap-3 text-white">
+          <BurgerMark className={`text-white transition-all ${scrolled ? 'h-7 w-7' : 'h-9 w-9'}`} />
           <span className={`font-extrabold tracking-tight transition-all ${scrolled ? 'text-base' : 'text-lg'}`}>
             {business.name}
           </span>
@@ -63,11 +63,11 @@ export default function Header() {
               key={item.href}
               href={item.href}
               aria-current={active === item.href ? 'page' : undefined}
-              className="relative py-1 text-sm font-semibold text-cream/80 transition-colors hover:text-gold"
+              className="relative py-1 text-sm font-semibold text-white/85 transition-colors hover:text-white"
             >
               {item.label}
               <span
-                className={`absolute -bottom-0.5 left-0 h-0.5 rounded-full bg-gold transition-all duration-300 ${
+                className={`absolute -bottom-0.5 left-0 h-0.5 rounded-full bg-white transition-all duration-300 ${
                   active === item.href ? 'w-full opacity-100' : 'w-0 opacity-0'
                 }`}
               />
@@ -78,7 +78,7 @@ export default function Header() {
         <div className="flex items-center gap-2">
           <a
             href="#cardapio"
-            className="hidden rounded-full border border-cream/40 px-5 py-2.5 text-sm font-bold text-cream transition-all hover:-translate-y-0.5 hover:border-gold hover:text-gold sm:inline-flex"
+            className="hidden rounded-full border border-white/55 px-5 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:border-white hover:text-white sm:inline-flex"
           >
             Peça agora
           </a>
@@ -89,7 +89,7 @@ export default function Header() {
             aria-expanded={menuOpen}
             aria-controls="menu-mobile"
             aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
-            className="rounded-full p-2.5 text-cream lg:hidden"
+            className="rounded-full p-2.5 text-white lg:hidden"
           >
             <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               {menuOpen ? <path d="M18 6 6 18M6 6l12 12" /> : <path d="M3 7h18M3 12h18M3 17h18" />}
@@ -99,14 +99,14 @@ export default function Header() {
       </div>
 
       {menuOpen && (
-        <nav id="menu-mobile" aria-label="Navegação" className="glass mt-2.5 lg:hidden">
+        <nav id="menu-mobile" aria-label="Navegação" className="mt-2.5 border-y border-white/25 bg-ember/85 backdrop-blur-xl lg:hidden">
           <ul className="mx-auto flex w-full max-w-[86rem] flex-col px-5 py-2 sm:px-8">
             {NAV.map((item) => (
               <li key={item.href}>
                 <a
                   href={item.href}
                   onClick={() => setMenuOpen(false)}
-                  className="block border-b border-flame/10 py-3.5 font-semibold text-cream last:border-0"
+                  className="block border-b border-white/18 py-3.5 font-semibold text-white last:border-0"
                 >
                   {item.label}
                 </a>

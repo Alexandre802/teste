@@ -62,7 +62,7 @@ export default function LoginSheet({
 
       <form onSubmit={submit} className="mt-6 flex flex-col gap-4">
         <div>
-          <label htmlFor="nome" className="mb-2 block text-sm font-bold text-cream">
+          <label htmlFor="nome" className="mb-2 block text-sm font-bold text-white">
             Seu nome
           </label>
           <input
@@ -72,12 +72,12 @@ export default function LoginSheet({
             autoComplete="name"
             required
             placeholder="Como podemos te chamar?"
-            className="w-full rounded-2xl bg-ink-3 px-4 py-3.5 text-cream placeholder:text-muted/55 ring-1 ring-inset ring-flame/25 focus:ring-2 focus:ring-gold"
+            className="w-full rounded-2xl bg-white/15 px-4 py-3.5 text-white placeholder:text-white/60 ring-1 ring-inset ring-white/35 focus:ring-2 focus:ring-white"
           />
         </div>
 
         <div>
-          <label htmlFor="tel" className="mb-2 block text-sm font-bold text-cream">
+          <label htmlFor="tel" className="mb-2 block text-sm font-bold text-white">
             WhatsApp
           </label>
           <input
@@ -88,12 +88,12 @@ export default function LoginSheet({
             autoComplete="tel"
             required
             placeholder="(12) 90000-0000"
-            className="w-full rounded-2xl bg-ink-3 px-4 py-3.5 text-cream placeholder:text-muted/55 ring-1 ring-inset ring-flame/25 focus:ring-2 focus:ring-gold"
+            className="w-full rounded-2xl bg-white/15 px-4 py-3.5 text-white placeholder:text-white/60 ring-1 ring-inset ring-white/35 focus:ring-2 focus:ring-white"
           />
         </div>
 
         <div>
-          <label htmlFor="end" className="mb-2 block text-sm font-bold text-cream">
+          <label htmlFor="end" className="mb-2 block text-sm font-bold text-white">
             Endereço <span className="font-normal text-muted">(para entrega)</span>
           </label>
           <input
@@ -102,7 +102,7 @@ export default function LoginSheet({
             onChange={(e) => setAddress(e.target.value)}
             autoComplete="street-address"
             placeholder="Rua, número, bairro e complemento"
-            className="w-full rounded-2xl bg-ink-3 px-4 py-3.5 text-cream placeholder:text-muted/55 ring-1 ring-inset ring-flame/25 focus:ring-2 focus:ring-gold"
+            className="w-full rounded-2xl bg-white/15 px-4 py-3.5 text-white placeholder:text-white/60 ring-1 ring-inset ring-white/35 focus:ring-2 focus:ring-white"
           />
         </div>
 
@@ -114,11 +114,11 @@ export default function LoginSheet({
       {FACEBOOK_ENABLED && (
         <>
           <div className="my-5 flex items-center gap-3 text-xs text-muted">
-            <span className="h-px flex-1 bg-flame/20" /> ou <span className="h-px flex-1 bg-flame/20" />
+            <span className="h-px flex-1 bg-white/25" /> ou <span className="h-px flex-1 bg-white/25" />
           </div>
           <a
             href="/api/auth/facebook"
-            className="flex w-full items-center justify-center gap-3 rounded-full border border-cream/30 px-6 py-3.5 font-bold text-cream transition-colors hover:border-gold hover:text-gold"
+            className="flex w-full items-center justify-center gap-3 rounded-full border border-cream/30 px-6 py-3.5 font-bold text-white transition-colors hover:border-white hover:text-white"
           >
             Continuar com Facebook
           </a>

@@ -25,15 +25,15 @@ export default function CategoryTabs({
             type="button"
             aria-selected={selected}
             onClick={() => onChange(category.id)}
-            className={`relative shrink-0 snap-start rounded-full px-6 py-3 text-sm font-bold transition-colors duration-200 ${
-              selected ? 'text-ink' : 'text-cream/70 hover:text-gold'
+            className={`relative shrink-0 snap-start rounded-full px-5 py-2.5 text-sm font-bold transition-colors duration-200 ${
+              selected ? 'text-ember' : 'text-white/85 hover:text-white'
             }`}
           >
             {selected && (
               <motion.span
                 layoutId="tab-pill"
                 transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-                className="absolute inset-0 -z-10 rounded-full bg-gradient-to-r from-gold to-flame shadow-[0_8px_24px_-8px_rgba(255,106,0,0.9)]"
+                className="absolute inset-0 -z-10 rounded-full bg-white shadow-[0_8px_22px_-8px_rgba(110,40,5,0.7)]"
               />
             )}
             {category.label}

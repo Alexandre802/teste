@@ -20,10 +20,10 @@ export default function Promocoes() {
     <section id="promocoes" className="scroll-mt-24 py-20 sm:py-24">
       <div className="mx-auto w-full max-w-[86rem] px-5 sm:px-8">
         <Reveal>
-          <p className="text-xs font-extrabold uppercase tracking-[0.35em] text-flame-soft">
+          <p className="text-xs font-extrabold uppercase tracking-[0.35em] text-white/75">
             Promoções
           </p>
-          <h2 className="mt-3 text-[clamp(2rem,5.5vw,3.5rem)] font-extrabold leading-none tracking-tight text-cream">
+          <h2 className="mt-3 text-[clamp(2rem,5.5vw,3.5rem)] font-extrabold leading-none tracking-tight text-white">
             O que está rolando
           </h2>
         </Reveal>
@@ -31,7 +31,7 @@ export default function Promocoes() {
         {promocoes.length === 0 ? (
           <Reveal delay={0.08}>
             <div className="glass mt-8 flex flex-col items-start gap-5 rounded-[var(--radius-card)] p-8 sm:flex-row sm:items-center sm:justify-between sm:p-10">
-              <p className="max-w-xl text-lg leading-relaxed text-cream/85">
+              <p className="max-w-xl text-lg leading-relaxed text-white/90">
                 Fique de olho nas novidades da {business.name}. Quando tiver promoção, ela aparece
                 aqui primeiro.
               </p>
@@ -41,7 +41,7 @@ export default function Promocoes() {
                 )}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex shrink-0 items-center gap-2.5 rounded-full border border-cream/40 px-6 py-3.5 font-extrabold text-cream transition-all hover:-translate-y-0.5 hover:border-gold hover:text-gold"
+                className="inline-flex shrink-0 items-center gap-2.5 rounded-full border border-white/55 px-6 py-3.5 font-extrabold text-white transition-all hover:-translate-y-0.5 hover:border-white hover:text-white"
               >
                 <WhatsAppIcon className="h-5 w-5" />
                 Me avisa no WhatsApp
@@ -53,10 +53,10 @@ export default function Promocoes() {
             {promocoes.map((promo, i) => (
               <Reveal key={promo.title} delay={0.06 * i} className="h-full">
                 <li className="glass flex h-full flex-col rounded-[var(--radius-card)] p-7">
-                  <h3 className="text-xl font-extrabold text-cream">{promo.title}</h3>
+                  <h3 className="text-xl font-extrabold text-white">{promo.title}</h3>
                   <p className="mt-2 flex-1 leading-relaxed text-muted">{promo.detail}</p>
                   {promo.validity && (
-                    <p className="mt-4 text-xs font-bold uppercase tracking-wider text-gold">
+                    <p className="mt-4 text-xs font-bold uppercase tracking-wider text-white">
                       {promo.validity}
                     </p>
                   )}

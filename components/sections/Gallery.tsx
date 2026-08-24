@@ -15,10 +15,10 @@ export default function Gallery() {
     <section aria-labelledby="galeria-titulo" className="py-20 sm:py-24">
       <div className="mx-auto w-full max-w-[86rem] px-5 sm:px-8">
         <Reveal>
-          <p className="text-xs font-extrabold uppercase tracking-[0.35em] text-flame-soft">
+          <p className="text-xs font-extrabold uppercase tracking-[0.35em] text-white/75">
             Galeria
           </p>
-          <h2 id="galeria-titulo" className="mt-3 text-[clamp(2rem,5.5vw,3.5rem)] font-extrabold leading-none tracking-tight text-cream">
+          <h2 id="galeria-titulo" className="mt-3 text-[clamp(2rem,5.5vw,3.5rem)] font-extrabold leading-none tracking-tight text-white">
             Direto da chapa
           </h2>
         </Reveal>
@@ -31,7 +31,7 @@ export default function Gallery() {
                   type="button"
                   onClick={() => setOpen(i)}
                   aria-label={`Ampliar foto: ${photo.alt}`}
-                  className="group relative block h-full w-full overflow-hidden rounded-3xl ring-1 ring-inset ring-flame/20"
+                  className="group relative block h-full w-full overflow-hidden rounded-3xl ring-1 ring-inset ring-white/30"
                 >
                   <span className={`block ${i === 0 ? 'aspect-square' : 'aspect-[4/5]'}`}>
                     <Image
@@ -42,7 +42,7 @@ export default function Gallery() {
                       className="object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                   </span>
-                  <span className="absolute inset-0 bg-ink/25 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  <span className="absolute inset-0 bg-ember/25 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                 </button>
               </li>
             </Reveal>
@@ -56,7 +56,7 @@ export default function Gallery() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[80] grid place-items-center bg-ink/95 p-5"
+            className="fixed inset-0 z-[80] grid place-items-center bg-ember/95 p-5"
             role="dialog"
             aria-modal="true"
             aria-label={galleryPhotos[open].alt}
@@ -66,7 +66,7 @@ export default function Gallery() {
               type="button"
               onClick={() => setOpen(null)}
               aria-label="Fechar"
-              className="absolute right-5 top-5 rounded-full bg-ink-3 p-3 text-cream"
+              className="absolute right-5 top-5 rounded-full bg-white/15 p-3 text-white"
             >
               <CloseIcon className="h-5 w-5" />
             </button>
