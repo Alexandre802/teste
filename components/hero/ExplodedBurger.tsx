@@ -11,27 +11,16 @@ import {
   useTransform,
   type MotionValue,
 } from 'framer-motion';
-import { BURGER_LAYERS, SOURCE, type BurgerLayer } from './BurgerLayers';
-
-/**
- * Ao fechar, todas as camadas sobem, e o lanche montado passa a ocupar só a
- * parte de cima da caixa — visualmente ele "sobe" e desalinha do título. Este
- * é o deslocamento que recentraliza o conjunto: metade do vazio que sobra
- * embaixo quando fechado, zerando conforme abre.
- */
-const ULTIMA = BURGER_LAYERS[BURGER_LAYERS.length - 1];
-const ALTURA_MONTADO = ULTIMA.top + ULTIMA.height + ULTIMA.shift;
-const CENTRALIZA = (SOURCE.h - ALTURA_MONTADO) / 2;
+import { BURGER_LAYERS, OPEN_SCALE, SOURCE, type BurgerLayer } from './BurgerLayers';
 
 /**
  * O lanche do hero se abre conforme a página rola.
  *
- * Em scroll = 0 as camadas estão encaixadas e o lanche parece montado; em
- * scroll = 1 cada uma voltou à posição exata da fotografia de referência.
- *
- * O progresso vem da geometria da seção do hero, e não de `useScroll` com
- * `target`: quando este componente monta, a ref do pai ainda está vazia e o
- * framer acabaria medindo a página inteira. Só `transform` é animado.
+ * Em scroll 0 as faixas se encaixam e a imagem é exatamente a fotografia
+ * original; em scroll 1 cada ingrediente está separado. O progresso vem da
+ * geometria da seção do hero, e não de `useScroll` com `target`: quando este
+ * componente monta, a ref do pai ainda está vazia e o framer acabaria medindo
+ * a página inteira. Só `transform` é animado.
  */
 
 interface Props {
@@ -51,11 +40,11 @@ function Layer({
   showLabel: boolean;
   priority: boolean;
 }) {
-  // shift é dado em pixels da foto original: converte para a altura atual
+  // spread está em pixels da foto: converte para a altura atual da caixa
   const y = useTransform([progress, boxHeight], ([p, h]: number[]) =>
-    (layer.shift * (h / SOURCE.h)) * (1 - p),
+    layer.spread * (h / SOURCE.h) * p,
   );
-  const labelOpacity = useTransform(progress, [0.35, 0.65], [0, 1]);
+  const labelOpacity = useTransform(progress, [0.45, 0.75], [0, 1]);
 
   return (
     <motion.div
@@ -66,19 +55,23 @@ function Layer({
       }}
       className="absolute inset-x-0 will-change-transform"
     >
+      {/* `unoptimized`: o otimizador reamostra cada faixa por conta própria e
+          devolve proporções que não batem com o recorte — as camadas chegam
+          esticadas e a foto deixa de se recompor. Servidas como estão, as
+          faixas se encaixam exatamente. */}
       <Image
         src={layer.src}
         alt=""
         width={SOURCE.w}
         height={layer.height}
         priority={priority}
-        sizes="(max-width: 640px) 78vw, (max-width: 1024px) 52vw, 40vw"
-        className="h-full w-full object-contain"
+        unoptimized
+        className="h-full w-full object-fill"
       />
       {showLabel && (
         <motion.span
           style={{ opacity: labelOpacity }}
-          className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 rounded-full bg-white/90 px-3 py-1 text-[11px] font-extrabold tracking-wide text-ember shadow-lg"
+          className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 rounded-full bg-white/95 px-3 py-1 text-[11px] font-extrabold tracking-wide text-ember shadow-lg"
         >
           {layer.alt}
         </motion.span>
@@ -122,16 +115,14 @@ export default function ExplodedBurger({ targetRef }: Props) {
   const still = useMotionValue(0);
   const andamento = reduce ? still : progress;
 
-  // recentraliza o lanche montado dentro da caixa
-  const centro = useTransform([andamento, boxHeight], ([p, h]: number[]) =>
-    CENTRALIZA * (h / SOURCE.h) * (1 - p),
-  );
+  // aberto, o conjunto fica mais alto que a foto: encolhe para continuar cabendo
+  const scale = useTransform(andamento, [0, 1], [1, OPEN_SCALE]);
 
   return (
     <motion.div
       ref={boxRef}
-      style={{ aspectRatio: `${SOURCE.w} / ${SOURCE.h}`, y: centro }}
-      className="relative mx-auto w-full max-w-[13.5rem] sm:max-w-[20rem] lg:max-w-[31rem]"
+      style={{ aspectRatio: `${SOURCE.w} / ${SOURCE.h}`, scale }}
+      className="relative mx-auto w-full max-w-[17rem] sm:max-w-[23rem] lg:max-w-[34rem]"
       role="img"
       aria-label="Lanche da Michel Food House que se separa em pão, tomate, alface, queijo e carne conforme a página rola"
     >
@@ -143,7 +134,7 @@ export default function ExplodedBurger({ targetRef }: Props) {
           progress={andamento}
           boxHeight={boxHeight}
           showLabel={wide && !reduce}
-          priority={i < 3}
+          priority={i < 4}
         />
       ))}
     </motion.div>

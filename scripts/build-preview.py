@@ -39,21 +39,20 @@ def carregar_dados() -> dict:
 def camadas_lanche() -> list[dict]:
     """As 8 fatias da foto de referência, já como data URI."""
     META = [
-        ("1-pao-superior", "Pão superior", 0, 186, 0),
-        ("2-tomate", "Tomate", 186, 156, -62),
-        ("3-alface", "Alface", 342, 134, -168),
-        ("4-queijo-cima", "Queijo", 476, 144, -252),
-        ("5-carne-cima", "Carne", 620, 150, -336),
-        ("6-queijo-baixo", "Queijo", 770, 114, -402),
-        ("7-carne-baixo", "Carne", 884, 164, -474),
-        ("8-pao-inferior", "Pão inferior", 1048, 136, -556),
+        ("1-pao-superior", "Pão superior", 0, 442, -225),
+        ("2-tomate", "Tomate", 440, 122, -150),
+        ("3-alface-cima", "Alface", 560, 82, -75),
+        ("4-carne-cima", "Carne e queijo", 640, 107, 0),
+        ("5-alface-baixo", "Alface", 745, 52, 75),
+        ("6-carne-baixo", "Carne e queijo", 795, 87, 150),
+        ("7-pao-inferior", "Pão inferior", 880, 337, 225),
     ]
     out = []
-    for slug, alt, top, h, shift in META:
+    for slug, alt, top, h, spread in META:
         b = (ROOT / "public" / "lanche" / f"{slug}.webp").read_bytes()
         out.append({
             "src": "data:image/webp;base64," + base64.b64encode(b).decode(),
-            "alt": alt, "top": top, "h": h, "shift": shift,
+            "alt": alt, "top": top, "h": h, "spread": spread,
         })
     return out
 
@@ -77,9 +76,7 @@ LOGO = "data:image/png;base64," + base64.b64encode(
     (ROOT / "public" / "marca" / "logo-512.png").read_bytes()
 ).decode()
 B = d["business"]
-SRC_W, SRC_H = 941, 1204
-ULTIMA = LANCHE[-1]
-CENTRALIZA = (SRC_H - (ULTIMA["top"] + ULTIMA["h"] + ULTIMA["shift"])) / 2
+SRC_W, SRC_H = 1292, 1217
 
 DATA = json.dumps({
     "products": d["products"],
@@ -89,13 +86,13 @@ DATA = json.dumps({
 }, ensure_ascii=False)
 
 BURGER = "".join(
-    f'<img class="layer" src="{c["src"]}" alt="" data-shift="{c["shift"]}" '
+    f'<img class="layer" src="{c["src"]}" alt="" data-spread="{c["spread"]}" '
     f'style="top:{c["top"]/SRC_H*100:.4f}%;height:{c["h"]/SRC_H*100:.4f}%">'
     for c in LANCHE
 )
 
 labels_html = "".join(
-    f'<span class="ing" data-shift="{c["shift"]}" '
+    f'<span class="ing" data-spread="{c["spread"]}" '
     f'style="top:{(c["top"]+c["h"]/2)/SRC_H*100:.4f}%">{c["alt"]}</span>'
     for c in LANCHE
 )
@@ -182,13 +179,13 @@ nav.main a:hover{{color:#fff}}
 .heroFade{{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 70%,rgb(208 69 10/.35) 100%)}}
 .heroGrid{{position:relative;height:100%;display:grid;align-items:center;gap:1rem;padding-top:6rem;padding-bottom:2rem}}
 .heroTxt{{order:2}} .heroImg{{order:1;display:flex;align-items:center;justify-content:center;min-height:0}}
-@media(min-width:1024px){{.heroTxt{{order:1}} .heroImg{{order:2}}}}
+@media(min-width:1024px){{.heroTxt{{order:1}} .heroImg{{order:2}} .slogan{{margin-top:2rem}}}}
 @media(min-width:1024px){{.heroGrid{{grid-template-columns:1.05fr 1fr;padding-top:5rem;padding-bottom:0}}}}
 h1{{font-size:clamp(2.6rem,9vw,6.5rem);font-weight:800;line-height:.9;letter-spacing:-.035em;color:#fff;text-shadow:0 4px 24px rgb(120 40 0/.45)}}
 .rule{{display:flex;align-items:center;gap:1rem;max-width:36rem;margin-block:1.25rem}}
 .rule span{{flex:1;height:1px;background:rgb(255 255 255/.45)}}
 .rule svg{{width:1.75rem;height:1.75rem;color:#fff;flex:none}}
-.slogan{{max-width:36rem;font-size:clamp(1rem,2.3vw,1.4rem);line-height:1.3;color:rgb(255 255 255/.95)}}
+.slogan{{margin-top:1.5rem;max-width:36rem;font-size:clamp(1rem,2.3vw,1.4rem);line-height:1.3;color:rgb(255 255 255/.95)}}
 .ctas{{display:flex;flex-direction:column;gap:.75rem;margin-top:1.75rem}}
 @media(min-width:640px){{.ctas{{flex-direction:row;flex-wrap:wrap}}}}
 .cta{{display:inline-flex;align-items:center;justify-content:center;gap:.75rem;border-radius:999px;padding:1rem 1.75rem;font-weight:800;font-size:1rem;transition:transform .2s}}
@@ -201,11 +198,11 @@ h1{{font-size:clamp(2.6rem,9vw,6.5rem);font-weight:800;line-height:.9;letter-spa
 .cta svg{{width:1.5rem;height:1.5rem}}
 .meta{{display:flex;flex-wrap:wrap;gap:.4rem .75rem;margin-top:1.5rem;font-size:.875rem;color:rgb(255 255 255/.85)}}
 .meta b{{color:#fff;font-weight:800}}
-.burgerBox{{position:relative;width:100%;max-width:13.5rem;margin-inline:auto;aspect-ratio:941/1204}}
-@media(min-width:640px){{.burgerBox{{max-width:20rem}}}}
-@media(min-width:1024px){{.burgerBox{{max-width:32rem}}}}
+.burgerBox{{position:relative;width:100%;max-width:17rem;margin-inline:auto;aspect-ratio:1292/1217;transform-origin:center}}
+@media(min-width:640px){{.burgerBox{{max-width:23rem}}}}
+@media(min-width:1024px){{.burgerBox{{max-width:34rem}}}}
 
-.layer{{position:absolute;left:0;width:100%;object-fit:contain;will-change:transform}}
+.layer{{position:absolute;left:0;width:100%;height:100%;object-fit:fill;will-change:transform}}
 .ing{{position:absolute;right:0;transform:translateY(-50%);background:rgb(255 255 255/.92);border-radius:999px;padding:.2rem .6rem;font-size:.68rem;font-weight:800;color:var(--ember);opacity:0;pointer-events:none;white-space:nowrap;box-shadow:0 6px 16px -6px rgb(110 40 5/.6)}}
 @media(max-width:767px){{.ing{{display:none}}}}
 .scrollCue{{position:absolute;inset:auto 0 1.25rem;margin-inline:auto;width:fit-content;display:none;flex-direction:column;align-items:center;gap:.4rem;color:rgb(255 255 255/.7)}}
@@ -585,9 +582,7 @@ document.getElementById('ano').textContent = new Date().getFullYear();
   const box  = document.getElementById('burger');
   const parts = [...box.querySelectorAll('.layer,.ing')];
   const SRC_H = {SRC_H};
-  /* fechado, as camadas sobem e o lanche ocupa só a parte de cima da caixa —
-     este deslocamento recentraliza o conjunto e zera conforme abre */
-  const CENTRALIZA = {CENTRALIZA};
+  const ESC_ABERTO = 0.74;   // aberto o conjunto cresce; encolhe para caber
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   let start=0, span=1, h=1, ticking=false;
   const measure = () => {{
@@ -598,13 +593,13 @@ document.getElementById('ano').textContent = new Date().getFullYear();
   }};
   const paint = () => {{
     const t = Math.min(1, Math.max(0, (scrollY - start) / span));
-    const k = (h / SRC_H) * (1 - t);
-    box.style.transform = `translateY(${{CENTRALIZA * k}}px)`;
+    const k = (h / SRC_H) * t;
+    box.style.transform = `scale(${{1 - (1 - ESC_ABERTO) * t}})`;
     for (const el of parts) {{
-      const d = parseFloat(el.dataset.shift) * k;
+      const d = parseFloat(el.dataset.spread) * k;
       if (el.classList.contains('ing')) {{
         el.style.transform = `translateY(calc(-50% + ${{d}}px))`;
-        el.style.opacity = Math.min(1, Math.max(0, (t - 0.35) / 0.3));
+        el.style.opacity = Math.min(1, Math.max(0, (t - 0.45) / 0.3));
       }} else {{
         el.style.transform = `translateY(${{d}}px)`;
       }}
