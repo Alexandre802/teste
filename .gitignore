@@ -1,0 +1,19 @@
+node_modules/
+dist/
+build/
+out/
+.next/
+.cache/
+.remotion/
+*.log
+
+.env
+.env.local
+.env.*.local
+
+.DS_Store
+Thumbs.db
+
+# saída de render e modelos pesados
+/render-out/
+/pretrained_models/
