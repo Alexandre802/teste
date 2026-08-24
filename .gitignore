@@ -17,3 +17,7 @@ Thumbs.db
 # saída de render e modelos pesados
 /render-out/
 /pretrained_models/
+/.next/
+/next-env.d.ts
+/node_modules
+.vercel

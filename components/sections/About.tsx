@@ -1,0 +1,44 @@
+import { aboutText, differentials } from '@/lib/business';
+import { BurgerMark } from '../ui/Icons';
+import { Reveal } from '../ui/Reveal';
+
+export default function About() {
+  return (
+    <section id="sobre" className="scroll-mt-24 py-20 sm:py-28">
+      <div className="mx-auto w-full max-w-[86rem] px-5 sm:px-8">
+        <div className="grid items-start gap-12 lg:grid-cols-[1fr_1.1fr]">
+          <Reveal>
+            <p className="text-xs font-extrabold uppercase tracking-[0.35em] text-flame-soft">
+              Sobre nós
+            </p>
+            <h2 className="mt-3 text-[clamp(2rem,5.5vw,3.5rem)] font-extrabold leading-[0.95] tracking-tight text-cream">
+              Uma lanchonete
+              <br />
+              de bairro, feita
+              <br />
+              <span className="text-flame-gradient">para voltar.</span>
+            </h2>
+          </Reveal>
+
+          <Reveal delay={0.1}>
+            <p className="text-lg leading-relaxed text-cream/85">{aboutText}</p>
+
+            <ul className="mt-9 flex flex-col gap-4">
+              {differentials.map((item) => (
+                <li key={item.title} className="glass flex gap-4 rounded-3xl p-5">
+                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-flame/15 text-gold">
+                    <BurgerMark className="h-6 w-6" />
+                  </span>
+                  <div>
+                    <h3 className="font-extrabold text-cream">{item.title}</h3>
+                    <p className="mt-1 text-sm leading-relaxed text-muted">{item.text}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
