@@ -63,14 +63,16 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
+  /**
+   * Só a forma de string é aceita na validação de deploy da Vercel — a forma
+   * de objeto (com `source` e `missing`) passa no build local e é recusada na
+   * publicação. As condições `missing` que havia aqui só pulavam requisições
+   * de prefetch, o que era otimização, não requisito: os cabeçalhos precisam
+   * valer para toda resposta de página e de API.
+   *
+   * Exclui os estáticos, que já saem com cabeçalho próprio do Next.
+   */
   matcher: [
-    // tudo, menos arquivos estáticos já servidos com cabeçalho próprio
-    {
-      source: '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|webp|avif|svg|ico|woff2?)$).*)',
-      missing: [
-        { type: 'header', key: 'next-router-prefetch' },
-        { type: 'header', key: 'purpose', value: 'prefetch' },
-      ],
-    },
+    '/((?!_next/static|_next/image|favicon.ico|apple-icon.png|.*\\.(?:png|jpg|jpeg|gif|webp|avif|svg|ico|woff2?)$).*)',
   ],
 };
