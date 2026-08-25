@@ -35,7 +35,18 @@ export const business = {
   mapsQuery:
     'Michel Food House, R. Fidêncio José de Souza, 100, Bandeira Branca I, Jacareí - SP, 12323-390',
 
-  siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://michelfoodhouse.com.br',
+  /**
+   * Endereço público do site, usado em canônico, Open Graph, sitemap e JSON-LD.
+   *
+   * Ordem: o que estiver configurado; senão a URL que a Vercel gera sozinha;
+   * e só então o domínio próprio. Sem o degrau da Vercel, um site publicado
+   * antes de ter domínio anuncia ao Google um endereço que ainda não existe.
+   */
+  siteUrl:
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    (process.env.NEXT_PUBLIC_VERCEL_URL
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+      : 'https://michelfoodhouse.com.br'),
 } as const;
 
 export const fullAddress = `${business.address.street} - ${business.address.district}, ${business.address.city} - ${business.address.state}, ${business.address.postalCode}`;
