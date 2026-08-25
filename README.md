@@ -153,3 +153,10 @@ referencias/ cardápio de origem e prints usados para montar o catálogo
 `.claude/skills/` traz as skills de design (`ui-ux-pro-max` e irmãs) e a skill
 `remotion-site`, para peças de vídeo. `.mcp.json` configura os MCPs de UI. Detalhes em
 `CLAUDE.md`.
+
+## Outro site neste repositório
+
+`allp-fit/` guarda o site da **Allp Fit**, academia em Londrina/PR — projeto
+Next.js separado, com `package.json`, conteúdo e identidade visual próprios.
+Nada ali compartilha código com a Michel Food House. Instruções em
+`allp-fit/README.md`.
