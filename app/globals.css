@@ -101,6 +101,15 @@
   box-shadow: 0 30px 70px -20px rgb(90 32 5 / 0.75);
 }
 
+/* Realce quente para uma palavra dentro do título. Fica na família do
+   laranja: vai do branco ao dourado claro, sem introduzir outro matiz. */
+@utility text-realce {
+  background: linear-gradient(100deg, #ffffff 0%, #ffd28a 55%, #ffb35c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 @utility no-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;

@@ -115,13 +115,14 @@ export default function ExplodedBurger({ targetRef }: Props) {
   const still = useMotionValue(0);
   const andamento = reduce ? still : progress;
 
-  // aberto, o conjunto fica mais alto que a foto: encolhe para continuar cabendo
+  // aberto, o conjunto fica mais alto que a foto: encolhe para continuar
+  // cabendo. A origem embaixo mantém o pão inferior no lugar.
   const scale = useTransform(andamento, [0, 1], [1, OPEN_SCALE]);
 
   return (
     <motion.div
       ref={boxRef}
-      style={{ aspectRatio: `${SOURCE.w} / ${SOURCE.h}`, scale }}
+      style={{ aspectRatio: `${SOURCE.w} / ${SOURCE.h}`, scale, transformOrigin: 'bottom center' }}
       className="relative mx-auto w-full max-w-[17rem] sm:max-w-[23rem] lg:max-w-[34rem]"
       role="img"
       aria-label="Lanche da Michel Food House que se separa em pão, tomate, alface, queijo e carne conforme a página rola"

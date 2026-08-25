@@ -11,12 +11,13 @@ export default function About() {
             <p className="text-xs font-extrabold uppercase tracking-[0.35em] text-white/75">
               Sobre nós
             </p>
-            <h2 className="mt-3 text-[clamp(2rem,5.5vw,3.5rem)] font-extrabold leading-[0.95] tracking-tight text-white">
-              Uma lanchonete
-              <br />
-              de bairro, feita
-              <br />
-              <span className="text-white-gradient">para voltar.</span>
+            {/* Sem <br />: a tag não gera espaço no conteúdo de texto, e a
+                frase chegava grudada ("Uma lanchonetede bairro, feitapara
+                voltar.") para leitor de tela e para o buscador. A largura
+                máxima é que decide onde quebrar. */}
+            <h2 className="mt-3 max-w-[13ch] text-balance text-[clamp(2rem,5.5vw,3.5rem)] font-extrabold leading-[0.95] tracking-tight text-white">
+              Uma lanchonete de bairro, feita{' '}
+              <span className="text-realce">para voltar.</span>
             </h2>
           </Reveal>
 

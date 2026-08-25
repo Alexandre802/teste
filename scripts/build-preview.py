@@ -39,13 +39,13 @@ def carregar_dados() -> dict:
 def camadas_lanche() -> list[dict]:
     """As 8 fatias da foto de referência, já como data URI."""
     META = [
-        ("1-pao-superior", "Pão superior", 0, 442, -225),
-        ("2-tomate", "Tomate", 440, 122, -150),
-        ("3-alface-cima", "Alface", 560, 82, -75),
-        ("4-carne-cima", "Carne e queijo", 640, 107, 0),
-        ("5-alface-baixo", "Alface", 745, 52, 75),
-        ("6-carne-baixo", "Carne e queijo", 795, 87, 150),
-        ("7-pao-inferior", "Pão inferior", 880, 337, 225),
+        ("1-pao-superior", "Pão superior", 0, 442, -450),
+        ("2-tomate", "Tomate", 440, 122, -375),
+        ("3-alface-cima", "Alface", 560, 82, -300),
+        ("4-carne-cima", "Carne e queijo", 640, 107, -225),
+        ("5-alface-baixo", "Alface", 745, 52, -150),
+        ("6-carne-baixo", "Carne e queijo", 795, 87, -75),
+        ("7-pao-inferior", "Pão inferior", 880, 337, 0),
     ]
     out = []
     for slug, alt, top, h, spread in META:
@@ -198,7 +198,7 @@ h1{{font-size:clamp(2.6rem,9vw,6.5rem);font-weight:800;line-height:.9;letter-spa
 .cta svg{{width:1.5rem;height:1.5rem}}
 .meta{{display:flex;flex-wrap:wrap;gap:.4rem .75rem;margin-top:1.5rem;font-size:.875rem;color:rgb(255 255 255/.85)}}
 .meta b{{color:#fff;font-weight:800}}
-.burgerBox{{position:relative;width:100%;max-width:17rem;margin-inline:auto;aspect-ratio:1292/1217;transform-origin:center}}
+.burgerBox{{position:relative;width:100%;max-width:17rem;margin-inline:auto;aspect-ratio:1292/1217;transform-origin:bottom center}}
 @media(min-width:640px){{.burgerBox{{max-width:23rem}}}}
 @media(min-width:1024px){{.burgerBox{{max-width:34rem}}}}
 
@@ -376,6 +376,8 @@ dialog::backdrop{{background:rgb(168 56 10/.72);backdrop-filter:blur(4px)}}
 .lema figcaption{{font-size:.72rem;font-weight:800;letter-spacing:.28em;text-transform:uppercase;color:rgb(255 255 255/.7)}}
 .lemaHr{{width:4rem;height:1px;background:rgb(255 255 255/.4)}}
 
+.realce{{background:linear-gradient(100deg,#fff 0%,#ffd28a 55%,#ffb35c 100%);-webkit-background-clip:text;background-clip:text;color:transparent}}
+
 /* faixa de preview */
 .pv{{position:fixed;inset:auto 0 0;z-index:60;background:var(--gold);color:var(--cocoa);font-size:.75rem;font-weight:700;text-align:center;padding:.5rem 1rem;display:none}}
 @media(prefers-reduced-motion:reduce){{*,*::before,*::after{{animation-duration:.001ms!important;transition-duration:.001ms!important}}}}
@@ -456,7 +458,7 @@ dialog::backdrop{{background:rgb(168 56 10/.72);backdrop-filter:blur(4px)}}
     <div class="wrap two">
       <div>
         <p class="eyebrow">Sobre nós</p>
-        <h2 class="big">Uma lanchonete<br>de bairro, feita<br><span style="background:linear-gradient(100deg,var(--gold),var(--flame) 45%,var(--ember));-webkit-background-clip:text;background-clip:text;color:transparent">para voltar.</span></h2>
+        <h2 class="big" style="max-width:13ch">Uma lanchonete de bairro, feita <span class="realce">para voltar.</span></h2>
       </div>
       <div>
         <p class="lead">{d["aboutText"]}</p>
@@ -582,7 +584,7 @@ document.getElementById('ano').textContent = new Date().getFullYear();
   const box  = document.getElementById('burger');
   const parts = [...box.querySelectorAll('.layer,.ing')];
   const SRC_H = {SRC_H};
-  const ESC_ABERTO = 0.74;   // aberto o conjunto cresce; encolhe para caber
+  const ESC_ABERTO = 0.73;   // 1217/1667: devolve a altura original
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   let start=0, span=1, h=1, ticking=false;
   const measure = () => {{
