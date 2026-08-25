@@ -10,6 +10,26 @@
 
 export type Horario = { dias: string; abre: string; fecha: string };
 
+const DOMINIO_PADRAO = 'https://casaderacaobandeirabranca.com.br';
+
+/**
+ * Domínio do site, de onde saem o canonical, o sitemap e as imagens de
+ * Open Graph. Vem de `NEXT_PUBLIC_SITE_URL` para o mesmo código servir o
+ * domínio de verdade e o de teste sem recompilar.
+ *
+ * Um valor inválido derrubaria o build lá no `new URL()` do layout, e o erro
+ * apareceria longe daqui — melhor cair no padrão e seguir.
+ */
+function dominio(): string {
+  const doAmbiente = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (!doAmbiente) return DOMINIO_PADRAO;
+  try {
+    return new URL(doAmbiente).origin;
+  } catch {
+    return DOMINIO_PADRAO;
+  }
+}
+
 export const business = {
   nome: 'Casa de Ração Bandeira Branca',
   nomeLinha1: 'CASA DE RAÇÃO',
@@ -35,8 +55,8 @@ export const business = {
   /** Horário de funcionamento ainda não confirmado pela loja. */
   horarios: [] as Horario[],
 
-  /** Trocar pelo domínio próprio quando existir. */
-  siteUrl: 'https://casaderacaobandeirabranca.com.br',
+  /** Definido por NEXT_PUBLIC_SITE_URL; ver `dominio()` acima. */
+  siteUrl: dominio(),
 
   entrega: {
     chamada: 'Entrega rápida em Jacareí',
