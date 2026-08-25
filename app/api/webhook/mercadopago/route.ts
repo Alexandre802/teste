@@ -88,7 +88,17 @@ export async function POST(request: Request) {
     meta.note ? `Obs.: ${meta.note}` : '',
   ].filter(Boolean);
 
-  await notifyStore(lines.join('\n'));
+  // parâmetros do template em uma linha cada — o WhatsApp rejeita quebra de
+  // linha dentro de parâmetro
+  await notifyStore(
+    [
+      `pago · ${meta.mode === 'retirada' ? 'Retirada' : 'Entrega'}`,
+      String(meta.items ?? '—'),
+      formatPrice(payment.transaction_amount),
+      [meta.customer_name, meta.customer_phone, meta.customer_address].filter(Boolean).join(' · ') || 'sem dados do cliente',
+    ],
+    lines.join('\n'),
+  );
 
   if (meta.customer_phone) {
     await sendWhatsappText(

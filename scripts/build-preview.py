@@ -791,7 +791,7 @@ function renderCart(){{
   foot.innerHTML = `<div class="tot"><span>Subtotal</span><b>${{BRL(total())}}</b></div>` + (
     cliente
       ? `<a class="go" target="_blank" rel="noopener" href="https://wa.me/${{D.whatsapp}}?text=${{encodeURIComponent(msg)}}">{WA}Finalizar pelo WhatsApp</a>
-         <p class="aviso">Identificado como <strong>${{cliente.nome}}</strong> (${{cliente.via}}). Preview: o pagamento por Pix e cartão fica no site publicado; aqui o pedido segue para o WhatsApp da casa.</p>`
+         <p class="aviso">Identificado como <strong>${{cliente.nome}}</strong> (${{cliente.via}}). No site publicado, fechar o pedido também dispara um aviso automático para o WhatsApp da casa ({B["phoneDisplay"]}) — isso precisa de servidor e não roda no preview. Aqui vale o botão acima.</p>`
       : `<button class="go" id="irLogin">Ir para o pagamento</button>
          <p class="aviso">Preview: o pagamento por Pix e cartão fica no site publicado. Antes dele vem a identificação, igual ao site.</p>`
   );

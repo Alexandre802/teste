@@ -28,8 +28,25 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
   /** Cliente já identificado não vê a tela de login de novo. */
   const goToPayment = () => setStep(customer ? 'pagamento' : 'login');
 
-  /** Fecha o pedido pelo WhatsApp — funciona sem gateway configurado. */
+  /**
+   * Fecha o pedido.
+   *
+   * Duas coisas acontecem: o site avisa a lanchonete pela Cloud API (rota
+   * /api/pedido) e abre o deeplink do WhatsApp para o cliente mandar a
+   * mensagem dele. O aviso é disparado sem `await` de propósito — se o
+   * WhatsApp estiver fora do ar ou não configurado, o cliente não pode ficar
+   * esperando nem perder o pedido.
+   */
   const finishOnWhatsapp = (paymentStatus?: 'pago' | 'pagar-na-entrega') => {
+    void fetch('/api/pedido', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lines, mode, note: orderNote, paymentStatus, customer }),
+      keepalive: true,
+    }).catch(() => {
+      /* aviso à loja é melhor-esforço: o pedido segue pelo deeplink */
+    });
+
     const url = orderWhatsappUrl({ lines, mode, customer, note: orderNote, paymentStatus });
     window.open(url, '_blank', 'noopener,noreferrer');
     recordOrder();
