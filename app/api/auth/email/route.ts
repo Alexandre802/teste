@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createHmac, randomInt, timingSafeEqual } from 'node:crypto';
+import { identificadorAnonimo, limitarTaxa, log } from '@/lib/seguranca';
 
 /**
  * Código de acesso por e-mail, sem banco de dados.
@@ -32,6 +33,16 @@ function conferem(a: string, b: string): boolean {
 }
 
 export async function POST(request: Request) {
+  // dois tetos: um por solicitante, para o site não virar disparador de
+  // e-mail, e outro mais folgado para a conferência do código
+  const taxa = limitarTaxa(`auth:${identificadorAnonimo(request)}`, 12, 300_000);
+  if (!taxa.ok) {
+    return NextResponse.json(
+      { erro: `Muitas tentativas. Tente de novo em ${taxa.esperaS}s.` },
+      { status: 429, headers: { 'Retry-After': String(taxa.esperaS) } },
+    );
+  }
+
   let corpo: { acao?: string; email?: string; codigo?: string };
   try {
     corpo = await request.json();

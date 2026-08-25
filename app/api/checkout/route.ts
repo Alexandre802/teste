@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { identificadorAnonimo, limitarTaxa, log } from '@/lib/seguranca';
 import { business } from '@/lib/business';
 import { MP_ACCESS_TOKEN, itemsTotal, paymentsEnabled, toCheckoutItems } from '@/lib/payments';
 import type { CartLine, Customer, FulfillmentMode } from '@/lib/store';
@@ -20,6 +21,15 @@ interface Body {
  * continua utilizável de ponta a ponta para teste, sem fingir que cobrou.
  */
 export async function POST(request: Request) {
+  // criar cobrança é a rota mais cara: teto apertado
+  const taxa = limitarTaxa(`checkout:${identificadorAnonimo(request)}`, 6, 60_000);
+  if (!taxa.ok) {
+    return NextResponse.json(
+      { error: `Muitas tentativas de pagamento. Aguarde ${taxa.esperaS}s.` },
+      { status: 429, headers: { 'Retry-After': String(taxa.esperaS) } },
+    );
+  }
+
   let body: Body;
   try {
     body = await request.json();
@@ -84,7 +94,7 @@ export async function POST(request: Request) {
 
   if (!res.ok) {
     const detail = await res.text();
-    console.error('[checkout] Mercado Pago respondeu', res.status, detail);
+    log.erro('checkout', 'Mercado Pago respondeu', res.status, detail);
     return NextResponse.json({ error: 'Não foi possível abrir o pagamento.' }, { status: 502 });
   }
 

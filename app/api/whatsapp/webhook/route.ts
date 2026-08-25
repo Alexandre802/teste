@@ -1,13 +1,30 @@
 import { NextResponse } from 'next/server';
+import { createHmac } from 'node:crypto';
 import Anthropic from '@anthropic-ai/sdk';
 import { business, fullAddress } from '@/lib/business';
 import { categories, formatPrice, products } from '@/lib/catalog';
 import { sendWhatsappText, whatsappApiEnabled } from '@/lib/whatsapp-api';
+import { comparaSegura, identificadorAnonimo, limitarTaxa, log } from '@/lib/seguranca';
 
 export const runtime = 'nodejs';
 
 const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN ?? '';
 const aiEnabled = Boolean(process.env.ANTHROPIC_API_KEY);
+const APP_SECRET = process.env.WHATSAPP_APP_SECRET ?? '';
+
+/**
+ * Confere a assinatura que a Meta manda em X-Hub-Signature-256.
+ *
+ * Sem isso qualquer pessoa que descubra a URL do webhook consegue forjar
+ * mensagem e fazer o bot responder — o que gasta cota da API do WhatsApp e
+ * crédito do modelo, e permite injetar texto no prompt do atendente.
+ */
+function assinaturaValida(corpoBruto: string, cabecalho: string | null): boolean {
+  if (!APP_SECRET) return false;
+  if (!cabecalho?.startsWith('sha256=')) return false;
+  const esperado = createHmac('sha256', APP_SECRET).update(corpoBruto, 'utf8').digest('hex');
+  return comparaSegura(cabecalho.slice(7), esperado);
+}
 
 /** Cardápio em texto, injetado no prompt para o bot não inventar item ou preço. */
 function menuForPrompt(): string {
@@ -75,7 +92,25 @@ interface WhatsappWebhook {
  * imediatamente e tratamos a mensagem depois.
  */
 export async function POST(request: Request) {
-  const payload = (await request.json().catch(() => null)) as WhatsappWebhook | null;
+  // o corpo cru é lido primeiro: a assinatura cobre os bytes exatos, e
+  // reserializar o JSON mudaria o resultado
+  const corpoBruto = await request.text();
+
+  if (!assinaturaValida(corpoBruto, request.headers.get('x-hub-signature-256'))) {
+    log.aviso('whatsapp-bot', 'assinatura inválida — requisição descartada');
+    return NextResponse.json({ erro: 'Assinatura inválida.' }, { status: 401 });
+  }
+
+  // teto por remetente: contém laço de mensagens e uso abusivo do modelo
+  const { ok } = limitarTaxa(`wa:${identificadorAnonimo(request)}`, 20, 60_000);
+  if (!ok) return NextResponse.json({ ok: true, limitado: true });
+
+  let payload: WhatsappWebhook | null = null;
+  try {
+    payload = JSON.parse(corpoBruto) as WhatsappWebhook;
+  } catch {
+    return NextResponse.json({ erro: 'Corpo inválido.' }, { status: 400 });
+  }
 
   const message = payload?.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
   if (!message || message.type !== 'text' || !message.text?.body) {
@@ -83,13 +118,13 @@ export async function POST(request: Request) {
   }
 
   if (!whatsappApiEnabled || !aiEnabled) {
-    console.warn('[whatsapp-bot] faltam credenciais (WHATSAPP_* e/ou ANTHROPIC_API_KEY).');
+    log.aviso('whatsapp-bot', 'faltam credenciais (WHATSAPP_* e/ou ANTHROPIC_API_KEY).');
     return NextResponse.json({ ok: true, skipped: true });
   }
 
   // não bloqueia o 200 devolvido à Meta
   void replyWithAi(message.from, message.text.body).catch((err) =>
-    console.error('[whatsapp-bot] falhou ao responder', err),
+    log.erro('whatsapp-bot', 'falhou ao responder', err),
   );
 
   return NextResponse.json({ ok: true });

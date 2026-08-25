@@ -1,3 +1,4 @@
+import { headers } from 'next/headers';
 import type { Metadata, Viewport } from 'next';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import { business, fullAddress } from '@/lib/business';
@@ -44,7 +45,10 @@ export const viewport: Viewport = {
   colorScheme: 'dark',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // nonce gerado pelo middleware: sem ele a CSP bloqueia o próprio JSON-LD
+  const nonce = (await headers()).get('x-nonce') ?? undefined;
+
   return (
     <html lang="pt-BR" className={jakarta.variable}>
       <body className="antialiased">
@@ -56,11 +60,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
         {children}
         <script
+          nonce={nonce}
           type="application/ld+json"
           // JSON-LD gerado a partir de lib/business.ts + lib/catalog.ts.
           dangerouslySetInnerHTML={{ __html: JSON.stringify(restaurantJsonLd()) }}
         />
         <script
+          nonce={nonce}
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({

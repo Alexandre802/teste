@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { business } from '@/lib/business';
 import { formatPrice, productsById } from '@/lib/catalog';
 import { notifyStore, storeNumber, whatsappApiEnabled, whatsappTemplateEnabled } from '@/lib/whatsapp-api';
+import { identificadorAnonimo, limitarTaxa, log } from '@/lib/seguranca';
 
 export const runtime = 'nodejs';
 
@@ -32,6 +33,16 @@ interface Corpo {
 }
 
 export async function POST(request: Request) {
+  // teto por solicitante: sem isso dá para inundar o WhatsApp da casa com
+  // pedidos falsos e queimar a cota da API
+  const taxa = limitarTaxa(`pedido:${identificadorAnonimo(request)}`, 8, 60_000);
+  if (!taxa.ok) {
+    return NextResponse.json(
+      { erro: `Muitos pedidos seguidos. Tente de novo em ${taxa.esperaS}s.` },
+      { status: 429, headers: { 'Retry-After': String(taxa.esperaS) } },
+    );
+  }
+
   let corpo: Corpo;
   try {
     corpo = await request.json();

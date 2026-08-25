@@ -7,6 +7,7 @@ import {
 } from '@/lib/business';
 import { PhoneIcon, PinIcon, WhatsAppIcon } from '../ui/Icons';
 import { Reveal } from '../ui/Reveal';
+import MeusDados from '../account/MeusDados';
 import { SplitHeading } from '../ui/Motion';
 
 export default function Location() {
@@ -99,7 +100,8 @@ export default function Location() {
           </Reveal>
 
           <Reveal delay={0.1}>
-            <div className="glass relative h-full min-h-[26rem] overflow-hidden rounded-[var(--radius-card)] p-1.5 lg:min-h-[32rem]">
+            <MeusDados />
+            <div className="glass relative mt-4 h-full min-h-[26rem] overflow-hidden rounded-[var(--radius-card)] p-1.5 lg:min-h-[32rem]">
               {/* Embed público do Google Maps: não precisa de chave de API e o
                   mapa é navegável — dá para arrastar, aproximar e abrir a rota. */}
               <iframe

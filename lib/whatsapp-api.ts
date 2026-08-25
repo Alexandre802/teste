@@ -1,4 +1,5 @@
 import { business } from './business';
+import { log } from './seguranca';
 
 const TOKEN = process.env.WHATSAPP_TOKEN ?? '';
 const PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID ?? '';
@@ -15,7 +16,7 @@ export const storeNumber = STORE_NUMBER;
 
 async function post(payload: Record<string, unknown>): Promise<boolean> {
   if (!whatsappApiEnabled) {
-    console.warn('[whatsapp] Cloud API não configurada — mensagem não enviada.');
+    log.aviso('whatsapp', 'Cloud API não configurada — mensagem não enviada.');
     return false;
   }
   try {
@@ -25,12 +26,12 @@ async function post(payload: Record<string, unknown>): Promise<boolean> {
       body: JSON.stringify({ messaging_product: 'whatsapp', ...payload }),
     });
     if (!res.ok) {
-      console.error('[whatsapp] envio falhou', res.status, await res.text());
+      log.erro('whatsapp', 'envio falhou', res.status, await res.text());
       return false;
     }
     return true;
   } catch (erro) {
-    console.error('[whatsapp] erro de rede', erro);
+    log.erro('whatsapp', 'erro de rede', erro);
     return false;
   }
 }

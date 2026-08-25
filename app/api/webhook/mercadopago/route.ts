@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { log } from '@/lib/seguranca';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { business } from '@/lib/business';
 import { formatPrice } from '@/lib/catalog';
@@ -59,7 +60,7 @@ export async function POST(request: Request) {
     headers: { Authorization: `Bearer ${MP_ACCESS_TOKEN}` },
   });
   if (!res.ok) {
-    console.error('[webhook] não consegui ler o pagamento', res.status);
+    log.erro('webhook', 'não consegui ler o pagamento', res.status);
     return NextResponse.json({ ok: false }, { status: 200 });
   }
 
