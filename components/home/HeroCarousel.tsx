@@ -13,7 +13,7 @@ const PAUSA_APOS_INTERACAO = 9000;
 
 /**
  * Carrossel do banner principal. CSS puro: o trilho é um flex que anda com
- * `translateX` e uma transição de 500ms — sem biblioteca de animação.
+ * `translateX` e uma transição de 300ms — sem biblioteca de animação.
  *
  * O loop infinito vem de clonar o último slide antes do primeiro e o primeiro
  * depois do último. Ao chegar em um clone, a transição é desligada por um
@@ -105,7 +105,7 @@ export default function HeroCarousel() {
             className="flex"
             style={{
               transform: `translateX(-${pos * 100}%)`,
-              transition: semTransicao ? 'none' : 'transform 500ms ease',
+              transition: semTransicao ? 'none' : 'transform 300ms ease',
             }}
           >
             {estendido.map((slide, indice) => {

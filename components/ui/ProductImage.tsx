@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import type { Produto } from '@/data/products';
+import { fotos } from '@/data/fotos';
 import { icones, type NomeIcone } from './Icons';
 
 /** Que ícone representa a categoria quando ainda não há foto do produto. */
@@ -22,9 +23,14 @@ const iconePorCategoria: Record<string, NomeIcone> = {
 };
 
 /**
- * Foto do produto. Sem foto confirmada (`imagem: null`) mostra o placeholder da
- * marca — ícone da categoria e o nome do fabricante — em vez de um quadrado
- * vazio ou, pior, da foto de outro item.
+ * Foto do produto, em três tentativas nesta ordem:
+ *   1. o `imagem` escrito à mão em data/products.ts;
+ *   2. o arquivo em /public/produtos/ que tenha o mesmo nome do id do produto
+ *      (mapa gerado por `npm run fotos`, que roda sozinho antes do build);
+ *   3. o placeholder da marca — ícone da categoria e nome do fabricante.
+ *
+ * O passo 2 é o que permite encher o catálogo de fotos sem tocar em código:
+ * basta salvar os arquivos com o nome do id.
  */
 export default function ProductImage({
   produto,
@@ -35,10 +41,12 @@ export default function ProductImage({
   sizes?: string;
   priority?: boolean;
 }) {
-  if (produto.imagem) {
+  const src = produto.imagem ?? fotos[produto.id] ?? null;
+
+  if (src) {
     return (
       <Image
-        src={produto.imagem}
+        src={src}
         alt={produto.nome}
         fill
         sizes={sizes}

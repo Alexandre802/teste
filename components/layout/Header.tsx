@@ -4,8 +4,9 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { business } from '@/data/business';
-import { IconeCaminhao, IconeLocal, IconeMenu, IconeUsuario } from '@/components/ui/Icons';
+import { IconeCaminhao, IconeLocal, IconeMenu } from '@/components/ui/Icons';
 import CartButton from './CartButton';
+import ContaButton from './ContaButton';
 import MobileMenu from './MobileMenu';
 import SearchBar from './SearchBar';
 
@@ -68,13 +69,7 @@ export default function Header() {
               </span>
 
               <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1">
-                <Link
-                  href="/login"
-                  aria-label="Entrar na minha conta"
-                  className="grid h-11 w-11 place-items-center rounded-full text-white transition-colors hover:bg-white/10"
-                >
-                  <IconeUsuario className="h-[26px] w-[26px]" />
-                </Link>
+                <ContaButton />
                 <CartButton />
               </div>
             </div>

@@ -11,9 +11,12 @@ sombra e o mesmo ritmo de espaçamento.
 
 ```bash
 npm install
-npm run dev      # http://localhost:3000
-npm run build    # build de produção
+npm run dev       # http://localhost:3000
+npm run build     # build de produção
 npm run lint
+npm run conferir  # confere o catálogo (id repetido, categoria vazia, âncora quebrada)
+npm run fotos     # remapeia /public/produtos
+npm test          # bateria num navegador de verdade; precisa do site no ar
 ```
 
 ## O que editar
@@ -27,6 +30,10 @@ Quase tudo do dia a dia mora em `data/` — não é preciso abrir componente:
 | `data/categories.ts` | espécies (fileira de ícones) e departamentos populares |
 | `data/banners.ts` | slides do carrossel, banners promocionais, benefícios e serviços |
 | `data/business.ts` | telefone, WhatsApp, cidade, endereço, horários |
+
+`npm run conferir` roda sozinho antes do build e reprova id repetido, categoria
+sem produto e âncora apontando para seção que não existe — a classe de defeito
+que fazia os botões de espécie não levarem a lugar nenhum.
 
 ### Preços
 
@@ -44,8 +51,10 @@ sem mexer em componente nenhum.
 
 ### Imagens
 
-- **Produtos:** `imagem: null` cai no placeholder da marca. Coloque a foto real
-  em `public/produtos/` e aponte no catálogo — ver `public/produtos/README.md`.
+- **Produtos:** salve a foto em `public/produtos/` com o **nome igual ao `id`
+  do produto** e ela aparece sozinha — sem editar código. O mapa é gerado por
+  `npm run fotos`, que roda antes do build. Sem foto, o card cai no placeholder
+  da marca. Ver `public/produtos/README.md`.
 - **Banners:** os arquivos em `public/banners/` são recortes da peça de
   referência, em baixa resolução. Servem para o layout ficar de pé; troque por
   fotografia real de campanha quando houver.
@@ -73,8 +82,12 @@ arquivo/        site anterior da Michel Food House, fora do build
 - **Carrinho no `localStorage`.** Guarda só id e quantidade; nome, preço e foto
   vêm sempre do catálogo. Corrigir um produto em `data/products.ts` corrige na
   hora o carrinho de quem já tinha o item.
-- **Login não é falso.** `lib/auth.ts` responde sempre "não configurado". Para
-  ligar de verdade, troque o corpo das três funções — nenhum componente muda.
+- **Login com Google, Facebook e e-mail** (Auth.js v5, em `auth.ts`). Cada
+  provedor só é registrado se as chaves dele existirem no ambiente: sem chave
+  do Facebook, o botão nem aparece — botão que existe é botão que funciona. As
+  variáveis e onde pegá-las estão em `.env.example`. O login por e-mail e senha
+  precisa de um lugar para guardar a conta: ligue seu banco em `lib/usuarios.ts`
+  (o hash com scrypt já está pronto lá).
 - **Só o confirmado aparece.** Endereço completo e horário estão `null` em
   `data/business.ts`; o rodapé e o JSON-LD simplesmente não os mostram até
   serem preenchidos.

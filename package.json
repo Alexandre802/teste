@@ -3,17 +3,21 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/mapear-fotos.mjs",
     "dev": "next dev",
-    "prebuild": "node scripts/checar-config-vercel.cjs",
+    "prebuild": "node scripts/mapear-fotos.mjs && node --experimental-strip-types --no-warnings scripts/conferir-catalogo.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "checar-config": "node scripts/checar-config-vercel.cjs --exigir"
+    "fotos": "node scripts/mapear-fotos.mjs",
+    "conferir": "node --experimental-strip-types --no-warnings scripts/conferir-catalogo.mjs",
+    "test": "node scripts/testar-site.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.120.0",
     "framer-motion": "^11.15.0",
     "next": "^16.3.2",
+    "next-auth": "^5.0.0-beta.32",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "zustand": "^5.0.2"
@@ -25,6 +29,7 @@
     "@types/react-dom": "^19.0.3",
     "eslint": "^9.18.0",
     "eslint-config-next": "^16.3.2",
+    "playwright-core": "^1.62.1",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.7.3"
   }

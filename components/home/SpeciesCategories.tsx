@@ -1,4 +1,4 @@
-import { especies } from '@/data/categories';
+import { especies, paraSecao } from '@/data/categories';
 import CategoryCard from '@/components/ui/CategoryCard';
 import SectionHeader from '@/components/ui/SectionHeader';
 
@@ -13,12 +13,12 @@ export default function SpeciesCategories() {
       <SectionHeader
         id="titulo-especies"
         titulo="Categorias por espécie"
-        verTodasHref="#departamentos"
+        verTodasHref="/#departamentos"
       />
       <ul className="rail sm:grid sm:grid-cols-6 sm:gap-4 sm:overflow-visible">
         {especies.map((especie) => (
           <li key={especie.id} className="w-[5.5rem] sm:w-auto">
-            <CategoryCard nome={especie.nome} icone={especie.icone} href={especie.ancora} />
+            <CategoryCard nome={especie.nome} icone={especie.icone} href={paraSecao(especie.ancora)} />
           </li>
         ))}
       </ul>

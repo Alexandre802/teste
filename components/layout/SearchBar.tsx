@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ancoraDoProduto, buscar, contarResultados } from '@/lib/search';
 import { moeda, precoVisivel } from '@/lib/format';
 import ProductImage from '@/components/ui/ProductImage';
@@ -15,6 +16,7 @@ import { IconeBusca, IconeFechar } from '@/components/ui/Icons';
  * Navegação por teclado: ↑ ↓ percorrem, Enter abre, Esc fecha.
  */
 export default function SearchBar({ autoFoco = false }: { autoFoco?: boolean }) {
+  const router = useRouter();
   const [consulta, setConsulta] = useState('');
   const [aberto, setAberto] = useState(false);
   const [selecionado, setSelecionado] = useState(-1);
@@ -55,7 +57,8 @@ export default function SearchBar({ autoFoco = false }: { autoFoco?: boolean }) 
     } else if (evento.key === 'Enter' && selecionado >= 0) {
       evento.preventDefault();
       const alvo = resultados[selecionado];
-      window.location.hash = ancoraDoProduto(alvo).slice(1);
+      // mesmo caminho do clique: funciona a partir de qualquer página
+      router.push(ancoraDoProduto(alvo));
       fechar();
     }
   }

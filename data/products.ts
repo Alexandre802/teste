@@ -1337,6 +1337,538 @@ export const produtos: Produto[] = [
     estoque: true,
     termos: ['dental', 'higiene bucal'],
   },
+
+  /* ── ampliação do catálogo ─────────────────────────────────────────────
+     Marcas e linhas que existem no mercado brasileiro. Confira com o estoque
+     da loja antes de publicar: o que ela não vende, apague daqui.           */
+
+  /* rações para cachorros */
+  {
+    id: 'premier-formula-caes-filhotes-medio-frango-15kg',
+    nome: 'Ração PremieR Fórmula Cães Filhotes Porte Médio Frango',
+    marca: 'PremieR', categoria: 'racao-cachorro', especie: 'cachorro',
+    medida: '15 kg', preco: 219.9, imagem: null, estoque: true, parcelas: 6,
+    termos: ['filhote', 'porte medio'],
+  },
+  {
+    id: 'premier-racas-especificas-golden-retriever-12kg',
+    nome: 'Ração PremieR Raças Específicas Golden Retriever Adultos',
+    marca: 'PremieR', categoria: 'racao-cachorro', especie: 'cachorro',
+    medida: '12 kg', preco: 269.9, imagem: null, estoque: true, parcelas: 6,
+    termos: ['golden', 'raca especifica'],
+  },
+  {
+    id: 'golden-formula-caes-adultos-frango-arroz-15kg',
+    nome: 'Ração Golden Fórmula Cães Adultos Frango e Arroz',
+    marca: 'Golden', categoria: 'racao-cachorro', especie: 'cachorro',
+    medida: '15 kg', preco: 179.9, imagem: null, estoque: true, parcelas: 6,
+  },
+  {
+    id: 'guabi-natural-caes-adultos-frango-105kg',
+    nome: 'Ração Guabi Natural Cães Adultos Frango e Arroz Integral',
+    marca: 'Guabi Natural', categoria: 'racao-cachorro', especie: 'cachorro',
+    medida: '10,1 kg', preco: 189.9, imagem: null, estoque: true, parcelas: 6,
+    termos: ['natural'],
+  },
+  {
+    id: 'royal-canin-mini-adult-25kg',
+    nome: 'Ração Royal Canin Mini Adult Cães Adultos Porte Pequeno',
+    marca: 'Royal Canin', categoria: 'racao-cachorro', especie: 'cachorro',
+    medida: '2,5 kg', preco: 129.9, imagem: null, estoque: true, parcelas: 6,
+  },
+  {
+    id: 'pedigree-filhotes-carne-101kg',
+    nome: 'Ração Pedigree Filhotes Carne',
+    marca: 'Pedigree', categoria: 'racao-cachorro', especie: 'cachorro',
+    medida: '10,1 kg', preco: 109.9, imagem: null, estoque: true, parcelas: 6,
+    termos: ['filhote'],
+  },
+
+  /* rações para gatos */
+  {
+    id: 'premier-formula-gatos-filhotes-frango-15kg',
+    nome: 'Ração PremieR Fórmula Gatos Filhotes Frango',
+    marca: 'PremieR', categoria: 'racao-gato', especie: 'gato',
+    medida: '1,5 kg', preco: 64.9, imagem: null, estoque: true,
+    termos: ['filhote', 'gatinho'],
+  },
+  {
+    id: 'premier-formula-gatos-adultos-frango-75kg',
+    nome: 'Ração PremieR Fórmula Gatos Adultos Frango',
+    marca: 'PremieR', categoria: 'racao-gato', especie: 'gato',
+    medida: '7,5 kg', preco: 249.9, imagem: null, estoque: true, parcelas: 6,
+  },
+  {
+    id: 'whiskas-sache-gatos-adultos-frango-85g',
+    nome: 'Whiskas Sachê Gatos Adultos Frango ao Molho',
+    marca: 'Whiskas', categoria: 'racao-gato', especie: 'gato',
+    medida: '85 g', preco: 2.59, imagem: null, estoque: true,
+    termos: ['sache', 'umido'],
+  },
+  {
+    id: 'golden-gatos-filhotes-frango-101kg',
+    nome: 'Ração Golden Gatos Filhotes Frango',
+    marca: 'Golden', categoria: 'racao-gato', especie: 'gato',
+    medida: '10,1 kg', preco: 199.9, imagem: null, estoque: true, parcelas: 6,
+    termos: ['filhote'],
+  },
+  {
+    id: 'granplus-menu-gatos-castrados-salmao-101kg',
+    nome: 'Ração GranPlus Menu Gatos Castrados Salmão',
+    marca: 'GranPlus', categoria: 'racao-gato', especie: 'gato',
+    medida: '10,1 kg', preco: 184.9, imagem: null, estoque: true, parcelas: 6,
+    termos: ['castrado'],
+  },
+  {
+    id: 'royal-canin-feline-kitten-15kg',
+    nome: 'Ração Royal Canin Feline Kitten Gatos Filhotes',
+    marca: 'Royal Canin', categoria: 'racao-gato', especie: 'gato',
+    medida: '1,5 kg', preco: 154.9, imagem: null, estoque: true, parcelas: 6,
+    termos: ['filhote'],
+  },
+
+  /* petiscos para cachorros */
+  {
+    id: 'bifinho-pedigree-frango-500g',
+    nome: 'Bifinho Pedigree Frango para Cães',
+    marca: 'Pedigree', categoria: 'petisco-cachorro', especie: 'cachorro',
+    medida: '500 g', preco: 34.9, imagem: null, estoque: true, termos: ['petisco'],
+  },
+  {
+    id: 'pedigree-dentastix-caes-pequenos-7un',
+    nome: 'Petisco Pedigree Dentastix Cães Porte Pequeno',
+    marca: 'Pedigree', categoria: 'petisco-cachorro', especie: 'cachorro',
+    medida: '7 unidades', preco: 22.9, imagem: null, estoque: true,
+    termos: ['dental', 'tartaro'],
+  },
+  {
+    id: 'osso-no-natural-caes-grande',
+    nome: 'Osso de Nó Natural para Cães Porte Grande',
+    marca: 'Bandeira Branca', categoria: 'petisco-cachorro', especie: 'cachorro',
+    medida: 'unidade', preco: 24.9, imagem: null, estoque: true, termos: ['osso'],
+  },
+  {
+    id: 'tiras-frango-desidratado-caes-100g',
+    nome: 'Tiras de Frango Desidratado para Cães',
+    marca: 'Bandeira Branca', categoria: 'petisco-cachorro', especie: 'cachorro',
+    medida: '100 g', preco: 18.9, imagem: null, estoque: true, termos: ['natural'],
+  },
+  {
+    id: 'biscoito-caes-filhotes-500g',
+    nome: 'Biscoito para Cães Filhotes',
+    marca: 'Bandeira Branca', categoria: 'petisco-cachorro', especie: 'cachorro',
+    medida: '500 g', preco: 16.9, imagem: null, estoque: true, termos: ['filhote'],
+  },
+
+  /* petiscos para gatos */
+  {
+    id: 'temptations-gatos-carne-40g',
+    nome: 'Petisco Whiskas Temptations Gatos Carne',
+    marca: 'Whiskas', categoria: 'petisco-gato', especie: 'gato',
+    medida: '40 g', preco: 11.9, imagem: null, estoque: true, termos: ['petisco'],
+  },
+  {
+    id: 'dreamies-gatos-queijo-40g',
+    nome: 'Petisco Dreamies Gatos Queijo',
+    marca: 'Dreamies', categoria: 'petisco-gato', especie: 'gato',
+    medida: '40 g', preco: 11.9, imagem: null, estoque: true,
+  },
+  {
+    id: 'petisco-peixe-desidratado-gatos-50g',
+    nome: 'Petisco de Peixe Desidratado para Gatos',
+    marca: 'Bandeira Branca', categoria: 'petisco-gato', especie: 'gato',
+    medida: '50 g', preco: 19.9, imagem: null, estoque: true, termos: ['natural'],
+  },
+  {
+    id: 'pasta-malte-gatos-50g',
+    nome: 'Pasta de Malte para Gatos',
+    marca: 'Bandeira Branca', categoria: 'petisco-gato', especie: 'gato',
+    medida: '50 g', preco: 26.9, imagem: null, estoque: true,
+    descricao: 'Ajuda na eliminação das bolas de pelo.', termos: ['malte', 'bola de pelo'],
+  },
+
+  /* brinquedos para cachorros */
+  {
+    id: 'bola-tenis-caes-3un',
+    nome: 'Bola de Tênis para Cães',
+    marca: 'Bandeira Branca', categoria: 'brinquedo-cachorro', especie: 'cachorro',
+    medida: '3 unidades', preco: 29.9, imagem: null, estoque: true, termos: ['bola'],
+  },
+  {
+    id: 'mordedor-osso-borracha-caes-g',
+    nome: 'Mordedor de Osso em Borracha para Cães',
+    marca: 'Bandeira Branca', categoria: 'brinquedo-cachorro', especie: 'cachorro',
+    medida: 'Tam. G', preco: 34.9, imagem: null, estoque: true, termos: ['mordedor'],
+  },
+  {
+    id: 'brinquedo-puxador-corda-argola-caes',
+    nome: 'Puxador de Corda com Argola para Cães',
+    marca: 'Bandeira Branca', categoria: 'brinquedo-cachorro', especie: 'cachorro',
+    medida: '35 cm', preco: 24.9, imagem: null, estoque: true, termos: ['corda', 'cabo de guerra'],
+  },
+  {
+    id: 'brinquedo-lancador-bolinha-caes',
+    nome: 'Lançador de Bolinha para Cães',
+    marca: 'Bandeira Branca', categoria: 'brinquedo-cachorro', especie: 'cachorro',
+    medida: '65 cm', preco: 39.9, imagem: null, estoque: true, termos: ['lancador', 'passeio'],
+  },
+  {
+    id: 'brinquedo-comedouro-lento-caes',
+    nome: 'Comedouro Lento Interativo para Cães',
+    marca: 'Bandeira Branca', categoria: 'brinquedo-cachorro', especie: 'cachorro',
+    medida: 'Tam. M', preco: 54.9, imagem: null, estoque: true,
+    descricao: 'Faz o cão comer mais devagar e entretém durante a refeição.',
+    termos: ['interativo', 'comedouro lento'],
+  },
+  {
+    id: 'brinquedo-pelucia-mordedor-caes-p',
+    nome: 'Mordedor de Pelúcia para Cães Porte Pequeno',
+    marca: 'Bandeira Branca', categoria: 'brinquedo-cachorro', especie: 'cachorro',
+    medida: 'Tam. P', preco: 22.9, imagem: null, estoque: true, termos: ['pelucia'],
+  },
+  {
+    id: 'brinquedo-disco-flutuante-caes',
+    nome: 'Disco Flutuante para Cães',
+    marca: 'Bandeira Branca', categoria: 'brinquedo-cachorro', especie: 'cachorro',
+    medida: '18 cm', preco: 27.9, imagem: null, estoque: true, termos: ['agua', 'piscina'],
+  },
+
+  /* brinquedos para gatos */
+  {
+    id: 'arranhador-torre-gatos-2-andares',
+    nome: 'Arranhador Torre para Gatos 2 Andares',
+    marca: 'Bandeira Branca', categoria: 'brinquedo-gato', especie: 'gato',
+    medida: '80 cm', preco: 249.9, imagem: null, estoque: true, parcelas: 6,
+    termos: ['arranhador', 'torre', 'sisal'],
+  },
+  {
+    id: 'arranhador-papelao-ondulado-gatos',
+    nome: 'Arranhador de Papelão Ondulado para Gatos',
+    marca: 'Bandeira Branca', categoria: 'brinquedo-gato', especie: 'gato',
+    medida: '45 cm', preco: 44.9, imagem: null, estoque: true, termos: ['arranhador'],
+  },
+  {
+    id: 'brinquedo-ponteiro-laser-gatos',
+    nome: 'Ponteiro Laser para Gatos',
+    marca: 'Bandeira Branca', categoria: 'brinquedo-gato', especie: 'gato',
+    medida: 'unidade', preco: 24.9, imagem: null, estoque: true, termos: ['laser'],
+  },
+  {
+    id: 'brinquedo-molinha-espiral-gatos-6un',
+    nome: 'Molinha Espiral para Gatos',
+    marca: 'Bandeira Branca', categoria: 'brinquedo-gato', especie: 'gato',
+    medida: '6 unidades', preco: 12.9, imagem: null, estoque: true, termos: ['mola'],
+  },
+  {
+    id: 'brinquedo-peixe-eletrico-gatos',
+    nome: 'Peixe Elétrico que Balança para Gatos',
+    marca: 'Bandeira Branca', categoria: 'brinquedo-gato', especie: 'gato',
+    medida: 'unidade', preco: 49.9, imagem: null, estoque: true, termos: ['interativo'],
+  },
+  {
+    id: 'brinquedo-nicho-parede-gatos',
+    nome: 'Nicho de Parede para Gatos',
+    marca: 'Bandeira Branca', categoria: 'brinquedo-gato', especie: 'gato',
+    medida: '40 x 30 cm', preco: 89.9, imagem: null, estoque: true,
+    termos: ['nicho', 'prateleira'],
+  },
+
+  /* higiene para cachorros */
+  {
+    id: 'tapete-higienico-caes-50un',
+    nome: 'Tapete Higiênico para Cães',
+    marca: 'Bandeira Branca', categoria: 'higiene-cachorro', especie: 'cachorro',
+    medida: '50 unidades', preco: 99.9, imagem: null, estoque: true, parcelas: 6,
+    termos: ['tapete', 'xixi'],
+  },
+  {
+    id: 'shampoo-antipulgas-caes-500ml',
+    nome: 'Shampoo Antipulgas para Cães',
+    marca: 'Bandeira Branca', categoria: 'higiene-cachorro', especie: 'cachorro',
+    medida: '500 ml', preco: 36.9, imagem: null, estoque: true, termos: ['antipulgas'],
+  },
+  {
+    id: 'colonia-caes-120ml',
+    nome: 'Colônia para Cães e Gatos',
+    marca: 'Bandeira Branca', categoria: 'higiene-cachorro', especie: 'todos',
+    medida: '120 ml', preco: 24.9, imagem: null, estoque: true, termos: ['perfume'],
+  },
+  {
+    id: 'cortador-unha-pets',
+    nome: 'Cortador de Unhas para Cães e Gatos',
+    marca: 'Bandeira Branca', categoria: 'higiene-cachorro', especie: 'todos',
+    medida: 'unidade', preco: 29.9, imagem: null, estoque: true, termos: ['unha', 'tosa'],
+  },
+  {
+    id: 'saquinho-higienico-caes-8rolos',
+    nome: 'Saquinho Higiênico para Passeio',
+    marca: 'Bandeira Branca', categoria: 'higiene-cachorro', especie: 'cachorro',
+    medida: '8 rolos', preco: 19.9, imagem: null, estoque: true, termos: ['passeio', 'coco'],
+  },
+
+  /* higiene para gatos */
+  {
+    id: 'areia-higienica-gatos-12kg',
+    nome: 'Areia Higiênica Granulada para Gatos',
+    marca: 'Bandeira Branca', categoria: 'higiene-gato', especie: 'gato',
+    medida: '12 kg', preco: 44.9, imagem: null, estoque: true, termos: ['areia'],
+  },
+  {
+    id: 'areia-aglomerante-gatos-4kg',
+    nome: 'Areia Aglomerante para Gatos',
+    marca: 'Bandeira Branca', categoria: 'higiene-gato', especie: 'gato',
+    medida: '4 kg', preco: 34.9, imagem: null, estoque: true,
+    descricao: 'Forma torrões, o que facilita tirar só a parte suja.',
+    termos: ['areia', 'aglomerante'],
+  },
+  {
+    id: 'caixa-areia-fechada-gatos',
+    nome: 'Caixa de Areia Fechada com Porta para Gatos',
+    marca: 'Bandeira Branca', categoria: 'higiene-gato', especie: 'gato',
+    medida: 'unidade', preco: 159.9, imagem: null, estoque: true, parcelas: 6,
+    termos: ['banheiro', 'fechada'],
+  },
+  {
+    id: 'tapete-caixa-areia-gatos',
+    nome: 'Tapete Retentor de Areia para Gatos',
+    marca: 'Bandeira Branca', categoria: 'higiene-gato', especie: 'gato',
+    medida: '60 x 45 cm', preco: 39.9, imagem: null, estoque: true, termos: ['tapete'],
+  },
+  {
+    id: 'escova-dupla-face-gatos',
+    nome: 'Escova Dupla Face para Gatos',
+    marca: 'Bandeira Branca', categoria: 'higiene-gato', especie: 'gato',
+    medida: 'unidade', preco: 27.9, imagem: null, estoque: true, termos: ['escova', 'pelos'],
+  },
+
+  /* coleiras e guias */
+  {
+    id: 'peitoral-antipuxao-caes-m',
+    nome: 'Peitoral Antipuxão Acolchoado para Cães',
+    marca: 'Bandeira Branca', categoria: 'coleiras', especie: 'cachorro',
+    medida: 'Tam. M', preco: 79.9, imagem: null, estoque: true,
+    descricao: 'Distribui a força no peito em vez do pescoço.',
+    termos: ['peitoral', 'antipuxao'],
+  },
+  {
+    id: 'coleira-couro-caes-g',
+    nome: 'Coleira de Couro Legítimo para Cães',
+    marca: 'Bandeira Branca', categoria: 'coleiras', especie: 'cachorro',
+    medida: 'Tam. G', preco: 69.9, imagem: null, estoque: true, termos: ['couro'],
+  },
+  {
+    id: 'guia-curta-adestramento-caes',
+    nome: 'Guia Curta de Adestramento para Cães',
+    marca: 'Bandeira Branca', categoria: 'coleiras', especie: 'cachorro',
+    medida: '60 cm', preco: 34.9, imagem: null, estoque: true, termos: ['adestramento'],
+  },
+  {
+    id: 'peitoral-gatos-guia-conjunto',
+    nome: 'Peitoral com Guia para Gatos',
+    marca: 'Bandeira Branca', categoria: 'coleiras', especie: 'gato',
+    medida: 'Tam. único', preco: 49.9, imagem: null, estoque: true, termos: ['passeio', 'gato'],
+  },
+  {
+    id: 'coleira-refletiva-caes-m',
+    nome: 'Coleira Refletiva para Cães',
+    marca: 'Bandeira Branca', categoria: 'coleiras', especie: 'cachorro',
+    medida: 'Tam. M', preco: 39.9, imagem: null, estoque: true, termos: ['refletiva', 'noite'],
+  },
+
+  /* camas e acessórios */
+  {
+    id: 'cama-pet-suspensa-g',
+    nome: 'Cama Suspensa Elevada para Cães',
+    marca: 'Bandeira Branca', categoria: 'camas', especie: 'cachorro',
+    medida: 'Tam. G', preco: 199.9, imagem: null, estoque: true, parcelas: 6,
+    termos: ['cama elevada'],
+  },
+  {
+    id: 'colchonete-pet-lavavel-m',
+    nome: 'Colchonete Lavável para Cães e Gatos',
+    marca: 'Bandeira Branca', categoria: 'camas', especie: 'todos',
+    medida: 'Tam. M', preco: 89.9, imagem: null, estoque: true, termos: ['colchonete'],
+  },
+  {
+    id: 'comedouro-antiformiga-pets',
+    nome: 'Comedouro Antiformiga para Cães e Gatos',
+    marca: 'Bandeira Branca', categoria: 'camas', especie: 'todos',
+    medida: '500 ml', preco: 34.9, imagem: null, estoque: true, termos: ['comedouro', 'formiga'],
+  },
+  {
+    id: 'bebedouro-automatico-pets-3l',
+    nome: 'Bebedouro Automático por Gravidade',
+    marca: 'Bandeira Branca', categoria: 'camas', especie: 'todos',
+    medida: '3 L', preco: 79.9, imagem: null, estoque: true, termos: ['bebedouro'],
+  },
+  {
+    id: 'bolsa-transporte-pets-p',
+    nome: 'Bolsa de Transporte para Cães e Gatos',
+    marca: 'Bandeira Branca', categoria: 'camas', especie: 'todos',
+    medida: 'Tam. P', preco: 129.9, imagem: null, estoque: true, parcelas: 6,
+    termos: ['bolsa', 'transporte'],
+  },
+  {
+    id: 'roupa-pet-moletom-m',
+    nome: 'Moletom para Cães',
+    marca: 'Bandeira Branca', categoria: 'camas', especie: 'cachorro',
+    medida: 'Tam. M', preco: 59.9, imagem: null, estoque: true, termos: ['roupa', 'frio'],
+  },
+  {
+    id: 'porta-racao-hermetico-15kg',
+    nome: 'Porta-Ração Hermético com Rodinhas',
+    marca: 'Bandeira Branca', categoria: 'camas', especie: 'todos',
+    medida: 'até 15 kg', preco: 149.9, imagem: null, estoque: true, parcelas: 6,
+    termos: ['porta racao', 'container'],
+  },
+
+  /* peixes */
+  {
+    id: 'aquario-kit-completo-30l',
+    nome: 'Aquário Kit Completo com Filtro e Iluminação',
+    marca: 'Bandeira Branca', categoria: 'peixes', especie: 'peixes',
+    medida: '30 L', preco: 349.9, imagem: null, estoque: true, parcelas: 6,
+    termos: ['aquario', 'kit'],
+  },
+  {
+    id: 'termostato-aquario-50w',
+    nome: 'Termostato com Aquecedor para Aquário',
+    marca: 'Bandeira Branca', categoria: 'peixes', especie: 'peixes',
+    medida: '50 W', preco: 69.9, imagem: null, estoque: true, termos: ['aquecedor'],
+  },
+  {
+    id: 'racao-peixe-fundo-50g',
+    nome: 'Ração em Pastilha para Peixes de Fundo',
+    marca: 'Bandeira Branca', categoria: 'peixes', especie: 'peixes',
+    medida: '50 g', preco: 21.9, imagem: null, estoque: true, termos: ['pastilha', 'cascudo'],
+  },
+  {
+    id: 'planta-artificial-aquario',
+    nome: 'Planta Artificial para Aquário',
+    marca: 'Bandeira Branca', categoria: 'peixes', especie: 'peixes',
+    medida: '20 cm', preco: 18.9, imagem: null, estoque: true, termos: ['decoracao'],
+  },
+
+  /* aves */
+  {
+    id: 'gaiola-calopsita-media',
+    nome: 'Gaiola para Calopsita com Comedouros',
+    marca: 'Bandeira Branca', categoria: 'aves', especie: 'aves',
+    medida: 'Tam. M', preco: 269.9, imagem: null, estoque: true, parcelas: 6,
+    termos: ['gaiola'],
+  },
+  {
+    id: 'brinquedo-escada-aves',
+    nome: 'Escada de Madeira para Gaiola',
+    marca: 'Bandeira Branca', categoria: 'aves', especie: 'aves',
+    medida: '30 cm', preco: 22.9, imagem: null, estoque: true, termos: ['brinquedo'],
+  },
+  {
+    id: 'racao-farinhada-passaros-300g',
+    nome: 'Farinhada para Pássaros',
+    marca: 'Bandeira Branca', categoria: 'aves', especie: 'aves',
+    medida: '300 g', preco: 24.9, imagem: null, estoque: true, termos: ['farinhada'],
+  },
+  {
+    id: 'ninho-madeira-passaros',
+    nome: 'Ninho de Madeira para Pássaros',
+    marca: 'Bandeira Branca', categoria: 'aves', especie: 'aves',
+    medida: 'unidade', preco: 34.9, imagem: null, estoque: true, termos: ['ninho', 'reproducao'],
+  },
+
+  /* coelhos e roedores */
+  {
+    id: 'gaiola-coelho-grande',
+    nome: 'Gaiola para Coelhos com Bandeja',
+    marca: 'Bandeira Branca', categoria: 'coelhos', especie: 'coelhos',
+    medida: 'Tam. G', preco: 289.9, imagem: null, estoque: true, parcelas: 6,
+    termos: ['gaiola'],
+  },
+  {
+    id: 'racao-hamster-500g',
+    nome: 'Ração para Hamsters',
+    marca: 'Bandeira Branca', categoria: 'coelhos', especie: 'coelhos',
+    medida: '500 g', preco: 19.9, imagem: null, estoque: true, termos: ['hamster', 'roedor'],
+  },
+  {
+    id: 'roda-exercicio-roedores',
+    nome: 'Roda de Exercício para Roedores',
+    marca: 'Bandeira Branca', categoria: 'coelhos', especie: 'coelhos',
+    medida: '18 cm', preco: 39.9, imagem: null, estoque: true, termos: ['roda', 'brinquedo'],
+  },
+  {
+    id: 'comedouro-ceramica-roedores',
+    nome: 'Comedouro de Cerâmica para Roedores',
+    marca: 'Bandeira Branca', categoria: 'coelhos', especie: 'coelhos',
+    medida: '200 ml', preco: 24.9, imagem: null, estoque: true, termos: ['comedouro'],
+  },
+
+  /* répteis */
+  {
+    id: 'terrario-vidro-repteis-40l',
+    nome: 'Terrário de Vidro para Répteis',
+    marca: 'Bandeira Branca', categoria: 'repteis', especie: 'repteis',
+    medida: '40 L', preco: 399.9, imagem: null, estoque: true, parcelas: 6,
+    termos: ['terrario'],
+  },
+  {
+    id: 'lampada-uvb-repteis',
+    nome: 'Lâmpada UVB para Répteis',
+    marca: 'Bandeira Branca', categoria: 'repteis', especie: 'repteis',
+    medida: '26 W', preco: 129.9, imagem: null, estoque: true, parcelas: 6,
+    descricao: 'Necessária para a síntese de vitamina D3 e a saúde dos ossos.',
+    termos: ['uvb', 'lampada'],
+  },
+  {
+    id: 'racao-jabuti-300g',
+    nome: 'Ração para Jabutis e Tartarugas Terrestres',
+    marca: 'Bandeira Branca', categoria: 'repteis', especie: 'repteis',
+    medida: '300 g', preco: 39.9, imagem: null, estoque: true, termos: ['jabuti'],
+  },
+  {
+    id: 'toca-caverna-repteis',
+    nome: 'Toca Caverna para Répteis',
+    marca: 'Bandeira Branca', categoria: 'repteis', especie: 'repteis',
+    medida: 'Tam. M', preco: 59.9, imagem: null, estoque: true, termos: ['toca', 'esconderijo'],
+  },
+
+  /* saúde e farmácia */
+  {
+    id: 'antipulgas-comprimido-caes-ate-10kg',
+    nome: 'Antipulgas em Comprimido para Cães até 10 kg',
+    marca: 'Bandeira Branca', categoria: 'saude', especie: 'cachorro',
+    medida: '1 comprimido', preco: 79.9, imagem: null, estoque: true,
+    descricao: 'Venda sob orientação. Consulte a dosagem com o veterinário do seu pet.',
+    termos: ['antipulgas', 'carrapato'],
+  },
+  {
+    id: 'antipulgas-topico-gatos',
+    nome: 'Antipulgas Tópico para Gatos',
+    marca: 'Bandeira Branca', categoria: 'saude', especie: 'gato',
+    medida: '1 pipeta', preco: 59.9, imagem: null, estoque: true,
+    descricao: 'Venda sob orientação. Consulte a dosagem com o veterinário do seu pet.',
+    termos: ['antipulgas', 'pipeta'],
+  },
+  {
+    id: 'suplemento-articular-caes-60comp',
+    nome: 'Suplemento Articular para Cães',
+    marca: 'Bandeira Branca', categoria: 'saude', especie: 'cachorro',
+    medida: '60 comprimidos', preco: 89.9, imagem: null, estoque: true,
+    termos: ['articulacao', 'condroitina'],
+  },
+  {
+    id: 'probiotico-pets-30g',
+    nome: 'Probiótico para Cães e Gatos',
+    marca: 'Bandeira Branca', categoria: 'saude', especie: 'todos',
+    medida: '30 g', preco: 54.9, imagem: null, estoque: true, termos: ['intestino', 'probiotico'],
+  },
+  {
+    id: 'colar-elizabetano-pets-m',
+    nome: 'Colar Elizabetano para Cães e Gatos',
+    marca: 'Bandeira Branca', categoria: 'saude', especie: 'todos',
+    medida: 'Tam. M', preco: 34.9, imagem: null, estoque: true,
+    termos: ['colar', 'pos-cirurgico'],
+  },
 ];
 
 /** Índice por id — usado pelo carrinho para reidratar o que veio do localStorage. */

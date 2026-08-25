@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { business } from '@/data/business';
-import { especies, departamentos } from '@/data/categories';
+import { especies, departamentos, paraSecao } from '@/data/categories';
 import { linkWhatsApp } from '@/lib/whatsapp';
 import { IconeLocal, IconeLoja, IconeTelefone, IconeWhatsApp } from '@/components/ui/Icons';
 
@@ -36,7 +36,7 @@ export default function Footer() {
           <ul className="mt-3 space-y-2">
             {especies.map((especie) => (
               <li key={especie.id}>
-                <Link href={especie.ancora} className="text-[13px] text-white/80 hover:text-white hover:underline">
+                <Link href={paraSecao(especie.ancora)} className="text-[13px] text-white/80 hover:text-white hover:underline">
                   {especie.nome}
                 </Link>
               </li>
@@ -49,7 +49,7 @@ export default function Footer() {
           <ul className="mt-3 space-y-2">
             {departamentos.slice(0, 7).map((departamento) => (
               <li key={departamento.nome}>
-                <Link href={departamento.ancora} className="text-[13px] text-white/80 hover:text-white hover:underline">
+                <Link href={paraSecao(departamento.ancora)} className="text-[13px] text-white/80 hover:text-white hover:underline">
                   {departamento.nome}
                 </Link>
               </li>

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { departamentos } from '@/data/categories';
+import { departamentos, paraSecao } from '@/data/categories';
 import { icones } from '@/components/ui/Icons';
 import SectionHeader from '@/components/ui/SectionHeader';
 
@@ -13,7 +13,7 @@ export default function DepartmentCards() {
       <SectionHeader
         id="titulo-departamentos"
         titulo="Departamentos populares"
-        verTodasHref="#racao-cachorro"
+        verTodasHref="/#racao-cachorro"
       />
       <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4">
         {departamentos.map((departamento) => {
@@ -21,7 +21,7 @@ export default function DepartmentCards() {
           return (
             <li key={departamento.nome}>
               <Link
-                href={departamento.ancora}
+                href={paraSecao(departamento.ancora)}
                 className="card-flat flex h-full items-center gap-3 p-3 transition-colors hover:border-brand-100 hover:bg-brand-50"
               >
                 <span className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-surface-2">

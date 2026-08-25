@@ -21,6 +21,31 @@ build e do typecheck. Não é para evoluir aquele código a partir daqui.
    item em outro, nem alterar a embalagem de uma marca.
 4. **Nada de texto escondido para buscador.** Os termos de busca vivem no
    conteúdo visível e em `termos` do catálogo, que alimenta a busca do topo.
+5. **Foto entra pelo nome do arquivo.** Salvar em `public/produtos/` com o nome
+   igual ao `id` do produto basta — `npm run fotos` gera o mapa e roda sozinho
+   antes de `dev` e `build`. Não é preciso editar o catálogo para isso.
+
+## Antes de dar por pronto
+
+- `npm run conferir` reprova id repetido, id com acento (o id vira nome de
+  arquivo), categoria sem produto e âncora apontando para seção inexistente.
+  Roda sozinho no `prebuild`.
+- `npm test` sobe um navegador de verdade e checa âncoras em todas as páginas,
+  cliques cobertos, carrinho, busca, carrossel, menu e login. Precisa do site
+  no ar (`npm start`).
+
+## Links de seção
+
+Todo link para uma seção da home usa **`/#id`**, nunca `#id` — o rodapé, o menu
+e a busca aparecem em `/carrinho` e `/login` também, e ali um `#id` sozinho não
+leva a lugar nenhum. Use `paraSecao(id)` de `data/categories.ts`.
+
+## Login
+
+Auth.js v5 em `auth.ts`, com Google, Facebook e e-mail/senha. Um provedor só é
+registrado se as chaves dele existirem no ambiente — botão que aparece na tela é
+botão que funciona. E-mail e senha depende de `lib/usuarios.ts`, que ainda não
+tem banco: o hash com scrypt já está pronto, falta ligar a consulta.
 
 ## Antes de construir UI
 
@@ -49,3 +74,13 @@ O recuo das âncoras é `scroll-padding-top` no `html`, e só ele — repetir co
 
 `.env.local` lê chaves por variável de ambiente. Nunca escreva chave em arquivo
 versionado. Variáveis documentadas em `.env.example`.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

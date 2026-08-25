@@ -23,55 +23,92 @@ const rotuloEspecie: Record<string, string> = {
 const tituloDaCategoria = new Map(secoes.map((s) => [s.categoria, s.titulo]));
 
 /**
- * Um só texto por produto, com tudo que a busca precisa reconhecer: nome,
- * marca, medida, categoria, espécie e os termos extras do catálogo. Montado
- * uma vez, no carregamento do módulo.
+ * O índice guarda os campos separados porque eles não valem a mesma coisa: um
+ * termo no nome do produto diz muito mais do que o mesmo termo no rótulo da
+ * espécie. Sem essa separação, "ração cachorro" trazia o porta-ração antes das
+ * rações — os dois casam com as duas palavras, mas por motivos bem diferentes.
  */
-const indice: { produto: Produto; texto: string }[] = produtos.map((produto) => ({
-  produto,
-  texto: normalizar(
-    [
-      produto.nome,
-      produto.marca,
-      produto.medida ?? '',
-      tituloDaCategoria.get(produto.categoria) ?? produto.categoria,
-      produto.categoria.replace(/-/g, ' '),
-      rotuloEspecie[produto.especie] ?? '',
-      (produto.termos ?? []).join(' '),
-    ].join(' '),
-  ),
-}));
+type Entrada = {
+  produto: Produto;
+  nome: string;
+  categoria: string;
+  resto: string;
+  tudo: string;
+};
+
+const indice: Entrada[] = produtos.map((produto) => {
+  const nome = normalizar(`${produto.nome} ${produto.medida ?? ''}`);
+  const categoria = normalizar(
+    `${tituloDaCategoria.get(produto.categoria) ?? ''} ${produto.categoria.replace(/-/g, ' ')}`,
+  );
+  const resto = normalizar(
+    [produto.marca, rotuloEspecie[produto.especie] ?? '', (produto.termos ?? []).join(' ')].join(' '),
+  );
+  return { produto, nome, categoria, resto, tudo: `${nome} ${categoria} ${resto}` };
+});
+
+/** Casa como palavra inteira: "gato" não deve casar dentro de "gatorade". */
+function palavraInteira(texto: string, termo: string): boolean {
+  const i = texto.indexOf(termo);
+  if (i === -1) return false;
+  const antes = i === 0 || !/[a-z0-9]/.test(texto[i - 1]);
+  const depois = i + termo.length >= texto.length || !/[a-z0-9]/.test(texto[i + termo.length]);
+  return antes && depois;
+}
+
+/** Quanto este termo pesa neste produto. Vale o campo mais forte, uma vez só. */
+function peso(entrada: Entrada, termo: string): number {
+  if (entrada.nome.startsWith(termo)) return 5;
+  if (palavraInteira(entrada.nome, termo)) return 4;
+  if (entrada.nome.includes(termo)) return 3;
+  if (entrada.categoria.includes(termo)) return 2;
+  if (entrada.resto.includes(termo)) return 1;
+  return 0;
+}
 
 /**
  * Busca por todos os termos digitados (E, não OU): "racao cachorro" só traz
- * quem casa com as duas palavras. Ordena quem bate no começo do nome primeiro.
+ * quem casa com as duas palavras. A ordem sai da soma dos pesos acima, com o
+ * nome do produto como desempate.
  */
 export function buscar(consulta: string, limite = 8): Produto[] {
   const termos = normalizar(consulta).split(/\s+/).filter(Boolean);
   if (termos.length === 0) return [];
 
-  const achados = indice.filter(({ texto }) => termos.every((t) => texto.includes(t)));
+  const achados: { entrada: Entrada; nota: number }[] = [];
+  for (const entrada of indice) {
+    let nota = 0;
+    let casouTudo = true;
+    for (const termo of termos) {
+      const p = peso(entrada, termo);
+      if (p === 0) {
+        casouTudo = false;
+        break;
+      }
+      nota += p;
+    }
+    if (casouTudo) achados.push({ entrada, nota });
+  }
 
-  const primeiro = termos[0];
-  achados.sort((a, b) => {
-    const aComeca = normalizar(a.produto.nome).includes(primeiro) ? 0 : 1;
-    const bComeca = normalizar(b.produto.nome).includes(primeiro) ? 0 : 1;
-    if (aComeca !== bComeca) return aComeca - bComeca;
-    return a.produto.nome.localeCompare(b.produto.nome, 'pt-BR');
-  });
-
-  return achados.slice(0, limite).map(({ produto }) => produto);
+  achados.sort(
+    (a, b) => b.nota - a.nota || a.entrada.produto.nome.localeCompare(b.entrada.produto.nome, 'pt-BR'),
+  );
+  return achados.slice(0, limite).map(({ entrada }) => entrada.produto);
 }
 
 /** Quantos produtos o termo encontra no catálogo inteiro. */
 export function contarResultados(consulta: string): number {
   const termos = normalizar(consulta).split(/\s+/).filter(Boolean);
   if (termos.length === 0) return 0;
-  return indice.filter(({ texto }) => termos.every((t) => texto.includes(t))).length;
+  return indice.filter((e) => termos.every((t) => e.tudo.includes(t))).length;
 }
 
-/** Âncora da seção onde o produto está, para a busca poder levar até ele. */
+/**
+ * Href da seção onde o produto está. A busca fica no cabeçalho, que aparece
+ * também em /carrinho e /login — por isso o "/" na frente: sem ele, clicar num
+ * resultado fora da home não levaria a lugar nenhum.
+ */
 export function ancoraDoProduto(produto: Produto): string {
   const secao = secoes.find((s) => s.categoria === produto.categoria);
-  return secao ? `#${secao.id}` : '#destaques';
+  return `/#${secao ? secao.id : 'destaques'}`;
 }

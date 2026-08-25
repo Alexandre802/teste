@@ -31,7 +31,7 @@ export default function Home() {
           id="destaques"
           titulo="Produtos em destaque"
           produtos={produtosDestaque}
-          verTodasHref="#departamentos"
+          verTodasHref="/#departamentos"
           prioridadeImagens
         />
 
@@ -43,7 +43,7 @@ export default function Home() {
             legenda={secao.legenda}
             produtos={produtosDaCategoria(secao.categoria)}
             ancoraEspecie={secao.ancoraEspecie}
-            verTodasHref="#departamentos"
+            verTodasHref="/#departamentos"
           />
         ))}
 
