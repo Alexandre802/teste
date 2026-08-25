@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import type { Produto } from '@/data/products';
-import { fotos } from '@/data/fotos';
+import { fotos, ilustracoes } from '@/data/fotos';
 import { icones, type NomeIcone } from './Icons';
 
 /** Que ícone representa a categoria quando ainda não há foto do produto. */
@@ -23,14 +23,14 @@ const iconePorCategoria: Record<string, NomeIcone> = {
 };
 
 /**
- * Foto do produto, em três tentativas nesta ordem:
+ * Imagem do produto, em quatro tentativas nesta ordem:
  *   1. o `imagem` escrito à mão em data/products.ts;
- *   2. o arquivo em /public/produtos/ que tenha o mesmo nome do id do produto
- *      (mapa gerado por `npm run fotos`, que roda sozinho antes do build);
- *   3. o placeholder da marca — ícone da categoria e nome do fabricante.
+ *   2. a foto real em /public/produtos/ com o nome do id do produto;
+ *   3. a ilustração da casa em /public/ilustracoes/ (npm run ilustracoes);
+ *   4. o placeholder — ícone da categoria e nome do fabricante.
  *
- * O passo 2 é o que permite encher o catálogo de fotos sem tocar em código:
- * basta salvar os arquivos com o nome do id.
+ * A ordem é o que importa: soltar a foto real em /public/produtos faz ela
+ * substituir a ilustração na hora, sem apagar nem editar nada.
  */
 export default function ProductImage({
   produto,
@@ -41,7 +41,7 @@ export default function ProductImage({
   sizes?: string;
   priority?: boolean;
 }) {
-  const src = produto.imagem ?? fotos[produto.id] ?? null;
+  const src = produto.imagem ?? fotos[produto.id] ?? ilustracoes[produto.id] ?? null;
 
   if (src) {
     return (
@@ -51,7 +51,7 @@ export default function ProductImage({
         fill
         sizes={sizes}
         priority={priority}
-        className="object-contain p-1"
+        className="object-contain"
       />
     );
   }

@@ -11,7 +11,8 @@
     "lint": "eslint .",
     "fotos": "node scripts/mapear-fotos.mjs",
     "conferir": "node --experimental-strip-types --no-warnings scripts/conferir-catalogo.mjs",
-    "test": "node scripts/testar-site.mjs"
+    "test": "node scripts/testar-site.mjs",
+    "ilustracoes": "node --experimental-strip-types --no-warnings scripts/gerar-ilustracoes.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.120.0",

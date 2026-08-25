@@ -16,6 +16,7 @@ npm run build     # build de produção
 npm run lint
 npm run conferir  # confere o catálogo (id repetido, categoria vazia, âncora quebrada)
 npm run fotos     # remapeia /public/produtos
+npm run ilustracoes # redesenha as ilustrações dos produtos
 npm test          # bateria num navegador de verdade; precisa do site no ar
 ```
 
@@ -51,10 +52,17 @@ sem mexer em componente nenhum.
 
 ### Imagens
 
-- **Produtos:** salve a foto em `public/produtos/` com o **nome igual ao `id`
-  do produto** e ela aparece sozinha — sem editar código. O mapa é gerado por
-  `npm run fotos`, que roda antes do build. Sem foto, o card cai no placeholder
-  da marca. Ver `public/produtos/README.md`.
+- **Produtos:** o card procura a imagem em quatro níveis, nesta ordem:
+  `imagem` no catálogo → foto real em `public/produtos/<id>` → ilustração da
+  casa em `public/ilustracoes/<id>` → placeholder com ícone.
+  Hoje os 175 produtos usam ilustração. Para trocar por foto de verdade, solte
+  o arquivo em `public/produtos/` com o nome igual ao `id` do produto — ela
+  passa a valer na hora, sem apagar nem editar nada.
+  Ver `public/produtos/README.md`.
+
+- **Ilustrações:** `npm run ilustracoes` redesenha as 175 a partir de
+  `scripts/arte/formas.mjs`. São desenhos da própria casa, em SVG, na paleta do
+  site: **nenhum reproduz embalagem, logotipo ou identidade de fabricante.**
 - **Banners:** os arquivos em `public/banners/` são recortes da peça de
   referência, em baixa resolução. Servem para o layout ficar de pé; troque por
   fotografia real de campanha quando houver.

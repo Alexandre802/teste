@@ -21,9 +21,15 @@ build e do typecheck. Não é para evoluir aquele código a partir daqui.
    item em outro, nem alterar a embalagem de uma marca.
 4. **Nada de texto escondido para buscador.** Os termos de busca vivem no
    conteúdo visível e em `termos` do catálogo, que alimenta a busca do topo.
-5. **Foto entra pelo nome do arquivo.** Salvar em `public/produtos/` com o nome
-   igual ao `id` do produto basta — `npm run fotos` gera o mapa e roda sozinho
-   antes de `dev` e `build`. Não é preciso editar o catálogo para isso.
+5. **Imagem entra pelo nome do arquivo.** A busca é em quatro níveis: `imagem`
+   no catálogo → `public/produtos/<id>` (foto real) → `public/ilustracoes/<id>`
+   (desenho da casa) → placeholder. `npm run fotos` gera o mapa e roda sozinho
+   antes de `dev` e `build`. Soltar a foto real em `public/produtos/` já
+   substitui a ilustração, sem apagar nada.
+6. **As ilustrações não imitam marca.** `scripts/arte/formas.mjs` desenha
+   formas genéricas na paleta da casa — saco, sachê, frasco, coleira. Nenhuma
+   reproduz embalagem, logotipo ou identidade visual de fabricante, e nenhuma
+   pode passar a reproduzir.
 
 ## Antes de dar por pronto
 
