@@ -21,3 +21,10 @@ Thumbs.db
 /next-env.d.ts
 /node_modules
 .vercel
+
+# cache das skills
+__pycache__/
+*.pyc
+
+# build info do TypeScript
+tsconfig.tsbuildinfo

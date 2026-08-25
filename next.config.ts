@@ -3,9 +3,8 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
-    // Fotos hospedadas no Google (perfil do Google Maps). Trocar por arquivos
-    // locais em /public assim que houver ensaio fotográfico próprio.
-    remotePatterns: [{ protocol: 'https', hostname: 'lh3.googleusercontent.com' }],
+    // Todas as imagens do site são locais, em /public. Se um dia as fotos dos
+    // produtos vierem de um CDN, libere o domínio aqui em `remotePatterns`.
   },
 };
 

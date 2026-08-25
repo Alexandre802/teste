@@ -1,13 +1,10 @@
 import type { MetadataRoute } from 'next';
-import { business } from '@/lib/business';
+import { business } from '@/data/business';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
+  const agora = new Date();
   return [
-    { url: business.siteUrl, lastModified: now, changeFrequency: 'weekly', priority: 1 },
-    { url: `${business.siteUrl}/#cardapio`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${business.siteUrl}/#sobre`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
-    { url: `${business.siteUrl}/#promocoes`, lastModified: now, changeFrequency: 'weekly', priority: 0.6 },
-    { url: `${business.siteUrl}/#contato`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
+    { url: business.siteUrl, lastModified: agora, changeFrequency: 'weekly', priority: 1 },
+    { url: `${business.siteUrl}/login`, lastModified: agora, changeFrequency: 'yearly', priority: 0.2 },
   ];
 }

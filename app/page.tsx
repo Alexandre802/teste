@@ -1,52 +1,57 @@
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import Hero from '@/components/hero/Hero';
-import ClienteDeVolta from '@/components/account/ClienteDeVolta';
-import MenuSection from '@/components/menu/MenuSection';
-import Bebidas from '@/components/sections/Bebidas';
-import Featured from '@/components/sections/Featured';
-import About from '@/components/sections/About';
-import Reviews from '@/components/sections/Reviews';
-import Gallery from '@/components/sections/Gallery';
-import Promocoes from '@/components/sections/Promocoes';
-import Versiculo from '@/components/sections/Versiculo';
-import Location from '@/components/sections/Location';
-import BuscaLocal from '@/components/sections/BuscaLocal';
-import CartFab from '@/components/cart/CartFab';
-import { Grain, Marquee, ScrollProgress } from '@/components/ui/Motion';
+import HeroCarousel from '@/components/home/HeroCarousel';
+import BenefitsBar from '@/components/home/BenefitsBar';
+import SpeciesCategories from '@/components/home/SpeciesCategories';
+import PromoBanners from '@/components/home/PromoBanners';
+import DepartmentCards from '@/components/home/DepartmentCards';
+import ProductSection from '@/components/home/ProductSection';
+import ServicesSection from '@/components/home/ServicesSection';
+import WhatsAppFloatingButton from '@/components/ui/WhatsAppFloatingButton';
+import { secoes } from '@/data/sections';
+import { produtosDaCategoria, produtosDestaque } from '@/data/products';
 
+/**
+ * A home. A ordem das seções de produtos vem de data/sections.ts — para criar,
+ * renomear ou reordenar uma seção, mexa lá, não aqui.
+ */
 export default function Home() {
   return (
     <>
-      <ScrollProgress />
-      <Grain />
       <Header />
-      <main>
-        <Hero />
-        <Marquee
-          items={[
-            'Lanches bem servidos',
-            'Delivery em Jacareí',
-            'Abre às 19h',
-            'Bandeira Branca I',
-            'Retirada na porta',
-          ]}
+
+      <main id="conteudo">
+        <HeroCarousel />
+        <BenefitsBar />
+        <SpeciesCategories />
+        <PromoBanners />
+        <DepartmentCards />
+
+        <ProductSection
+          id="destaques"
+          titulo="Produtos em destaque"
+          produtos={produtosDestaque}
+          verTodasHref="#departamentos"
+          prioridadeImagens
         />
-        <ClienteDeVolta />
-        <MenuSection />
-        <Bebidas />
-        <Featured />
-        <About />
-        <Versiculo />
-        <Gallery />
-        <Promocoes />
-        <Location />
-        <BuscaLocal />
-        {/* avaliações ficam no fim, depois de tudo que ajuda a decidir o pedido */}
-        <Reviews />
+
+        {secoes.map((secao) => (
+          <ProductSection
+            key={secao.id}
+            id={secao.id}
+            titulo={secao.titulo}
+            legenda={secao.legenda}
+            produtos={produtosDaCategoria(secao.categoria)}
+            ancoraEspecie={secao.ancoraEspecie}
+            verTodasHref="#departamentos"
+          />
+        ))}
+
+        <ServicesSection />
       </main>
+
       <Footer />
-      <CartFab />
+      <WhatsAppFloatingButton />
     </>
   );
 }

@@ -2,20 +2,25 @@
 
 import { useSyncExternalStore } from 'react';
 
-const noop = () => () => {};
+/** Assinatura vazia: o valor nunca muda depois da hidratação. */
+const semAssinatura = () => () => {};
 
 /**
  * `false` no servidor e no primeiro render do cliente, `true` depois.
  *
- * Usado por quem lê estado do localStorage (sacola, cliente, histórico): sem
- * isso o HTML do servidor e o primeiro render do cliente divergem e o React
- * acusa erro de hidratação. Resolve com useSyncExternalStore em vez de
- * setState dentro de efeito, que dispara render em cascata.
+ * O carrinho vive no localStorage, que o servidor não enxerga: sem isso o HTML
+ * do servidor diria "0 itens" e o cliente diria "3", e o React acusaria erro de
+ * hidratação. Componentes que leem o carrinho mostram o estado vazio até este
+ * hook virar.
+ *
+ * `useSyncExternalStore` é o caminho certo aqui justamente porque tem um
+ * instantâneo separado para o servidor — dá para distinguir os dois lados sem
+ * disparar um setState dentro de efeito.
  */
 export function useHydrated(): boolean {
   return useSyncExternalStore(
-    noop,
-    () => true,
-    () => false,
+    semAssinatura,
+    () => true, // cliente
+    () => false, // servidor
   );
 }

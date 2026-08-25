@@ -1,120 +1,108 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { business } from '@/lib/business';
-import { Logo } from '../ui/Logo';
+import { useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { business } from '@/data/business';
+import { IconeCaminhao, IconeLocal, IconeMenu, IconeUsuario } from '@/components/ui/Icons';
+import CartButton from './CartButton';
+import MobileMenu from './MobileMenu';
+import SearchBar from './SearchBar';
 
-const NAV = [
-  { href: '#inicio', label: 'Início' },
-  { href: '#cardapio', label: 'Cardápio' },
-  { href: '#sobre', label: 'Sobre nós' },
-  { href: '#promocoes', label: 'Promoções' },
-  { href: '#contato', label: 'Contato' },
-];
-
+/**
+ * Cabeçalho da referência, em três faixas:
+ *   1. azul institucional (#034782) — hambúrguer, marca, selo PremieR, conta e carrinho
+ *   2. a mesma faixa azul, com a busca ocupando quase toda a largura
+ *   3. azul de ação (#04559D) — entrega à esquerda, cidade à direita
+ *
+ * Fica fixo no topo: em uma página longa como esta, busca e carrinho precisam
+ * estar sempre a um toque de distância.
+ */
 export default function Header() {
-  const [scrolled, setScrolled] = useState(false);
-  const [active, setActive] = useState('#inicio');
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  // marca o item da navbar correspondente à seção visível
-  useEffect(() => {
-    const ids = NAV.map((n) => n.href.slice(1));
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible) setActive(`#${visible.target.id}`);
-      },
-      { rootMargin: '-45% 0px -50% 0px', threshold: [0, 0.25, 0.6] },
-    );
-    ids.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
-    return () => observer.disconnect();
-  }, []);
+  const [menuAberto, setMenuAberto] = useState(false);
 
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-        scrolled ? 'border-b border-white/25 bg-ember/70 py-2.5 backdrop-blur-xl' : 'border-b border-transparent py-5'
-      }`}
-    >
-      <div className="mx-auto flex w-full max-w-[86rem] items-center justify-between gap-6 px-5 sm:px-8">
-        <a href="#inicio" className="flex shrink-0 items-center gap-3 text-white">
-          <Logo size={scrolled ? 36 : 44} className="transition-all duration-300" />
-          <span className={`font-extrabold tracking-tight transition-all ${scrolled ? 'text-base' : 'text-lg'}`}>
-            {business.name}
-          </span>
-        </a>
+    <>
+      <header className="sticky top-0 z-50">
+        <div className="bg-brand-700">
+          <div className="shell py-2.5 sm:py-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button
+                type="button"
+                onClick={() => setMenuAberto(true)}
+                aria-label="Abrir menu"
+                aria-expanded={menuAberto}
+                className="grid h-11 w-11 shrink-0 place-items-center rounded-lg text-white transition-colors hover:bg-white/10"
+              >
+                <IconeMenu className="h-6 w-6" />
+              </button>
 
-        <nav aria-label="Navegação principal" className="hidden items-center gap-8 lg:flex">
-          {NAV.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              aria-current={active === item.href ? 'page' : undefined}
-              className="relative py-1 text-sm font-semibold text-white/85 transition-colors hover:text-white"
-            >
-              {item.label}
-              <span
-                className={`absolute -bottom-0.5 left-0 h-0.5 rounded-full bg-white transition-all duration-300 ${
-                  active === item.href ? 'w-full opacity-100' : 'w-0 opacity-0'
-                }`}
-              />
-            </a>
-          ))}
-        </nav>
+              <Link href="/" className="flex min-w-0 items-center gap-2 sm:gap-3">
+                <Image
+                  src="/marca/cachorro-gato.webp"
+                  alt=""
+                  width={116}
+                  height={88}
+                  priority
+                  className="h-11 w-11 rounded-lg object-cover sm:h-[3.5rem] sm:w-[4.25rem]"
+                />
+                <span className="min-w-0">
+                  <span className="block truncate text-[10px] font-semibold leading-tight tracking-[0.18em] text-white/85 sm:text-[13px]">
+                    {business.nomeLinha1}
+                  </span>
+                  <span className="block truncate text-[15px] font-extrabold leading-tight tracking-tight text-white sm:text-2xl lg:text-[1.75rem]">
+                    {business.nomeLinha2}
+                  </span>
+                </span>
+              </Link>
 
-        <div className="flex items-center gap-2">
-          <a
-            href="#cardapio"
-            className="hidden rounded-full border border-white/55 px-5 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:border-white hover:text-white sm:inline-flex"
-          >
-            Peça agora
-          </a>
+              {/* selo da marca parceira — fica só onde há largura para ele */}
+              <span aria-hidden="true" className="mx-1 hidden h-11 w-px bg-white/25 lg:block" />
+              <span className="hidden shrink-0 rounded-lg bg-brand-800 px-4 py-2 text-center leading-none lg:block">
+                <span className="block text-[1.375rem] font-bold italic tracking-tight text-white">
+                  PremieR
+                </span>
+                <span className="mt-1 block border-t border-white/35 pt-1 text-[10px] font-semibold tracking-[0.14em] text-white">
+                  SUPER PREMIUM
+                </span>
+              </span>
 
-          <button
-            type="button"
-            onClick={() => setMenuOpen((v) => !v)}
-            aria-expanded={menuOpen}
-            aria-controls="menu-mobile"
-            aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
-            className="rounded-full p-2.5 text-white lg:hidden"
-          >
-            <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              {menuOpen ? <path d="M18 6 6 18M6 6l12 12" /> : <path d="M3 7h18M3 12h18M3 17h18" />}
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      {menuOpen && (
-        <nav id="menu-mobile" aria-label="Navegação" className="mt-2.5 border-y border-white/25 bg-ember/85 backdrop-blur-xl lg:hidden">
-          <ul className="mx-auto flex w-full max-w-[86rem] flex-col px-5 py-2 sm:px-8">
-            {NAV.map((item) => (
-              <li key={item.href}>
-                <a
-                  href={item.href}
-                  onClick={() => setMenuOpen(false)}
-                  className="block border-b border-white/18 py-3.5 font-semibold text-white last:border-0"
+              <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1">
+                <Link
+                  href="/login"
+                  aria-label="Entrar na minha conta"
+                  className="grid h-11 w-11 place-items-center rounded-full text-white transition-colors hover:bg-white/10"
                 >
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      )}
-    </header>
+                  <IconeUsuario className="h-[26px] w-[26px]" />
+                </Link>
+                <CartButton />
+              </div>
+            </div>
+
+            <div className="mt-2.5 sm:mt-3">
+              <SearchBar />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-brand-500">
+          <div className="shell flex items-center justify-between gap-3 py-2 text-white">
+            <p className="flex min-w-0 items-center gap-2 text-[12px] font-semibold sm:text-sm">
+              <IconeCaminhao className="h-5 w-5 shrink-0" />
+              <span className="truncate">
+                {business.entrega.chamada}
+                <span className="hidden sm:inline"> • {business.entrega.prazo}</span>
+              </span>
+            </p>
+            <p className="flex shrink-0 items-center gap-1.5 text-[12px] font-semibold sm:text-sm">
+              <IconeLocal className="h-5 w-5" />
+              {business.cidadeUf}
+            </p>
+          </div>
+        </div>
+      </header>
+
+      <MobileMenu aberto={menuAberto} aoFechar={() => setMenuAberto(false)} />
+    </>
   );
 }

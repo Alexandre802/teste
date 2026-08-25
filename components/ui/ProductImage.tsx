@@ -1,49 +1,61 @@
 import Image from 'next/image';
-import { BurgerMark } from './Icons';
-import type { Product } from '@/lib/catalog';
+import type { Produto } from '@/data/products';
+import { icones, type NomeIcone } from './Icons';
+
+/** Que ícone representa a categoria quando ainda não há foto do produto. */
+const iconePorCategoria: Record<string, NomeIcone> = {
+  'racao-cachorro': 'racao',
+  'racao-gato': 'racao',
+  'petisco-cachorro': 'petisco',
+  'petisco-gato': 'petisco',
+  'brinquedo-cachorro': 'brinquedo',
+  'brinquedo-gato': 'brinquedo',
+  'higiene-cachorro': 'higiene',
+  'higiene-gato': 'higiene',
+  coleiras: 'coleira',
+  camas: 'cama',
+  peixes: 'peixe',
+  aves: 'ave',
+  coelhos: 'coelho',
+  repteis: 'reptil',
+  saude: 'saude',
+};
 
 /**
- * Foto do produto — ou o placeholder da marca.
- *
- * Produto sem fotografia confirmada NUNCA recebe a foto de outro item: cai no
- * placeholder. As fotos disponíveis foram extraídas do cardápio da casa e são
- * de baixa resolução; substituir por ensaio próprio melhora bastante o card.
+ * Foto do produto. Sem foto confirmada (`imagem: null`) mostra o placeholder da
+ * marca — ícone da categoria e o nome do fabricante — em vez de um quadrado
+ * vazio ou, pior, da foto de outro item.
  */
-export function ProductImage({
-  product,
-  sizes,
+export default function ProductImage({
+  produto,
+  sizes = '(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 220px',
   priority = false,
-  className = '',
 }: {
-  product: Product;
-  sizes: string;
+  produto: Produto;
+  sizes?: string;
   priority?: boolean;
-  className?: string;
 }) {
-  if (!product.image) {
+  if (produto.imagem) {
     return (
-      <div
-        className={`flex h-full w-full items-center justify-center bg-white/12 ${className}`}
-        aria-hidden="true"
-      >
-        <div className="flex flex-col items-center gap-1.5 opacity-70">
-          <BurgerMark className="h-8 w-8 text-white/80" />
-          <span className="text-[9px] font-extrabold uppercase tracking-[0.18em] text-white/70">
-            Michel Food House
-          </span>
-        </div>
-      </div>
+      <Image
+        src={produto.imagem}
+        alt={produto.nome}
+        fill
+        sizes={sizes}
+        priority={priority}
+        className="object-contain p-1"
+      />
     );
   }
 
+  const Icone = icones[iconePorCategoria[produto.categoria] ?? 'pata'];
+
   return (
-    <Image
-      src={product.image}
-      alt={`${product.name} — Michel Food House, lanches em Jacareí`}
-      fill
-      sizes={sizes}
-      priority={priority}
-      className={`object-cover ${className}`}
-    />
+    <div className="flex h-full w-full flex-col items-center justify-center gap-2 rounded-lg bg-surface-3 px-2">
+      <Icone className="h-10 w-10 text-brand-300" />
+      <span className="text-center text-[10px] font-bold uppercase tracking-[0.14em] text-brand-300">
+        {produto.marca}
+      </span>
+    </div>
   );
 }

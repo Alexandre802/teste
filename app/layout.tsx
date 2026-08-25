@@ -1,82 +1,99 @@
-import { headers } from 'next/headers';
 import type { Metadata, Viewport } from 'next';
-import { Plus_Jakarta_Sans } from 'next/font/google';
-import { business, fullAddress } from '@/lib/business';
-import { allSearchTerms, restaurantJsonLd } from '@/lib/seo';
+import { Montserrat } from 'next/font/google';
+import { business } from '@/data/business';
 import './globals.css';
 
-const jakarta = Plus_Jakarta_Sans({
+/* Montserrat é a fonte da peça de referência: geométrica, peso alto nos
+   títulos e leitura limpa nos textos de apoio. */
+const montserrat = Montserrat({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-jakarta',
+  variable: '--font-montserrat',
+  weight: ['400', '500', '600', '700', '800'],
 });
+
+const titulo = `${business.nome} | Pet Shop em Jacareí`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(business.siteUrl),
-  title: {
-    default: `${business.name} | Lanches em Jacareí`,
-    template: `%s | ${business.name}`,
-  },
-  description: business.description,
-  keywords: allSearchTerms,
-  applicationName: business.name,
+  title: { default: titulo, template: `%s | ${business.nome}` },
+  description: business.descricao,
+  applicationName: business.nome,
   alternates: { canonical: '/' },
+  keywords: [
+    'pet shop Jacareí',
+    'casa de ração Jacareí',
+    'ração PremieR',
+    'ração para cachorro',
+    'ração para gato',
+    'acessórios para pet',
+    'Bandeira Branca',
+  ],
   openGraph: {
     type: 'website',
     locale: 'pt_BR',
     url: business.siteUrl,
-    siteName: business.name,
-    title: `${business.name} | Lanches em Jacareí`,
-    description: business.description,
-    images: [{ url: '/og.png', width: 1200, height: 630, alt: `${business.name} — ${business.slogan}` }],
+    siteName: business.nome,
+    title: titulo,
+    description: business.descricao,
+    images: [
+      {
+        url: '/banners/cachorro-e-gato.webp',
+        width: 940,
+        height: 624,
+        alt: 'Cachorro e gato — Casa de Ração Bandeira Branca',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${business.name} | Lanches em Jacareí`,
-    description: business.description,
-    images: ['/og.png'],
+    title: titulo,
+    description: business.descricao,
+    images: ['/banners/cachorro-e-gato.webp'],
   },
   robots: { index: true, follow: true },
-  other: { 'geo.placename': `${business.address.city}, ${business.address.state}`, 'geo.region': 'BR-SP' },
+  other: { 'geo.placename': business.cidadeUf, 'geo.region': 'BR-SP' },
 };
 
 export const viewport: Viewport = {
-  themeColor: '#f2620c',
-  colorScheme: 'dark',
+  themeColor: '#034782',
+  colorScheme: 'light',
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  // nonce gerado pelo middleware: sem ele a CSP bloqueia o próprio JSON-LD
-  const nonce = (await headers()).get('x-nonce') ?? undefined;
+/** Ficha da loja para os buscadores. Só entra o que está confirmado. */
+function fichaDaLoja() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'PetStore',
+    name: business.nome,
+    description: business.descricao,
+    url: business.siteUrl,
+    telephone: business.telefone,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: business.cidade,
+      addressRegion: business.estado,
+      addressCountry: 'BR',
+      ...(business.enderecoCompleto ? { streetAddress: business.enderecoCompleto } : {}),
+    },
+    areaServed: business.cidadeUf,
+  };
+}
 
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={jakarta.variable}>
+    <html lang="pt-BR" className={montserrat.variable}>
       <body className="antialiased">
         <a
-          href="#cardapio"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-white focus:px-5 focus:py-3 focus:font-bold focus:text-cocoa"
+          href="#conteudo"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-white focus:px-5 focus:py-3 focus:font-bold focus:text-brand-700"
         >
-          Pular para o cardápio
+          Pular para o conteúdo
         </a>
         {children}
         <script
-          nonce={nonce}
           type="application/ld+json"
-          // JSON-LD gerado a partir de lib/business.ts + lib/catalog.ts.
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(restaurantJsonLd()) }}
-        />
-        <script
-          nonce={nonce}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'WebSite',
-              name: business.name,
-              url: business.siteUrl,
-              description: `${business.name} — ${fullAddress}`,
-            }),
-          }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(fichaDaLoja()) }}
         />
       </body>
     </html>

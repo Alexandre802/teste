@@ -1,0 +1,128 @@
+@import 'tailwindcss';
+
+/* ───────────────────────── design tokens ─────────────────────────
+   Laranja vivo em toda a página — não há fundo escuro em lugar nenhum.
+   A profundidade vem de tons dentro do próprio laranja e de vidro branco
+   translúcido, nunca de preto.                                           */
+@theme {
+  --color-flare: #ff8a2b; /* laranja mais claro — topo do gradiente */
+  --color-flame: #f2620c; /* laranja base da marca */
+  --color-ember: #d8490a; /* laranja queimado */
+  --color-ember-deep: #a8380a; /* profundidade, cantos e rodapé */
+  --color-amber: #ffa43d;
+  --color-gold: #ffd28a; /* dourado claro — detalhes sobre laranja */
+
+  --color-cream: #ffffff; /* texto principal */
+  --color-muted: #ffe4cf; /* texto auxiliar sobre laranja */
+  --color-cocoa: #5a2005; /* marrom — texto sobre superfície branca */
+
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --radius-card: 1.25rem;
+}
+
+/* ───────────────────────────── base ───────────────────────────── */
+@layer base {
+  * {
+    border-color: rgb(255 255 255 / 0.25);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5.5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    color: var(--color-cream);
+    font-family: var(--font-sans);
+    /* laranja vivo do topo ao rodapé, com variação suave para dar volume */
+    background-color: var(--color-flame);
+    background-image:
+      radial-gradient(120% 70% at 78% 0%, #ff9a3f 0%, transparent 55%),
+      radial-gradient(90% 60% at 5% 40%, #ff7a18 0%, transparent 60%),
+      linear-gradient(180deg, #ff7a18 0%, #f2620c 38%, #e2530b 70%, #d0450a 100%);
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    background: #fff;
+    color: var(--color-ember);
+  }
+
+  :where(a, button, input, textarea, select, [tabindex]):focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+    border-radius: 0.5rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+/* ──────────────────────────── utilitários ──────────────────────── */
+
+/* vidro branco sobre laranja — a única fonte de "card" do site */
+@utility glass {
+  /* laranja profundo translúcido: mantém a paleta e devolve contraste para o
+     texto branco, que sobre branco-sobre-laranja ficava ilegível */
+  background: linear-gradient(165deg, rgb(255 255 255 / 0.24) 0%, rgb(150 48 8 / 0.46) 100%);
+  backdrop-filter: blur(16px) saturate(1.15);
+  -webkit-backdrop-filter: blur(16px) saturate(1.15);
+  border: 1px solid rgb(255 255 255 / 0.28);
+  box-shadow:
+    0 14px 34px -16px rgb(120 45 5 / 0.55),
+    inset 0 1px 0 0 rgb(255 255 255 / 0.3);
+}
+
+@utility glass-strong {
+  background: rgb(255 255 255 / 0.2);
+  backdrop-filter: blur(24px) saturate(1.2);
+  -webkit-backdrop-filter: blur(24px) saturate(1.2);
+  border: 1px solid rgb(255 255 255 / 0.36);
+  box-shadow: 0 26px 60px -22px rgb(110 40 5 / 0.7);
+}
+
+/* painéis (sacola, modal): fundo laranja sólido para o texto não competir
+   com o conteúdo atrás */
+@utility panel {
+  background: linear-gradient(170deg, #ff8a2b 0%, #ef5c0a 55%, #d8490a 100%);
+  border: 1px solid rgb(255 255 255 / 0.32);
+  box-shadow: 0 30px 70px -20px rgb(90 32 5 / 0.75);
+}
+
+/* Realce quente para uma palavra dentro do título. Fica na família do
+   laranja: vai do branco ao dourado claro, sem introduzir outro matiz. */
+@utility text-realce {
+  background: linear-gradient(100deg, #ffffff 0%, #ffd28a 55%, #ffb35c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@keyframes mfh-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+
+@utility animate-bob {
+  animation: mfh-bob 2.2s ease-in-out infinite;
+}

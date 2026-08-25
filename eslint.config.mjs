@@ -6,7 +6,14 @@ const config = [
   ...nextTypescript,
   {
     // Fora do app: skills do Claude Code, imagens de referência e build.
-    ignores: ['.next/**', '.vercel/**', 'node_modules/**', 'next-env.d.ts', '.claude/**', 'referencias/**'],
+    ignores: ['.next/**', '.vercel/**', 'node_modules/**', 'next-env.d.ts', '.claude/**', 'arquivo/**'],
+  },
+  {
+    // Argumentos com underscore marcam o que ainda não é usado de propósito —
+    // é o caso das funções de lib/auth.ts, que esperam o back-end.
+    rules: {
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+    },
   },
   {
     // Ferramentas de linha de comando: rodam no Node direto, sem bundler, e
