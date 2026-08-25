@@ -3,6 +3,10 @@ import { NextResponse, type NextRequest } from 'next/server';
 /**
  * Cabeçalhos de segurança em toda resposta.
  *
+ * Arquivo `proxy.ts`: é a convenção do Next 16. `middleware.ts` ainda
+ * funciona, mas entra por um caminho de compatibilidade — e era ali que a
+ * publicação na Vercel quebrava, depois de o build já ter terminado.
+ *
  * A CSP usa nonce por requisição em vez de liberar `unsafe-inline` para
  * script: com `unsafe-inline` qualquer injeção de HTML vira execução de
  * código, que é a porta de entrada mais comum de roubo de dados em site de
@@ -13,7 +17,19 @@ import { NextResponse, type NextRequest } from 'next/server';
  * escrevem no atributo `style` dos elementos, e não há como assinar isso.
  * O risco é bem menor — CSS injetado não executa código.
  */
-export function middleware(request: NextRequest) {
+/**
+ * Caminhos que não precisam de cabeçalho de segurança: imagem não executa
+ * script. Filtrar aqui, e não por `config.matcher`, é deliberado — ver a nota
+ * no fim do arquivo.
+ */
+const SEM_CABECALHO = ['/_next/static', '/_next/image', '/produtos/', '/lanche/', '/marca/'];
+
+export function proxy(request: NextRequest) {
+  const caminho = request.nextUrl.pathname;
+  if (SEM_CABECALHO.some((prefixo) => caminho.startsWith(prefixo))) {
+    return NextResponse.next();
+  }
+
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
   const dev = process.env.NODE_ENV !== 'production';
 
@@ -62,16 +78,14 @@ export function middleware(request: NextRequest) {
   return resposta;
 }
 
-export const config = {
-  /**
-   * Só a forma de string é aceita pelo validador de deploy da Vercel — a
-   * forma de objeto (`source` + `missing`) passa no `next build` local e é
-   * recusada na publicação.
-   *
-   * O padrão aqui não tem nenhum caractere escapado nem alternância de
-   * extensão: é o exemplo canônico da documentação do Next, com as pastas de
-   * imagem excluídas por prefixo. Menos coisa para o validador interpretar,
-   * menos chance de recusa — e as fotos deixam de invocar a função à toa.
-   */
-  matcher: ['/((?!_next/static|_next/image|favicon|apple-icon|produtos/|lanche/|marca/).*)'],
-};
+/*
+ * Sem `export const config`.
+ *
+ * O `config.matcher` é a única coisa deste projeto que a Vercel converte com
+ * path-to-regexp depois do build — e era ali que a publicação quebrava com
+ * "Unhandled type: ColonToken", já com o `next build` concluído. Sem matcher,
+ * o manifesto sai sem nenhum padrão para converter, e não há o que falhar.
+ *
+ * O custo é a função rodar também para arquivo estático; o filtro acima
+ * devolve a resposta na primeira linha nesse caso.
+ */
