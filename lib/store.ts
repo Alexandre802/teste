@@ -22,9 +22,11 @@ export type FulfillmentMode = 'entrega' | 'retirada';
 
 export interface Customer {
   name: string;
+  /** Vazio quando o cliente entrou como convidado sem informar telefone. */
   phone: string;
-  /** Como o cliente se identificou. 'facebook' exige app Meta configurado. */
-  provider: 'telefone' | 'facebook';
+  /** Como o cliente se identificou. */
+  provider: 'telefone' | 'email' | 'google' | 'facebook' | 'convidado';
+  email?: string;
   address?: string;
 }
 

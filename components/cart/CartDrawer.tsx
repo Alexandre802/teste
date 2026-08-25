@@ -8,10 +8,10 @@ import { ProductImage } from '../ui/ProductImage';
 import { Sheet } from '../ui/Sheet';
 import { Button } from '../ui/Button';
 import { WhatsAppIcon } from '../ui/Icons';
-import LoginSheet from '../account/LoginSheet';
+import LoginStep from '../account/LoginStep';
 import PaymentStep from './PaymentStep';
 
-type Step = 'sacola' | 'entrega' | 'pagamento';
+type Step = 'sacola' | 'entrega' | 'login' | 'pagamento';
 
 export default function CartDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
   const lines = useShop((s) => s.lines);
@@ -21,18 +21,12 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
 
   const [step, setStep] = useState<Step>('sacola');
   const [orderNote, setOrderNote] = useState('');
-  const [loginOpen, setLoginOpen] = useState(false);
 
   const total = cartTotal(lines);
   const empty = lines.length === 0;
 
-  const goToPayment = () => {
-    if (!customer) {
-      setLoginOpen(true);
-      return;
-    }
-    setStep('pagamento');
-  };
+  /** Cliente já identificado não vê a tela de login de novo. */
+  const goToPayment = () => setStep(customer ? 'pagamento' : 'login');
 
   /** Fecha o pedido pelo WhatsApp — funciona sem gateway configurado. */
   const finishOnWhatsapp = (paymentStatus?: 'pago' | 'pagar-na-entrega') => {
@@ -49,7 +43,15 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
       <Sheet
         open={open}
         onClose={onClose}
-        title={step === 'sacola' ? 'Sua sacola' : step === 'entrega' ? 'Entrega ou retirada' : 'Pagamento'}
+        title={
+          step === 'sacola'
+            ? 'Sua sacola'
+            : step === 'entrega'
+              ? 'Entrega ou retirada'
+              : step === 'login'
+                ? 'Identifique-se'
+                : 'Pagamento'
+        }
         footer={
           empty ? undefined : (
             <div className="flex flex-col gap-3">
@@ -196,7 +198,7 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
                   )}
                   <button
                     type="button"
-                    onClick={() => setLoginOpen(true)}
+                    onClick={() => setStep('login')}
                     className="mt-2 text-xs font-bold text-white underline underline-offset-2"
                   >
                     alterar dados
@@ -207,7 +209,7 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
                   <p className="text-sm text-muted">
                     Falta só se identificar para a casa saber quem está pedindo.
                   </p>
-                  <Button size="sm" className="mt-3" onClick={() => setLoginOpen(true)}>
+                  <Button size="sm" className="mt-3" onClick={() => setStep('login')}>
                     Identificar-me
                   </Button>
                 </>
@@ -232,23 +234,34 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
         )}
 
         {/* ─────────────── passo 3: pagamento ─────────────── */}
+        {!empty && step === 'login' && (
+          <div className="flex flex-col gap-5">
+            <p className="text-sm leading-relaxed text-white/90">
+              Falta pouco. Entre para a casa lembrar do seu pedido na próxima, ou siga como
+              convidado — o pedido sai igual dos dois jeitos.
+            </p>
+            <LoginStep onDone={() => setStep('pagamento')} />
+            <button
+              type="button"
+              onClick={() => setStep('entrega')}
+              className="text-sm font-bold text-white/80 underline underline-offset-4 hover:text-white"
+            >
+              Voltar para entrega
+            </button>
+          </div>
+        )}
+
         {!empty && step === 'pagamento' && (
           <PaymentStep
             lines={lines}
             mode={mode}
             note={orderNote}
-            onBack={() => setStep('entrega')}
+            onBack={() => setStep('login')}
             onPaid={() => finishOnWhatsapp('pago')}
             onWhatsappOnly={() => finishOnWhatsapp('pagar-na-entrega')}
           />
         )}
       </Sheet>
-
-      <LoginSheet
-        open={loginOpen}
-        onClose={() => setLoginOpen(false)}
-        onDone={() => setStep('pagamento')}
-      />
     </>
   );
 }
