@@ -89,6 +89,49 @@ const cobertos = await p.evaluate(() => {
 });
 checa('botões do topo recebem clique', cobertos.length === 0, cobertos.join('; ') || 'todos livres');
 
+/* ── o botão flutuante do WhatsApp não pode roubar toque de nenhum card ── */
+{
+  const celular = await (await nav.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })).newPage();
+  await celular.goto(BASE, { waitUntil: 'networkidle' });
+  await celular.waitForTimeout(700);
+  await celular.evaluate(() => { document.documentElement.style.scrollBehavior = 'auto'; });
+
+  let roubados = 0;
+  for (let y = 0; y < 12000; y += 200) {
+    await celular.evaluate((v) => window.scrollTo(0, v), y);
+    await celular.waitForTimeout(60);
+    roubados += await celular.evaluate(() => {
+      const fab = document.querySelector('a[aria-label^="Falar no WhatsApp"]');
+      if (!fab) return 0;
+      let n = 0;
+      document.querySelectorAll('button[aria-label^="Adicionar"]').forEach((el) => {
+        const b = el.getBoundingClientRect();
+        // o que está sob o cabeçalho fixo é rolagem normal, não obstrução
+        if (b.top < 176 || b.bottom > innerHeight || b.width === 0) return;
+        const centro = document.elementFromPoint(b.x + b.width / 2, b.y + b.height / 2);
+        if (centro && centro !== el && !el.contains(centro) && fab.contains(centro)) n++;
+      });
+      return n;
+    });
+  }
+  checa('bolha do WhatsApp não cobre botão de card', roubados === 0, `${roubados} card(s) bloqueado(s)`);
+
+  const opacidade = () => celular.locator('a[aria-label^="Falar no WhatsApp"]').evaluate((e) => getComputedStyle(e).opacity);
+  const rolarAte = async (y) => { await celular.evaluate((v) => window.scrollTo(0, v), y); await celular.waitForTimeout(500); };
+  await rolarAte(0);
+  checa('bolha aparece no topo', (await opacidade()) === '1');
+  await rolarAte(1400);
+  checa('bolha some ao descer', (await opacidade()) === '0');
+  await rolarAte(1000);
+  checa('bolha volta ao subir', (await opacidade()) === '1');
+
+  await celular.goto(BASE + '/carrinho', { waitUntil: 'networkidle' });
+  await celular.waitForTimeout(400);
+  checa('carrinho não tem bolha (a página já é um CTA de WhatsApp)',
+        (await celular.locator('a[aria-label^="Falar no WhatsApp"]').count()) === 0);
+  await celular.close();
+}
+
 /* ── busca ── */
 const campo = p.getByRole('combobox');
 for (const [termo, esperado] of [['premier', 'premier'], ['ração cachorro', 'cães'], ['whiskas', 'whiskas'], ['arranhador', 'arranhador']]) {

@@ -109,7 +109,9 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-white/15">
-        <div className="shell flex flex-col gap-1 py-4 text-[12px] text-white/70 sm:flex-row sm:items-center sm:justify-between">
+        {/* folga extra embaixo no celular: é onde a bolha do WhatsApp mora, e a
+            última linha do rodapé não pode ficar debaixo dela */}
+        <div className="shell flex flex-col gap-1 py-4 pb-20 text-[12px] text-white/70 sm:flex-row sm:items-center sm:justify-between sm:pb-4">
           <p>
             © {ano} {business.nome}. Todos os direitos reservados.
           </p>

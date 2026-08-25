@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import CartView from '@/components/cart/CartView';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import WhatsAppFloatingButton from '@/components/ui/WhatsAppFloatingButton';
 
 export const metadata: Metadata = {
   title: 'Meu carrinho',
@@ -10,6 +9,8 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 
+/* Sem o botão flutuante do WhatsApp aqui de propósito: a ação principal desta
+   página já é "Fechar pedido no WhatsApp", e a bolha ficava por cima dela. */
 export default function CarrinhoPage() {
   return (
     <>
@@ -18,7 +19,6 @@ export default function CarrinhoPage() {
         <CartView />
       </main>
       <Footer />
-      <WhatsAppFloatingButton />
     </>
   );
 }
