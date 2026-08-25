@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { createHmac, randomInt, timingSafeEqual } from 'node:crypto';
-import { identificadorAnonimo, limitarTaxa, log } from '@/lib/seguranca';
+import { createHmac, timingSafeEqual } from 'node:crypto';
+import { identificadorAnonimo, limitarTaxa } from '@/lib/seguranca';
 
 /**
  * Código de acesso por e-mail, sem banco de dados.

@@ -1,6 +1,6 @@
 import { business, whatsappUrl } from '@/lib/business';
 import { Logo } from '../ui/Logo';
-import { BurgerMark, WhatsAppIcon } from '../ui/Icons';
+import { WhatsAppIcon } from '../ui/Icons';
 
 const LINKS = [
   { href: '#inicio', label: 'Início' },

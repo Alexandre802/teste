@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/checar-config-vercel.cjs",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "checar-config": "node scripts/checar-config-vercel.cjs --exigir"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.120.0",

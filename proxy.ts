@@ -17,11 +17,9 @@ import { NextResponse, type NextRequest } from 'next/server';
  * escrevem no atributo `style` dos elementos, e não há como assinar isso.
  * O risco é bem menor — CSS injetado não executa código.
  */
-/**
- * Caminhos que não precisam de cabeçalho de segurança: imagem não executa
- * script. Filtrar aqui, e não por `config.matcher`, é deliberado — ver a nota
- * no fim do arquivo.
- */
+
+// Caminhos que dispensam cabeçalho de segurança: imagem não executa script.
+// Filtrar aqui, e não por `config.matcher`, é deliberado — ver a nota no fim.
 const SEM_CABECALHO = ['/_next/static', '/_next/image', '/produtos/', '/lanche/', '/marca/'];
 
 export function proxy(request: NextRequest) {
@@ -79,13 +77,25 @@ export function proxy(request: NextRequest) {
 }
 
 /*
- * Sem `export const config`.
+ * ATENÇÃO ao mexer no bloco abaixo.
  *
- * O `config.matcher` é a única coisa deste projeto que a Vercel converte com
- * path-to-regexp depois do build — e era ali que a publicação quebrava com
- * "Unhandled type: ColonToken", já com o `next build` concluído. Sem matcher,
- * o manifesto sai sem nenhum padrão para converter, e não há o que falhar.
+ * A Vercel lê este `config` com @vercel/static-config, que percorre o AST do
+ * TypeScript. O leitor dela faz:
  *
- * O custo é a função rodar também para arquivo estático; o filtro acima
- * devolve a resposta na primeira linha nesse caso.
+ *     const [nome, _doisPontos, valor] = prop.getChildren();
+ *
+ * e assume três filhos por propriedade. Comentário JSDoc (barra-asterisco-
+ * asterisco) DENTRO do objeto vira um nó do AST, entra como primeiro filho e
+ * desloca tudo: o leitor acaba pedindo o valor do próprio token de dois
+ * pontos e a publicação morre com `Unhandled type: "ColonToken"` — depois de
+ * o `next build` já ter concluído, o que torna o erro difícil de rastrear.
+ *
+ * Comentário de linha (barra-barra) é trivia, não vira nó, e é seguro.
+ * Por isso toda explicação fica aqui fora e o objeto abaixo é mínimo.
+ *
+ * Há um verificador em scripts/checar-config-vercel.cjs que roda o mesmo
+ * leitor da Vercel sobre o projeto.
  */
+export const config = {
+  matcher: ['/((?!_next/static|_next/image|favicon|apple-icon|produtos/|lanche/|marca/).*)'],
+};

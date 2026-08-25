@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { business } from '@/lib/business';
 import { formatPrice, productsById } from '@/lib/catalog';
 import { notifyStore, storeNumber, whatsappApiEnabled, whatsappTemplateEnabled } from '@/lib/whatsapp-api';
-import { identificadorAnonimo, limitarTaxa, log } from '@/lib/seguranca';
+import { identificadorAnonimo, limitarTaxa } from '@/lib/seguranca';
 
 export const runtime = 'nodejs';
 
