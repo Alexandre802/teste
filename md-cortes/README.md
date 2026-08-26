@@ -87,21 +87,32 @@ Os dois podem ser rodados de novo sem quebrar nada.
 
 ### 4. Apontar o app para o projeto
 
+**Pelo próprio aplicativo** (é o caminho normal, e não exige gerar o site de
+novo): em **Perfil → Conectar à nuvem**, cole o *Project URL* e a chave *anon
+public*. O app guarda no aparelho e recarrega já conectado.
+
+Feito isso, o botão **Copiar link para o outro celular** empacota a mesma
+configuração num endereço. Quem abrir esse link entra conectado sem digitar
+nada — é assim que o segundo e o terceiro celular são configurados.
+
+**Pela build**, se preferir deixar fixo no site publicado:
+
 ```bash
 cp .env.example .env.local
 ```
-
-E preencha:
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
 ```
 
-A chave `anon` é pública por natureza e pode ficar no JavaScript entregue ao
-celular. Quem protege os dados é a RLS do passo 3, não o segredo da chave.
+A ordem de precedência é: o que foi salvo no aparelho vence; sem isso valem as
+variáveis da build; sem nem isso, o app abre em modo local.
 
-Rode `npm run build` de novo: agora o app entra em modo nuvem.
+A chave `anon` é pública por natureza e pode ficar no JavaScript entregue ao
+celular — por isso ela também pode viajar no link de convite. Quem protege os
+dados é a RLS do passo 3, não o segredo da chave. A `service_role` é outra
+história e **nunca** entra em nenhum dos dois lugares.
 
 ---
 
@@ -110,17 +121,32 @@ Rode `npm run build` de novo: agora o app entra em modo nuvem.
 A build é um site estático — 1,7 MB de HTML, CSS, JS e ícones. Qualquer um
 destes serve, todos com plano gratuito:
 
-**GitHub Pages** (usa o repositório que você já tem)
+**GitHub Pages** — um comando:
 
 ```bash
-# Se o endereço final tiver subpasta, ex.: usuario.github.io/md-cortes
-echo 'NEXT_PUBLIC_BASE_PATH=/md-cortes' >> .env.local
-npm run build
+npm run publicar
 ```
 
-Depois publique o conteúdo de `out/` no branch `gh-pages` (ou aponte o Pages
-para a pasta). O `.nojekyll` não é necessário porque nada aqui começa com `_`
-fora de `_next`, mas se o Pages engasgar, crie um arquivo vazio `out/.nojekyll`.
+O script gera o site e empurra **só o compilado** para o branch `gh-pages`
+(o código-fonte não vai junto — o repositório de origem pode ser privado e o
+Pages é público). Ele já inclui o `.nojekyll`, sem o qual o Jekyll do Pages
+engole a pasta `/_next/` inteira e o site abre em branco.
+
+Na primeira vez, ligue o Pages uma única vez:
+**Settings → Pages → Deploy from a branch → `gh-pages` → `/ (root)`**.
+O endereço fica `https://<usuario>.github.io/<repositorio>/`.
+
+O `BASE_PATH` padrão do script é `/teste`, que é o nome do repositório. Para
+outro repositório ou para um domínio próprio na raiz:
+
+```bash
+BASE_PATH=/outro-nome npm run publicar
+BASE_PATH= npm run publicar          # raiz de um domínio próprio
+```
+
+> Pages em repositório **privado** só existe nos planos pagos do GitHub. Se o
+> seu for privado e o plano for gratuito, ou torne o repositório público (o
+> site publicado é público de qualquer forma), ou use uma das opções abaixo.
 
 **Netlify / Cloudflare Pages** — arraste a pasta `out/` na área de deploy.
 Nenhuma configuração, nenhum servidor Node.
@@ -238,5 +264,6 @@ sugerido no formulário — o funcionário ainda pode mudar antes de lançar.
 | `npm start` | serve `out/` para conferir antes de publicar |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript sem emitir |
+| `npm run publicar` | gera o site e publica no branch `gh-pages` |
 | `npm run criar-usuarios` | cria os três usuários no Supabase Auth |
 | `npm run icones` | regenera os ícones da PWA a partir de `scripts/icone.html` |
