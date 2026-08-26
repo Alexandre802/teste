@@ -121,6 +121,23 @@ Atalho "ir para o conteúdo", foco visível em ciano, `aria-label` nos controles
 `aria-expanded` nos acordeões e no menu, teclado no visualizador de fotos
 (Esc, ← →) e texto alternativo descritivo em todas as fotos.
 
+## Prévia em arquivo único (para o cliente ver antes de publicar)
+
+```bash
+npm run previa   # gera previa/allp-fit-previa.html
+```
+
+O comando exporta o site estático e embute tudo — CSS, JavaScript, fontes e
+fotos — em um HTML só (~4 MB). O arquivo abre sozinho, sem servidor e sem
+domínio: dá para mandar por e-mail, anexar ou hospedar em qualquer lugar que
+sirva um arquivo. O site continua inteiro: menu, galeria em tela cheia, troca
+mensal/anual, acordeão e o formulário que monta a mensagem do WhatsApp.
+
+Duas diferenças em relação ao site publicado, ambas por conta do arquivo único:
+o mapa do Google entra como aviso com link (página embutida não carrega
+enquadramento de outro domínio) e o console mostra alguns pedidos a `/_next/…`
+que falham — a página já tem tudo embutido e não depende deles.
+
 ## Publicação
 
 O site é estático (`○ Static` no build). Em qualquer host que rode Next 16

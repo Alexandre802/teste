@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "previa": "PREVIA_ESTATICA=1 next build && node scripts/previa.mjs"
   },
   "dependencies": {
     "framer-motion": "^13.1.1",
