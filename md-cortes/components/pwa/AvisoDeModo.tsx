@@ -18,8 +18,8 @@ export function AvisoDeModo() {
       <Icone nome="celular" tamanho={15} className="mt-0.5 shrink-0 text-ouro/70" />
       <span>
         <strong className="font-semibold text-fumaca">Modo local.</strong> Os lançamentos ficam
-        guardados só neste aparelho. Para que o Maicon acompanhe em tempo real do celular dele,
-        configure o Supabase — o passo a passo está no README do projeto.
+        guardados só neste aparelho. Para que os três celulares vejam os mesmos cortes, conecte
+        à nuvem em <strong className="text-fumaca">Perfil → Conectar à nuvem</strong>.
       </span>
     </p>
   );

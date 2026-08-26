@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { Marca } from '@/components/layout/Marca';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { PrimeiroAcesso } from '@/components/auth/PrimeiroAcesso';
+import { ConfigNuvem } from '@/components/auth/ConfigNuvem';
 import { dados } from '@/lib/data';
 import { useSessao } from '@/lib/hooks/use-sessao';
 
@@ -17,6 +18,7 @@ export default function PaginaDeLogin() {
   // devolve `false` (nunca pede senha em HTML estático) e o navegador corrige
   // no primeiro render, sem um efeito que empurra estado.
   const [senhasDefinidas, setSenhasDefinidas] = useState(false);
+  const [nuvemAberta, setNuvemAberta] = useState(false);
   const precisaConfigurar = useSyncExternalStore(
     () => () => {},
     () => dados.precisaConfigurar(),
@@ -57,9 +59,14 @@ export default function PaginaDeLogin() {
         ) : configurar ? (
           <PrimeiroAcesso aoConcluir={() => setSenhasDefinidas(true)} />
         ) : (
-          <LoginForm aoEntrar={() => router.replace('/inicio')} />
+          <LoginForm
+            aoEntrar={() => router.replace('/inicio')}
+            aoConfigurarNuvem={() => setNuvemAberta(true)}
+          />
         )}
       </div>
+
+      <ConfigNuvem aberto={nuvemAberta} aoFechar={() => setNuvemAberta(false)} />
     </main>
   );
 }

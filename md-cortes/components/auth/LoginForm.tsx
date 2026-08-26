@@ -13,6 +13,7 @@ const PERFIS = [
 
 interface Props {
   aoEntrar: () => void;
+  aoConfigurarNuvem: () => void;
 }
 
 /**
@@ -23,7 +24,7 @@ interface Props {
  * exatamente a diferença que o pedido faz questão de marcar em relação a uma
  * tela de "escolha o perfil".
  */
-export function LoginForm({ aoEntrar }: Props) {
+export function LoginForm({ aoEntrar, aoConfigurarNuvem }: Props) {
   const { entrar, modo } = useSessao();
   const [usuario, setUsuario] = useState('');
   const [senha, setSenha] = useState('');
@@ -174,15 +175,27 @@ export function LoginForm({ aoEntrar }: Props) {
         )}
       </motion.button>
 
-      {modo === 'local' ? (
-        <p className="mt-4 flex items-start gap-2 rounded-xl border border-grafite bg-carvao/70 px-3 py-2.5 text-[0.74rem] leading-snug text-fumaca-fraca">
-          <Icone nome="celular" tamanho={14} className="mt-0.5 shrink-0 text-ouro/70" />
-          <span>
-            Modo local: os dados ficam guardados neste aparelho. Para o Maicon acompanhar do
-            celular dele, configure o Supabase — o passo a passo está no README.
-          </span>
-        </p>
-      ) : null}
+      <button
+        type="button"
+        onClick={aoConfigurarNuvem}
+        className="mt-4 flex w-full items-start gap-2 rounded-xl border border-grafite bg-carvao/70 px-3 py-2.5 text-left text-[0.74rem] leading-snug text-fumaca-fraca transition-colors hover:border-ouro/30"
+      >
+        <Icone nome="nuvem" tamanho={14} className="mt-0.5 shrink-0 text-ouro/70" />
+        <span className="flex-1">
+          {modo === 'local' ? (
+            <>
+              <strong className="font-semibold text-fumaca">Modo local.</strong> Os cortes ficam
+              só neste aparelho. Toque aqui para conectar os três celulares ao mesmo banco.
+            </>
+          ) : (
+            <>
+              <strong className="font-semibold text-fumaca">Conectado à nuvem.</strong> Toque aqui
+              para ver o projeto ou mandar o acesso para outro celular.
+            </>
+          )}
+        </span>
+        <Icone nome="seta-direita" tamanho={14} className="mt-0.5 shrink-0" />
+      </button>
     </form>
   );
 }

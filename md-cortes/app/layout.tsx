@@ -5,6 +5,7 @@ import { ProvedorDeSessao } from '@/lib/hooks/use-sessao';
 import { ProvedorDeToasts } from '@/lib/hooks/use-toasts';
 import { PilhaDeToasts } from '@/components/ui/ToastNotification';
 import { RegistroDoServiceWorker } from '@/components/pwa/RegistroDoServiceWorker';
+import { ConviteDaNuvem } from '@/components/pwa/ConviteDaNuvem';
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 
@@ -57,6 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {children}
             <PilhaDeToasts />
             <RegistroDoServiceWorker />
+            <ConviteDaNuvem />
           </ProvedorDeSessao>
         </ProvedorDeToasts>
       </body>

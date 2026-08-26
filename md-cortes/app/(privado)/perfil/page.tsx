@@ -1,10 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Icone } from '@/components/ui/Icone';
 import { Marca } from '@/components/layout/Marca';
 import { InstallPrompt } from '@/components/pwa/InstallPrompt';
+import { ConfigNuvem } from '@/components/auth/ConfigNuvem';
 import { useCentral } from '@/lib/hooks/use-central';
 import { useSessao } from '@/lib/hooks/use-sessao';
 import { useToasts } from '@/lib/hooks/use-toasts';
@@ -15,6 +17,7 @@ export default function PaginaPerfil() {
   const { perfil, ehAdmin, modo, sair } = useSessao();
   const { avisos, naoLidas } = useCentral();
   const { mostrar } = useToasts();
+  const [nuvemAberta, setNuvemAberta] = useState(false);
 
   if (!perfil) return null;
 
@@ -77,6 +80,29 @@ export default function PaginaPerfil() {
           ) : null}
         </section>
 
+        <button
+          type="button"
+          onClick={() => setNuvemAberta(true)}
+          className={`cartao flex w-full items-center gap-3 p-4 text-left transition-colors hover:border-ouro/30 ${
+            modo === 'local' ? 'border-ouro/25' : ''
+          }`}
+        >
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-ouro/30 bg-ouro/8 text-ouro">
+            <Icone nome="nuvem" tamanho={18} />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[0.9rem] font-semibold text-neve">
+              {modo === 'local' ? 'Conectar à nuvem' : 'Nuvem conectada'}
+            </span>
+            <span className="block text-[0.78rem] leading-snug text-fumaca-fraca">
+              {modo === 'local'
+                ? 'Para os três celulares verem os mesmos cortes e o Maicon receber os avisos.'
+                : 'Ver o projeto ou mandar o acesso para outro celular.'}
+            </span>
+          </span>
+          <Icone nome="seta-direita" tamanho={16} className="shrink-0 text-fumaca-fraca" />
+        </button>
+
         <InstallPrompt />
 
         {ehAdmin ? (
@@ -131,6 +157,8 @@ export default function PaginaPerfil() {
           <p className="text-[0.7rem] text-fumaca-fraca">Controle de cortes da barbearia</p>
         </div>
       </div>
+
+      <ConfigNuvem aberto={nuvemAberta} aoFechar={() => setNuvemAberta(false)} />
     </>
   );
 }

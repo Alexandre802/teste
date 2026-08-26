@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "criar-usuarios": "node scripts/criar-usuarios.mjs",
-    "icones": "python3 scripts/gerar-icones.py"
+    "icones": "python3 scripts/gerar-icones.py",
+    "publicar": "bash scripts/publicar.sh"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.47.10",

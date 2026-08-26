@@ -1,20 +1,24 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import type { AppNotification, Haircut, Profile, Service } from '@/lib/types';
 import { type Adapter, ErroDeLogin } from './adapter';
+import { lerConfigNuvem } from './config';
 
-const URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
-const CHAVE = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
 const DOMINIO = process.env.NEXT_PUBLIC_LOGIN_DOMAIN || 'mdcortes.app';
 
 export function nuvemConfigurada(): boolean {
-  return Boolean(URL && CHAVE);
+  return lerConfigNuvem() !== null;
 }
 
 let cliente: SupabaseClient | null = null;
 
 function sb(): SupabaseClient {
   if (!cliente) {
-    cliente = createClient(URL, CHAVE, {
+    const config = lerConfigNuvem();
+    if (!config) {
+      // Não deveria acontecer: o adapter da nuvem só é escolhido com config.
+      throw new Error('Supabase não configurado neste aparelho.');
+    }
+    cliente = createClient(config.url, config.chave, {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
