@@ -39,3 +39,11 @@ outra: toda animação é função de `useCurrentFrame()`.
 
 `.env.local` e `.mcp.json` leem chaves por variável de ambiente. Nunca escreva chave
 em arquivo versionado. Variáveis documentadas em `.env.example`.
+
+# md-cortes/ — projeto separado no mesmo repositório
+
+`md-cortes/` é outro produto, não uma parte do site da lanchonete: o sistema de
+controle de cortes da barbearia MD_cortes. Tem `package.json`, dependências,
+tokens e regras próprios — as regras acima (catálogo, fotos, paleta laranja)
+**não valem lá dentro**. A paleta dele é preto com dourado, ele sai como PWA
+estática (`output: 'export'`) e o backend é o Supabase. Veja `md-cortes/README.md`.

@@ -1,0 +1,222 @@
+@import 'tailwindcss';
+
+/* ═════════════════════════ MD_cortes — sistema visual ═════════════════════
+   Preto quase absoluto com uma gota de azul, cartões grafite e um único
+   acento: o dourado. Nada mais colore a interface — não há verde de sucesso
+   nem azul de link. O que precisa de atenção fica dourado; o resto é cinza.
+   Vermelho aparece só onde significa erro de verdade.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@theme {
+  /* fundo e superfícies */
+  --color-noite: #07080b;        /* fundo da aplicação */
+  --color-noite-alta: #0b0d12;   /* barras fixas sobre o fundo */
+  --color-carvao: #111319;       /* cartão */
+  --color-carvao-alto: #171a22;  /* cartão em destaque, campo de formulário */
+  --color-grafite: #232733;      /* borda, divisória, trilho */
+
+  /* dourado — o único acento */
+  --color-ouro: #d9a441;         /* dourado base, ícone e rótulo */
+  --color-ouro-claro: #f0cd80;   /* topo do gradiente, número em destaque */
+  --color-ouro-fundo: #a97b28;   /* base do gradiente, sombra do dourado */
+
+  /* texto */
+  --color-neve: #ffffff;         /* texto principal e números */
+  --color-fumaca: #9ba0ad;       /* texto secundário */
+  --color-fumaca-fraca: #666b78; /* legenda, eixo do gráfico */
+
+  /* estado */
+  --color-alerta: #e05a4e;
+
+  --font-sans: var(--fonte-app), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --radius-cartao: 1.125rem;
+  --radius-campo: 0.875rem;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    /* Altura da barra inferior + área segura do iPhone. Usada por qualquer
+       tela que precise não terminar embaixo do menu. */
+    --altura-barra: 4.25rem;
+    --seguro-baixo: env(safe-area-inset-bottom, 0px);
+    --seguro-alto: env(safe-area-inset-top, 0px);
+  }
+
+  * {
+    border-color: var(--color-grafite);
+  }
+
+  html {
+    background-color: var(--color-noite);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-noite);
+    /* Brilho dourado quase imperceptível no topo — dá profundidade sem virar
+       decoração. É a única fonte de luz da tela. */
+    background-image: radial-gradient(
+      120% 55% at 50% -10%,
+      rgb(217 164 65 / 0.09) 0%,
+      transparent 60%
+    );
+    background-attachment: fixed;
+    color: var(--color-neve);
+    font-family: var(--font-sans);
+    /* Aparência de aplicativo: sem realce azul no toque e sem o "elástico" que
+       denuncia página de navegador. */
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+    /* Regra do projeto: nunca existe rolagem horizontal no celular. */
+    overflow-x: hidden;
+  }
+
+  /* Cromo da interface não é texto a ser selecionado; conteúdo é. */
+  button,
+  nav,
+  [role='tab'],
+  [role='button'] {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-ouro);
+    outline-offset: 2px;
+    border-radius: 0.5rem;
+  }
+
+  /* Tira as setinhas do campo numérico: no celular elas só atrapalham. */
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+
+  ::selection {
+    background: var(--color-ouro);
+    color: #000;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-grafite);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+/* ───────────────────────────── superfícies ─────────────────────────────── */
+
+@utility cartao {
+  background: var(--color-carvao);
+  border: 1px solid rgb(35 39 51 / 0.9);
+  border-radius: var(--radius-cartao);
+  /* Sombra quase invisível: sobre preto, sombra forte vira sujeira. */
+  box-shadow: 0 1px 0 0 rgb(255 255 255 / 0.03) inset, 0 8px 24px -18px rgb(0 0 0 / 0.9);
+}
+
+@utility cartao-ouro {
+  background: linear-gradient(160deg, rgb(217 164 65 / 0.1) 0%, var(--color-carvao) 55%);
+  border: 1px solid rgb(217 164 65 / 0.28);
+  border-radius: var(--radius-cartao);
+}
+
+@utility borda-ouro-fraca {
+  border: 1px solid rgb(217 164 65 / 0.18);
+}
+
+/* ───────────────────────────── dourado ────────────────────────────────── */
+
+@utility texto-ouro {
+  background: linear-gradient(180deg, var(--color-ouro-claro) 0%, var(--color-ouro) 55%, var(--color-ouro-fundo) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility btn-ouro {
+  background: linear-gradient(180deg, var(--color-ouro-claro) 0%, var(--color-ouro) 62%, #c08f34 100%);
+  color: #21160a;
+  border-radius: var(--radius-campo);
+  font-weight: 700;
+  box-shadow: 0 10px 24px -14px rgb(217 164 65 / 0.85);
+}
+
+@utility btn-ouro-fantasma {
+  background: rgb(217 164 65 / 0.08);
+  color: var(--color-ouro);
+  border: 1px solid rgb(217 164 65 / 0.3);
+  border-radius: var(--radius-campo);
+  font-weight: 600;
+}
+
+/* ───────────────────────────── formulário ─────────────────────────────── */
+
+@utility campo {
+  background: var(--color-carvao-alto);
+  border: 1px solid var(--color-grafite);
+  border-radius: var(--radius-campo);
+  color: var(--color-neve);
+  /* 16px trava o zoom automático do Safari ao focar um campo. */
+  font-size: 1rem;
+  width: 100%;
+  padding: 0.875rem 1rem;
+  transition: border-color 0.18s ease, background-color 0.18s ease;
+}
+
+@utility campo-foco {
+  border-color: rgb(217 164 65 / 0.55);
+  background: #1a1e27;
+}
+
+/* ───────────────────────── layout de aplicativo ───────────────────────── */
+
+/* Respiro do conteúdo para ele nunca terminar debaixo da barra inferior. */
+@utility respiro-barra {
+  padding-bottom: calc(var(--altura-barra) + var(--seguro-baixo) + 1.5rem);
+}
+
+@utility topo-seguro {
+  padding-top: calc(var(--seguro-alto) + 0.75rem);
+}
+
+/* Números grandes: tabular para não dançarem enquanto contam. */
+@utility numero {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+@utility esqueleto {
+  background: linear-gradient(90deg, #14171f 25%, #1c2029 50%, #14171f 75%);
+  background-size: 200% 100%;
+  animation: brilho-esqueleto 1.4s ease-in-out infinite;
+  border-radius: 0.75rem;
+}
+
+@keyframes brilho-esqueleto {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
