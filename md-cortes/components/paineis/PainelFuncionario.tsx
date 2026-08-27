@@ -10,7 +10,6 @@ import { Icone } from '@/components/ui/Icone';
 import { ResultsChart } from '@/components/graficos/ResultsChart';
 import { RegisterHaircutForm } from '@/components/cortes/RegisterHaircutForm';
 import { TodayTransactions } from '@/components/cortes/TodayTransactions';
-import { AvisoDeModo } from '@/components/pwa/AvisoDeModo';
 import { useCortes } from '@/lib/hooks/use-cortes';
 import { useServicos } from '@/lib/hooks/use-servicos';
 import { plural } from '@/lib/format';
@@ -121,9 +120,6 @@ export function PainelFuncionario({ perfil }: { perfil: Profile }) {
           Todos os registros são enviados ao painel do Desenvolvedor Maicon
         </motion.p>
 
-        <div className="lg:col-span-2">
-          <AvisoDeModo />
-        </div>
       </div>
     </>
   );

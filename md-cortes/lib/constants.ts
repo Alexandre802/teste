@@ -1,8 +1,8 @@
 import type { PaymentMethod } from './types';
 
 /**
- * Serviços que aparecem quando o catálogo do banco ainda está vazio (modo local
- * ou primeiro acesso). Os preços ficam em zero de propósito: a tabela real da
+ * Serviços que o formulário mostra enquanto a tabela `services` do banco não
+ * responde ou vem vazia. Os preços ficam em zero de propósito: a tabela real da
  * barbearia não foi informada, e chutar valor de serviço é inventar dado da casa.
  */
 export const SERVICOS_PADRAO = [

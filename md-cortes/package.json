@@ -11,9 +11,7 @@
     "typecheck": "tsc --noEmit",
     "criar-usuarios": "node scripts/criar-usuarios.mjs",
     "icones": "python3 scripts/gerar-icones.py",
-    "publicar": "bash scripts/publicar.sh",
     "publicar:vercel": "bash scripts/publicar-vercel.sh",
-    "previa": "node scripts/demo/montar.mjs",
     "supabase-falso": "node scripts/teste/supabase-falso.mjs"
   },
   "dependencies": {

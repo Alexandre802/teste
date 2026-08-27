@@ -13,7 +13,6 @@ import { EmployeeCard } from '@/components/equipe/EmployeeCard';
 import { RelatorioIndividual } from '@/components/equipe/RelatorioIndividual';
 import { NotificationBell } from '@/components/notificacoes/NotificationBell';
 import { NotificationPanel } from '@/components/notificacoes/NotificationPanel';
-import { AvisoDeModo } from '@/components/pwa/AvisoDeModo';
 import { useCortes } from '@/lib/hooks/use-cortes';
 import { usePerfis } from '@/lib/hooks/use-perfis';
 import { useCentral } from '@/lib/hooks/use-central';
@@ -169,7 +168,6 @@ export function PainelAdmin({ perfil }: { perfil: Profile }) {
           titulo="Lançamentos de hoje"
         />
 
-        <AvisoDeModo />
       </div>
 
       <NotificationPanel

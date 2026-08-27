@@ -302,13 +302,6 @@ export const adapterNuvem: Adapter = {
     return () => data.subscription.unsubscribe();
   },
 
-  precisaConfigurar() {
-    return false;
-  },
-
-  async configurar() {
-    /* nada a fazer: no modo nuvem quem guarda senha é o Supabase Auth. */
-  },
 };
 
 async function buscarPerfil(id: string): Promise<Profile | null> {

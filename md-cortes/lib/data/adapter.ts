@@ -8,11 +8,10 @@ import type {
 } from '@/lib/types';
 
 /**
- * 'nuvem' é o modo de produção: Supabase Auth de verdade.
- * 'local' só existe em build de demonstração, explicitamente ligada.
- * 'nao-configurado' é quando falta a chave: o app não deixa ninguém entrar.
+ * 'nuvem' é o sistema: Supabase Auth.
+ * 'nao-configurado' é quando falta a chave — e aí ninguém entra.
  */
-export type Modo = 'nuvem' | 'local' | 'nao-configurado';
+export type Modo = 'nuvem' | 'nao-configurado';
 
 export interface EventoCorte {
   tipo: 'INSERT' | 'UPDATE' | 'DELETE';
@@ -61,11 +60,6 @@ export interface Adapter {
    * mostrando um painel de quem já não está mais autenticado.
    */
   aoMudarAutenticacao?(aviso: (perfil: Profile | null) => void): () => void;
-
-  /** Só no modo local: true enquanto as senhas dos três perfis não existirem. */
-  precisaConfigurar(): boolean;
-  /** Só no modo local: grava o hash das senhas do primeiro acesso. */
-  configurar(senhas: Record<string, string>): Promise<void>;
 }
 
 export class ErroDeLogin extends Error {

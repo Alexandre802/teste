@@ -7,10 +7,9 @@ const AVISO =
 /**
  * O adapter que não deixa ninguém entrar.
  *
- * Existe para o caso de a build sair sem as chaves do Supabase. A alternativa
- * seria cair no modo local, e aí um sistema que deveria exigir senha de verdade
- * passaria a aceitar a senha que a própria pessoa acabou de inventar — que é
- * exatamente o que não pode acontecer em produção.
+ * Existe para o caso de a build sair sem as chaves do Supabase. Sem banco não há
+ * senha para validar, e deixar passar mesmo assim é o oposto do que este sistema
+ * precisa fazer.
  *
  * Ele não é um "modo": é uma recusa explícita, com a tela dizendo o que falta.
  */
@@ -44,8 +43,4 @@ export const adapterNaoConfigurado: Adapter = {
   escutar() {
     return () => {};
   },
-  precisaConfigurar() {
-    return false;
-  },
-  async configurar() {},
 };

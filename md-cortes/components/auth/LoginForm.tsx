@@ -7,8 +7,6 @@ import { useSessao } from '@/lib/hooks/use-sessao';
 
 interface Props {
   aoEntrar: () => void;
-  /** Só aparece quando a build saiu sem as chaves do Supabase. */
-  aoConfigurarNuvem?: () => void;
 }
 
 /**
@@ -21,7 +19,7 @@ interface Props {
  * O campo aceita "gabriel" ou "gabriel@mdcortes.app" — a conversão acontece no
  * adapter, que completa o domínio quando falta o @.
  */
-export function LoginForm({ aoEntrar, aoConfigurarNuvem }: Props) {
+export function LoginForm({ aoEntrar }: Props) {
   const { entrar } = useSessao();
   const [usuario, setUsuario] = useState('');
   const [senha, setSenha] = useState('');
@@ -141,15 +139,6 @@ export function LoginForm({ aoEntrar, aoConfigurarNuvem }: Props) {
         Cada perfil tem login próprio. O acesso é verificado no servidor.
       </p>
 
-      {aoConfigurarNuvem ? (
-        <button
-          type="button"
-          onClick={aoConfigurarNuvem}
-          className="mt-4 w-full rounded-xl border border-grafite bg-carvao/70 px-3 py-2.5 text-center text-[0.74rem] text-fumaca-fraca transition-colors hover:border-ouro/30"
-        >
-          Configurar a conexão com o banco
-        </button>
-      ) : null}
     </form>
   );
 }
