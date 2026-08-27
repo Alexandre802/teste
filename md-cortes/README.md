@@ -148,6 +148,27 @@ BASE_PATH= npm run publicar          # raiz de um domínio próprio
 > seu for privado e o plano for gratuito, ou torne o repositório público (o
 > site publicado é público de qualquer forma), ou use uma das opções abaixo.
 
+**Vercel** — um comando:
+
+```bash
+npm run publicar:vercel
+```
+
+O script gera o site na raiz do domínio, copia o `vercel.json` para dentro de
+`out/` e sobe **só essa pasta**, num projeto fixado em `md-cortes`. Como o que
+sobe não tem `package.json`, a Vercel não detecta framework nenhum e não
+reconstrói nada — o que está na pasta é exatamente o que vai ao ar. O
+`--project md-cortes` garante que o deploy não caia em cima de outro projeto da
+conta.
+
+Na primeira vez a CLI pede login (`vercel login`), que abre o navegador.
+
+O `vercel.json` cuida do que uma PWA precisa e que não vem de graça: o `sw.js`
+sai sem cache (senão o aparelho trava numa versão antiga para sempre), o
+`manifest.webmanifest` sai com `application/manifest+json` (sem isso o Chrome
+ignora o manifest e o convite de instalar nunca aparece), e o `/_next/static/`
+sai com cache eterno, que é seguro porque esses arquivos têm hash no nome.
+
 **Netlify / Cloudflare Pages** — arraste a pasta `out/` na área de deploy.
 Nenhuma configuração, nenhum servidor Node.
 
@@ -265,5 +286,6 @@ sugerido no formulário — o funcionário ainda pode mudar antes de lançar.
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript sem emitir |
 | `npm run publicar` | gera o site e publica no branch `gh-pages` |
+| `npm run publicar:vercel` | gera o site e publica na Vercel, no projeto `md-cortes` |
 | `npm run criar-usuarios` | cria os três usuários no Supabase Auth |
 | `npm run icones` | regenera os ícones da PWA a partir de `scripts/icone.html` |
