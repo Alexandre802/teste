@@ -14,6 +14,8 @@ import {
 } from '@/lib/data';
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+/** Ligado só na prévia de página única, que não tem saída para a internet. */
+const PREVIA = process.env.NEXT_PUBLIC_PREVIA === '1';
 
 interface Props {
   aberto: boolean;
@@ -146,6 +148,14 @@ export function ConfigNuvem({ aberto, aoFechar }: Props) {
               </section>
             ) : null}
 
+            {PREVIA ? (
+              <p className="mt-4 rounded-2xl border border-grafite bg-carvao px-3.5 py-3 text-[0.8rem] leading-relaxed text-fumaca">
+                Esta é uma prévia de página única e ela não tem saída para a internet, então não
+                dá para conectar um projeto Supabase por aqui. No aplicativo publicado, é neste
+                lugar que entram o endereço do projeto e a chave <strong className="text-neve">anon
+                public</strong> — e o botão ao lado passa esse acesso para o outro celular.
+              </p>
+            ) : (
             <form onSubmit={salvar} className="mt-4 flex flex-col gap-3" noValidate>
               <p className="text-[0.8rem] leading-relaxed text-fumaca">
                 No painel do Supabase, em <strong className="text-neve">Project Settings → API</strong>,
@@ -208,6 +218,7 @@ export function ConfigNuvem({ aberto, aoFechar }: Props) {
                 <strong className="text-fumaca">anon public</strong>, feita para ficar no aplicativo.
               </p>
             </form>
+            )}
           </motion.div>
         </>
       ) : null}

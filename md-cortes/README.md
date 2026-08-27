@@ -267,6 +267,26 @@ supabase/
 
 ---
 
+## Prévia de página única
+
+```bash
+npm run build && npm run previa
+```
+
+Junta o aplicativo — os mesmos componentes, a folha de estilo saída da build de
+produção — num arquivo HTML só, que abre sem servidor nenhum. Serve para mostrar
+o sistema funcionando por um link enquanto a publicação de verdade não está no
+ar.
+
+Não substitui o site publicado: ali não há service worker, não há instalação na
+tela de início e não há saída para a internet, então o modo nuvem fica de fora.
+O que roda é o modo local — o aplicativo de verdade, guardando os dados no
+próprio navegador.
+
+O que troca de lugar é só a casca. `scripts/demo/shims/` põe um roteador de
+`#/rota` no lugar do roteador do Next, e `scripts/demo/entrada.tsx` monta os
+mesmos arquivos de rota que o site publicado monta. Nenhum componente muda.
+
 ## Preços dos serviços
 
 O catálogo entra com preço **zero** de propósito. A tabela real da barbearia
@@ -289,3 +309,4 @@ sugerido no formulário — o funcionário ainda pode mudar antes de lançar.
 | `npm run publicar:vercel` | gera o site e publica na Vercel, no projeto `md-cortes` |
 | `npm run criar-usuarios` | cria os três usuários no Supabase Auth |
 | `npm run icones` | regenera os ícones da PWA a partir de `scripts/icone.html` |
+| `npm run previa` | empacota o app inteiro num HTML só, para mostrar por link |
