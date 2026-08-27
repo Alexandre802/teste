@@ -33,8 +33,15 @@ export function CampoLinha({ rotulo, htmlFor, children, erro }: Props) {
   );
 }
 
-/** Select nativo com a aparência do app. Nativo de propósito: no celular ele
- *  abre a roleta do sistema, que é mais rápida que qualquer lista desenhada. */
+/**
+ * Select nativo com a aparência do app. Nativo de propósito: no celular ele
+ * abre a roleta do sistema, que é mais rápida que qualquer lista desenhada.
+ *
+ * As <option> não fixam cor. A lista é desenhada pelo sistema, e muitos
+ * navegadores ignoram o fundo que a gente pede mas obedecem a cor do texto —
+ * o que dava branco sobre branco. Sem cor fixada, o navegador escolhe o par
+ * certo a partir do `color-scheme` declarado em globals.css.
+ */
 export function Seletor({
   id,
   valor,
@@ -62,7 +69,7 @@ export function Seletor({
           {vazio}
         </option>
         {opcoes.map((o) => (
-          <option key={o.valor} value={o.valor} className="bg-carvao text-neve">
+          <option key={o.valor} value={o.valor}>
             {o.rotulo}
           </option>
         ))}

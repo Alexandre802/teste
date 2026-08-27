@@ -23,7 +23,7 @@
   /* texto */
   --color-neve: #ffffff;         /* texto principal e números */
   --color-fumaca: #9ba0ad;       /* texto secundário */
-  --color-fumaca-fraca: #666b78; /* legenda, eixo do gráfico */
+  --color-fumaca-fraca: #868da0; /* legenda, eixo do gráfico */
 
   /* estado */
   --color-alerta: #e05a4e;
@@ -34,9 +34,43 @@
   --radius-campo: 0.875rem;
 }
 
+/* ─────────────────────── o chão, fora de qualquer camada ───────────────────
+   Fundo, cor do texto e color-scheme ficam sem @layer de propósito.
+
+   Regra do CSS: declaração sem camada vence declaração em camada, não importa a
+   ordem. Enquanto isso morava em `@layer base`, bastava a página que embute o
+   app declarar o próprio `body { background }` para o chão virar claro por
+   baixo — e aí o dourado e o vermelho, pensados para preto, sumiam contra o
+   branco. Fora da camada, o app carrega o próprio chão para onde quer que vá.
+
+   Pelo mesmo motivo o color-scheme fica aqui: é ele que faz a lista do <select>
+   e o calendário do <input type="date"> abrirem escuros. Se um hospedeiro
+   impuser "light", eles abrem claros com texto escuro — legível de qualquer
+   jeito, que é por isso que o <option> não fixa mais cor nenhuma.            */
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  background-color: var(--color-noite);
+}
+
+body {
+  background-color: var(--color-noite);
+  /* Brilho dourado quase imperceptível no topo — dá profundidade sem virar
+     decoração. É a única fonte de luz da tela. */
+  background-image: radial-gradient(
+    120% 55% at 50% -10%,
+    rgb(217 164 65 / 0.09) 0%,
+    transparent 60%
+  );
+  background-attachment: fixed;
+  color: var(--color-neve);
+}
+
 @layer base {
   :root {
-    color-scheme: dark;
     /* Altura da barra inferior + área segura do iPhone. Usada por qualquer
        tela que precise não terminar embaixo do menu. */
     --altura-barra: 4.25rem;
@@ -49,21 +83,10 @@
   }
 
   html {
-    background-color: var(--color-noite);
     -webkit-text-size-adjust: 100%;
   }
 
   body {
-    background-color: var(--color-noite);
-    /* Brilho dourado quase imperceptível no topo — dá profundidade sem virar
-       decoração. É a única fonte de luz da tela. */
-    background-image: radial-gradient(
-      120% 55% at 50% -10%,
-      rgb(217 164 65 / 0.09) 0%,
-      transparent 60%
-    );
-    background-attachment: fixed;
-    color: var(--color-neve);
     font-family: var(--font-sans);
     /* Aparência de aplicativo: sem realce azul no toque e sem o "elástico" que
        denuncia página de navegador. */
