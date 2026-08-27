@@ -5,42 +5,51 @@ import { useSyncExternalStore } from 'react';
 /**
  * Substituto do roteador do Next para a prévia de página única.
  *
- * A prévia é um arquivo HTML só, sem servidor que resolva /inicio ou /perfil.
- * Então a rota vive no fim do endereço (#/inicio) e o resto do aplicativo nem
- * fica sabendo: `usePathname` continua devolvendo "/inicio", e os componentes
- * seguem iguais aos que rodam em produção.
+ * A rota fica em memória, e não no endereço. A primeira versão usava #/rota e
+ * quebrou: a prévia é servida dentro de um quadro que injeta uma <base>, e com
+ * uma <base> presente o href="#/inicio" passa a resolver contra ela em vez de
+ * contra o documento. Cada toque virava uma navegação para fora da página.
+ *
+ * Guardar a rota em memória tira o endereço da conversa e não sobra nada para
+ * a <base> atrapalhar. O preço é que recarregar volta ao começo — o que numa
+ * prévia não custa nada, porque a sessão continua guardada e o app manda a
+ * pessoa direto para o painel.
  */
 
-function caminhoAtual(): string {
-  const bruto = window.location.hash.replace(/^#/, '');
-  return bruto.startsWith('/') ? bruto : '/';
+let rotaAtual = '/';
+const ouvintes = new Set<() => void>();
+
+/** Usada também pelo <Link>, que não pode deixar o navegador navegar. */
+export function irPara(destino: string): void {
+  const limpo = destino.startsWith('/') ? destino : `/${destino}`;
+  if (limpo === rotaAtual) return;
+  rotaAtual = limpo;
+  for (const ouvinte of ouvintes) ouvinte();
 }
 
 function assinar(avisar: () => void) {
-  window.addEventListener('hashchange', avisar);
-  return () => window.removeEventListener('hashchange', avisar);
+  ouvintes.add(avisar);
+  return () => {
+    ouvintes.delete(avisar);
+  };
+}
+
+function ler(): string {
+  return rotaAtual;
 }
 
 export function usePathname(): string {
-  return useSyncExternalStore(assinar, caminhoAtual, () => '/');
+  return useSyncExternalStore(assinar, ler, ler);
 }
 
 export function useRouter() {
   return {
-    push(destino: string) {
-      window.location.hash = destino;
-    },
-    replace(destino: string) {
-      // replace de verdade: navegar para trás não volta para a tela de login
-      // depois de entrar, como acontece no aplicativo publicado.
-      window.location.replace(`#${destino}`);
-    },
-    back() {
-      window.history.back();
-    },
-    forward() {
-      window.history.forward();
-    },
+    push: irPara,
+    // Sem histórico de navegador para manipular, empurrar e substituir são a
+    // mesma coisa aqui.
+    replace: irPara,
+    back() {},
+    forward() {},
     refresh() {},
     prefetch() {},
   };

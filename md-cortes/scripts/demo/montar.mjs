@@ -60,7 +60,11 @@ const nomes = (await readdir(pastaCss)).filter((n) => n.endsWith('.css'));
 if (nomes.length === 0) {
   throw new Error('Nenhum CSS em out/. Rode `npm run build` antes.');
 }
-const css = (await Promise.all(nomes.map((n) => readFile(join(pastaCss, n), 'utf8')))).join('\n');
+const cssBruto = (await Promise.all(nomes.map((n) => readFile(join(pastaCss, n), 'utf8')))).join('\n');
+
+// Fora os @font-face: eles apontam para ../media/*.woff2, que só existe no site
+// publicado. Aqui a fonte vem do Google Fonts, declarado no topo da página.
+const css = cssBruto.replace(/@font-face\s*\{[^}]*\}/g, '');
 
 /* ── 3. a página ────────────────────────────────────────────────────────── */
 

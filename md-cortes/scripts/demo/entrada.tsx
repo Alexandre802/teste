@@ -1,7 +1,8 @@
 'use client';
 
-import { StrictMode, useSyncExternalStore } from 'react';
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { usePathname } from 'next/navigation';
 
 import { ProvedorDeSessao } from '@/lib/hooks/use-sessao';
 import { ProvedorDeToasts } from '@/lib/hooks/use-toasts';
@@ -20,22 +21,12 @@ import PaginaPerfil from '@/app/(privado)/perfil/page';
  *
  * Monta exatamente os mesmos componentes que o site publicado monta — as
  * páginas são importadas dos próprios arquivos de rota. O que muda é só a
- * casca: no lugar do roteador do Next, um switch sobre o fim do endereço, e no
- * lugar do layout raiz, este arquivo com os mesmos provedores.
+ * casca: no lugar do roteador do Next, um switch sobre a rota guardada em
+ * memória, e no lugar do layout raiz, este arquivo com os mesmos provedores.
  *
  * Fica de fora o service worker: numa página avulsa não há o que instalar nem
  * o que guardar offline.
  */
-
-function caminho(): string {
-  const bruto = window.location.hash.replace(/^#/, '');
-  return bruto.startsWith('/') ? bruto.replace(/\/+$/, '') || '/' : '/';
-}
-
-function assinar(avisar: () => void) {
-  window.addEventListener('hashchange', avisar);
-  return () => window.removeEventListener('hashchange', avisar);
-}
 
 const PRIVADAS: Record<string, () => React.ReactElement | null> = {
   '/inicio': PaginaInicio,
@@ -45,7 +36,8 @@ const PRIVADAS: Record<string, () => React.ReactElement | null> = {
 };
 
 function Rotas() {
-  const rota = useSyncExternalStore(assinar, caminho, () => '/');
+  // Mesma fonte que os componentes usam para saber a aba ativa.
+  const rota = usePathname().replace(/\/+$/, '') || '/';
 
   if (rota === '/login') return <PaginaDeLogin />;
 
