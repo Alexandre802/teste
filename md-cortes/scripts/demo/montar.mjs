@@ -46,6 +46,9 @@ const resultado = await build({
     'process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY': '""',
     'process.env.NEXT_PUBLIC_LOGIN_DOMAIN': '"mdcortes.app"',
     'process.env.NEXT_PUBLIC_PREVIA': '"1"',
+    // A prévia roda sem servidor: sem isto ela cairia na tela "Sistema não
+    // configurado", que é o comportamento certo em produção e inútil aqui.
+    'process.env.NEXT_PUBLIC_PERMITIR_MODO_LOCAL': '"1"',
   },
   write: false,
   logLevel: 'warning',

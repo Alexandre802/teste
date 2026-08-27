@@ -13,7 +13,8 @@
     "icones": "python3 scripts/gerar-icones.py",
     "publicar": "bash scripts/publicar.sh",
     "publicar:vercel": "bash scripts/publicar-vercel.sh",
-    "previa": "node scripts/demo/montar.mjs"
+    "previa": "node scripts/demo/montar.mjs",
+    "supabase-falso": "node scripts/teste/supabase-falso.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.47.10",

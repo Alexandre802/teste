@@ -46,6 +46,17 @@ export function ProvedorDeSessao({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  // A sessão pode cair sem o app pedir: token expirado, saída noutra aba,
+  // renovação recusada. Quando isso acontece, o perfil vira null e o portão
+  // das telas internas manda a pessoa de volta para o login.
+  useEffect(() => {
+    if (!dados.aoMudarAutenticacao) return;
+    return dados.aoMudarAutenticacao((p) => {
+      setPerfil(p);
+      setCarregando(false);
+    });
+  }, []);
+
   const entrar = useCallback(async (identificador: string, senha: string) => {
     const p = await dados.entrar(identificador, senha);
     setPerfil(p);

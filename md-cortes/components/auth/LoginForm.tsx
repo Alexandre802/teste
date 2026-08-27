@@ -5,27 +5,24 @@ import { motion } from 'framer-motion';
 import { Icone } from '@/components/ui/Icone';
 import { useSessao } from '@/lib/hooks/use-sessao';
 
-const PERFIS = [
-  { usuario: 'maicon', nome: 'Maicon', cargo: 'Desenvolvedor' },
-  { usuario: 'gabriel', nome: 'Gabriel', cargo: 'Funcionário 1' },
-  { usuario: 'nino', nome: 'Nino', cargo: 'Funcionário 2' },
-];
-
 interface Props {
   aoEntrar: () => void;
-  aoConfigurarNuvem: () => void;
+  /** Só aparece quando a build saiu sem as chaves do Supabase. */
+  aoConfigurarNuvem?: () => void;
 }
 
 /**
  * "Acesse sua conta".
  *
- * Os três nomes embaixo são atalho de digitação, não porta de entrada: tocar em
- * um deles só preenche o campo de usuário. Sem a senha, ninguém passa — que é
- * exatamente a diferença que o pedido faz questão de marcar em relação a uma
- * tela de "escolha o perfil".
+ * Usuário e senha, e nada mais. Não há atalho de perfil, não há entrada de
+ * demonstração, não há caminho que dispense a senha: quem decide se entra é o
+ * Supabase Auth, do outro lado.
+ *
+ * O campo aceita "gabriel" ou "gabriel@mdcortes.app" — a conversão acontece no
+ * adapter, que completa o domínio quando falta o @.
  */
 export function LoginForm({ aoEntrar, aoConfigurarNuvem }: Props) {
-  const { entrar, modo } = useSessao();
+  const { entrar } = useSessao();
   const [usuario, setUsuario] = useState('');
   const [senha, setSenha] = useState('');
   const [verSenha, setVerSenha] = useState(false);
@@ -45,7 +42,7 @@ export function LoginForm({ aoEntrar, aoConfigurarNuvem }: Props) {
       await entrar(usuario, senha);
       aoEntrar();
     } catch (e) {
-      setErro(e instanceof Error ? e.message : 'Não foi possível entrar.');
+      setErro(e instanceof Error ? e.message : 'Usuário ou senha inválidos');
       setSenha('');
     } finally {
       setEnviando(false);
@@ -58,12 +55,12 @@ export function LoginForm({ aoEntrar, aoConfigurarNuvem }: Props) {
         Acesse sua conta
       </h1>
       <p className="mt-1.5 text-center text-[0.88rem] text-fumaca">
-        Cada perfil possui login separado
+        Entre com o usuário e a senha da sua conta
       </p>
 
-      <div className="mt-7 flex flex-col gap-3">
+      <div className="mt-8 flex flex-col gap-3">
         <label className="sr-only" htmlFor="login-usuario">
-          Usuário ou e-mail
+          Usuário
         </label>
         <div className="flex items-center gap-3 rounded-campo border border-grafite bg-carvao-alto px-4 transition-colors focus-within:border-ouro/55">
           <Icone nome="pessoa" tamanho={19} className="shrink-0 text-ouro/80" />
@@ -74,7 +71,7 @@ export function LoginForm({ aoEntrar, aoConfigurarNuvem }: Props) {
             autoCapitalize="none"
             autoCorrect="off"
             spellCheck={false}
-            placeholder="Usuário ou e-mail"
+            placeholder="Usuário"
             value={usuario}
             onChange={(e) => setUsuario(e.target.value)}
             className="w-full bg-transparent py-3.5 text-[1rem] text-neve outline-none placeholder:text-fumaca-fraca"
@@ -106,61 +103,25 @@ export function LoginForm({ aoEntrar, aoConfigurarNuvem }: Props) {
         </div>
       </div>
 
-      {erro ? (
-        <motion.p
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          role="alert"
-          className="mt-3 flex items-center justify-center gap-1.5 text-center text-[0.82rem] text-alerta"
-        >
-          <Icone nome="alerta" tamanho={14} />
-          {erro}
-        </motion.p>
-      ) : (
-        <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-[0.78rem] text-fumaca-fraca">
-          <Icone nome="escudo" tamanho={13} />
-          Só é possível acessar os perfis com login
-        </p>
-      )}
-
-      <section className="mt-7">
-        <h2 className="flex items-center gap-2 text-[0.85rem] font-semibold text-neve">
-          <Icone nome="equipe" tamanho={16} className="text-ouro" />
-          Perfis autorizados
-        </h2>
-        <div className="mt-2.5 grid grid-cols-3 gap-2">
-          {PERFIS.map((p) => {
-            const escolhido = usuario.trim().toLowerCase().split('@')[0] === p.usuario;
-            return (
-              <button
-                key={p.usuario}
-                type="button"
-                onClick={() => setUsuario(p.usuario)}
-                className={`flex flex-col items-center gap-1.5 rounded-2xl border px-2 py-3 transition-colors ${
-                  escolhido
-                    ? 'border-ouro/55 bg-ouro/10'
-                    : 'border-grafite bg-carvao hover:border-ouro/30'
-                }`}
-              >
-                <span className="flex h-9 w-9 items-center justify-center rounded-full border border-ouro/35 text-ouro">
-                  <Icone nome="pessoa" tamanho={17} />
-                </span>
-                <span className="text-[0.8rem] font-semibold text-neve">{p.nome}</span>
-                <span className="text-[0.68rem] leading-tight text-fumaca-fraca">{p.cargo}</span>
-              </button>
-            );
-          })}
-        </div>
-        <p className="mt-2 text-center text-[0.72rem] text-fumaca-fraca">
-          Tocar em um nome só preenche o campo — a senha continua obrigatória.
-        </p>
-      </section>
+      <div className="mt-3 min-h-[1.5rem]">
+        {erro ? (
+          <motion.p
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            role="alert"
+            className="flex items-center justify-center gap-1.5 text-center text-[0.85rem] font-medium text-alerta"
+          >
+            <Icone nome="alerta" tamanho={15} className="shrink-0" />
+            {erro}
+          </motion.p>
+        ) : null}
+      </div>
 
       <motion.button
         type="submit"
         disabled={enviando}
         whileTap={{ scale: 0.985 }}
-        className="btn-ouro mt-6 flex h-[3.4rem] w-full items-center justify-center gap-2 text-[1.05rem] disabled:opacity-90"
+        className="btn-ouro mt-3 flex h-[3.4rem] w-full items-center justify-center gap-2 text-[1.05rem] disabled:opacity-90"
       >
         {enviando ? (
           <>
@@ -175,27 +136,20 @@ export function LoginForm({ aoEntrar, aoConfigurarNuvem }: Props) {
         )}
       </motion.button>
 
-      <button
-        type="button"
-        onClick={aoConfigurarNuvem}
-        className="mt-4 flex w-full items-start gap-2 rounded-xl border border-grafite bg-carvao/70 px-3 py-2.5 text-left text-[0.74rem] leading-snug text-fumaca-fraca transition-colors hover:border-ouro/30"
-      >
-        <Icone nome="nuvem" tamanho={14} className="mt-0.5 shrink-0 text-ouro/70" />
-        <span className="flex-1">
-          {modo === 'local' ? (
-            <>
-              <strong className="font-semibold text-fumaca">Modo local.</strong> Os cortes ficam
-              só neste aparelho. Toque aqui para conectar os três celulares ao mesmo banco.
-            </>
-          ) : (
-            <>
-              <strong className="font-semibold text-fumaca">Conectado à nuvem.</strong> Toque aqui
-              para ver o projeto ou mandar o acesso para outro celular.
-            </>
-          )}
-        </span>
-        <Icone nome="seta-direita" tamanho={14} className="mt-0.5 shrink-0" />
-      </button>
+      <p className="mt-5 flex items-center justify-center gap-1.5 text-center text-[0.76rem] text-fumaca-fraca">
+        <Icone nome="escudo" tamanho={13} className="shrink-0" />
+        Cada perfil tem login próprio. O acesso é verificado no servidor.
+      </p>
+
+      {aoConfigurarNuvem ? (
+        <button
+          type="button"
+          onClick={aoConfigurarNuvem}
+          className="mt-4 w-full rounded-xl border border-grafite bg-carvao/70 px-3 py-2.5 text-center text-[0.74rem] text-fumaca-fraca transition-colors hover:border-ouro/30"
+        >
+          Configurar a conexão com o banco
+        </button>
+      ) : null}
     </form>
   );
 }

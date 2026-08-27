@@ -7,7 +7,12 @@ import type {
   Service,
 } from '@/lib/types';
 
-export type Modo = 'nuvem' | 'local';
+/**
+ * 'nuvem' é o modo de produção: Supabase Auth de verdade.
+ * 'local' só existe em build de demonstração, explicitamente ligada.
+ * 'nao-configurado' é quando falta a chave: o app não deixa ninguém entrar.
+ */
+export type Modo = 'nuvem' | 'local' | 'nao-configurado';
 
 export interface EventoCorte {
   tipo: 'INSERT' | 'UPDATE' | 'DELETE';
@@ -49,6 +54,13 @@ export interface Adapter {
 
   /** Devolve a função que cancela a escuta. */
   escutar(escutas: Escutas): () => void;
+
+  /**
+   * Avisa quando a autenticação muda por fora do app: token expirado, sessão
+   * encerrada noutra aba, refresh recusado. Sem isso a tela continuaria
+   * mostrando um painel de quem já não está mais autenticado.
+   */
+  aoMudarAutenticacao?(aviso: (perfil: Profile | null) => void): () => void;
 
   /** Só no modo local: true enquanto as senhas dos três perfis não existirem. */
   precisaConfigurar(): boolean;

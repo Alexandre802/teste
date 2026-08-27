@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Icone } from '@/components/ui/Icone';
 import {
   apagarConfigNuvem,
+  configVeioDaBuild,
   configVeioDoAparelho,
   gravarConfigNuvem,
   lerConfigNuvem,
@@ -36,6 +37,7 @@ interface Props {
 export function ConfigNuvem({ aberto, aoFechar }: Props) {
   const atual = lerConfigNuvem();
   const noAparelho = configVeioDoAparelho();
+  const naBuild = configVeioDaBuild();
 
   const [url, setUrl] = useState(atual?.url ?? '');
   const [chave, setChave] = useState('');
@@ -148,7 +150,13 @@ export function ConfigNuvem({ aberto, aoFechar }: Props) {
               </section>
             ) : null}
 
-            {PREVIA ? (
+            {naBuild ? (
+              <p className="mt-4 rounded-2xl border border-grafite bg-carvao px-3.5 py-3 text-[0.8rem] leading-relaxed text-fumaca">
+                A conexão vem embutida nesta versão do aplicativo e não pode ser trocada pelo
+                aparelho — é o que impede alguém de repontar o sistema para outro banco. Para
+                mudar de projeto, é preciso gerar e publicar o site de novo.
+              </p>
+            ) : PREVIA ? (
               <p className="mt-4 rounded-2xl border border-grafite bg-carvao px-3.5 py-3 text-[0.8rem] leading-relaxed text-fumaca">
                 Esta é uma prévia de página única e ela não tem saída para a internet, então não
                 dá para conectar um projeto Supabase por aqui. No aplicativo publicado, é neste

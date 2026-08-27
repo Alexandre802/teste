@@ -184,7 +184,7 @@ export const adapterLocal: Adapter = {
     const calculado = await derivar(senha, saltUsado);
 
     if (!perfil || !credencial || !iguais(calculado, credencial.hash)) {
-      throw new ErroDeLogin('Usuário ou senha incorretos.');
+      throw new ErroDeLogin('Usuário ou senha inválidos');
     }
 
     gravar(CHAVE_SESSAO, { id: perfil.id, em: Date.now() });

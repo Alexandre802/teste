@@ -11,12 +11,37 @@ HTML, inclusive de graça.
 
 ---
 
+## Autenticação
+
+Quem valida senha é o **Supabase Auth**, sempre. O app não tem lista de usuários,
+não tem senha no código e não tem caminho que dispense o servidor.
+
+Na tela de login o campo aceita `gabriel` ou `gabriel@mdcortes.app` — sem o `@`,
+o app completa com o domínio de `NEXT_PUBLIC_LOGIN_DOMAIN`. Depois vai direto
+para `signInWithPassword`. Senha errada devolve **"Usuário ou senha inválidos"**
+e mais nada: nenhuma sessão, nenhuma rota interna aberta.
+
+Com o login aceito, o app lê `profiles` pelo `auth.uid()` e é o `role` de lá que
+decide a tela — `developer` cai no painel do Maicon, `employee` no painel do
+funcionário. As rotas internas (`/inicio`, `/lancamentos`, `/equipe`, `/perfil`)
+não abrem sem sessão, e `/equipe` devolve o funcionário para `/inicio`.
+
+Isso é conveniência de tela, não a segurança: quem impede o Gabriel de ler os
+dados do Nino é a Row Level Security do banco. Trocar a rota no navegador não
+contorna nada — o Postgres simplesmente devolve lista vazia.
+
+**Sem as chaves do Supabase, ninguém entra.** A build mostra "Sistema não
+configurado" em vez de abrir. Não existe modo local de reserva em produção: sem
+banco não há senha para validar, e aceitar uma senha inventada seria pior que
+não abrir.
+
 ## Os dois modos
 
 O sistema decide sozinho, na build, onde os dados vão morar.
 
-| | **Modo local** (padrão) | **Modo nuvem** (Supabase) |
+| | **Modo local** (só demonstração) | **Modo nuvem** (produção) |
 |---|---|---|
+| Quando existe | só com `NEXT_PUBLIC_PERMITIR_MODO_LOCAL=1` | sempre que houver chaves |
 | Configuração | nenhuma | duas variáveis de ambiente |
 | Onde os dados ficam | no próprio aparelho | no Postgres do Supabase |
 | Login | senha definida no primeiro acesso | Supabase Auth |
@@ -25,12 +50,14 @@ O sistema decide sozinho, na build, onde os dados vão morar.
 | Notificação do Maicon | só no mesmo aparelho | em tempo real, entre aparelhos |
 | Custo | zero | zero (plano gratuito) |
 
-O **modo local** serve para começar a usar hoje e para testar. O **modo nuvem**
-é o que o pedido descreve de ponta a ponta — e é ele que faz sentido para a
-barbearia de verdade, porque são três celulares diferentes.
+O **modo local** existe para uma coisa só: a prévia de página única, que roda
+sem servidor para mostrar o sistema. Ele precisa ser ligado de propósito, na
+build, e quando está ligado a tela de login mostra um aviso de **Demonstração**
+dizendo que as senhas são as que a pessoa definir ali. Numa build normal esse
+ramo nem existe — a variável é constante de build e o código morre na
+minificação.
 
-Enquanto o modo local estiver ativo, o app diz isso na tela, com todas as
-letras. Não há como usar por engano achando que está sincronizando.
+O **modo nuvem** é o sistema de verdade, e é o único que roda em produção.
 
 ---
 
@@ -310,3 +337,4 @@ sugerido no formulário — o funcionário ainda pode mudar antes de lançar.
 | `npm run criar-usuarios` | cria os três usuários no Supabase Auth |
 | `npm run icones` | regenera os ícones da PWA a partir de `scripts/icone.html` |
 | `npm run previa` | empacota o app inteiro num HTML só, para mostrar por link |
+| `npm run supabase-falso` | sobe um Supabase de mentira, para testar o login |

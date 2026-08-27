@@ -51,13 +51,26 @@ export function validar(url?: string, chave?: string): ConfigNuvem | null {
   return { url: u, chave: c };
 }
 
+/**
+ * A configuração da build vence a do aparelho.
+ *
+ * A ordem já foi a inversa, para deixar configurar pelo celular. Numa build de
+ * produção isso é um buraco: bastaria escrever no localStorage para repontar o
+ * app para outro projeto Supabase — outro banco, outros usuários. Agora, quando
+ * a build traz as chaves, elas mandam, e a tela de configuração só informa.
+ */
 export function lerConfigNuvem(): ConfigNuvem | null {
-  return doAparelho() ?? daBuild();
+  return daBuild() ?? doAparelho();
+}
+
+/** Verdadeiro quando as chaves vieram embutidas na build. */
+export function configVeioDaBuild(): boolean {
+  return daBuild() !== null;
 }
 
 /** Verdadeiro quando quem mandou foi o aparelho, e não a build. */
 export function configVeioDoAparelho(): boolean {
-  return doAparelho() !== null;
+  return daBuild() === null && doAparelho() !== null;
 }
 
 export function gravarConfigNuvem(config: ConfigNuvem): void {

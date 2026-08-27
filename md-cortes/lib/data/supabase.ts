@@ -67,6 +67,9 @@ interface LinhaCorte {
 /** Mantido entre chamadas para dar nome ao corte que chega pelo tempo real. */
 const nomePorId = new Map<string, string>();
 
+/** Numera os canais do Realtime, para duas assinaturas nunca colidirem. */
+let proximoCanal = 0;
+
 function paraCorte(linha: LinhaCorte): Haircut {
   const bruto = linha.employee;
   const juntado = Array.isArray(bruto) ? bruto[0] : bruto;
@@ -126,7 +129,7 @@ export const adapterNuvem: Adapter = {
     });
     if (error || !data.user) {
       // A mensagem do Supabase vem em inglês e entrega se o e-mail existe.
-      throw new ErroDeLogin('Usuário ou senha incorretos.');
+      throw new ErroDeLogin('Usuário ou senha inválidos');
     }
     const perfil = await buscarPerfil(data.user.id);
     if (!perfil) {
@@ -245,10 +248,12 @@ export const adapterNuvem: Adapter = {
   },
 
   escutar({ aoCorte, aoNotificar }) {
-    // O Realtime respeita a RLS: o Gabriel só recebe os eventos dos cortes dele,
-    // e a caixa de notificação do Maicon só chega no Maicon.
+    // Cada assinatura ganha o próprio canal. Com um nome fixo, o supabase-js
+    // devolvia o mesmo canal para todo mundo, e a segunda assinatura tentava
+    // registrar callbacks depois do subscribe() — o que ele recusa. O painel do
+    // Maicon assina dois (cortes e notificações), então batia sempre nele.
     const canal = sb()
-      .channel('md-cortes')
+      .channel(`md-cortes-${(proximoCanal += 1)}`)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'haircuts' },
@@ -280,6 +285,21 @@ export const adapterNuvem: Adapter = {
     return () => {
       void sb().removeChannel(canal);
     };
+  },
+
+  aoMudarAutenticacao(aviso) {
+    const { data } = sb().auth.onAuthStateChange((evento, sessao) => {
+      if (evento === 'SIGNED_OUT' || !sessao?.user) {
+        nomePorId.clear();
+        aviso(null);
+        return;
+      }
+      // TOKEN_REFRESHED não muda quem está logado: buscar o perfil de novo a
+      // cada renovação seria uma consulta a mais sem nenhuma informação nova.
+      if (evento !== 'SIGNED_IN' && evento !== 'USER_UPDATED') return;
+      void buscarPerfil(sessao.user.id).then(aviso);
+    });
+    return () => data.subscription.unsubscribe();
   },
 
   precisaConfigurar() {
