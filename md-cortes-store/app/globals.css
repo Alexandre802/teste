@@ -1,0 +1,134 @@
+@import "tailwindcss";
+
+/*
+  Sistema visual do MD Cortes Store.
+
+  Fundo branco, muito ar, cartão arredondado com sombra quase invisível e
+  borda discreta. O ouro é a única cor de marca: aparece em ícone, valor em
+  destaque e no que estiver selecionado. Verde só fala de lucro e estoque
+  saudável; vermelho e laranja só falam de alerta. Nada de gradiente
+  decorativo — a cor sempre significa alguma coisa.
+*/
+@theme {
+  --color-branco: #ffffff;
+  --color-areia: #f8f8f6;
+  --color-tinta: #111111;
+  --color-grafite: #374151;
+  --color-cinza: #6b7280;
+  --color-cinza-claro: #9ca3af;
+  --color-borda: #ededea;
+  --color-borda-forte: #e0e0db;
+
+  --color-ouro: #c98a13;
+  --color-ouro-claro: #e8b84b;
+  --color-ouro-suave: #fdf6e7;
+  --color-ouro-borda: #f0dfb8;
+
+  --color-verde: #16a34a;
+  --color-verde-suave: #eaf7ee;
+  --color-vermelho: #dc2626;
+  --color-vermelho-suave: #fdeded;
+  --color-laranja: #ea8a00;
+  --color-laranja-suave: #fdf2e3;
+  --color-azul: #2563eb;
+  --color-azul-suave: #eaf1fe;
+  --color-roxo: #7c3aed;
+  --color-roxo-suave: #f2ecfe;
+
+  --radius-card: 18px;
+  --radius-suave: 14px;
+  --radius-pill: 999px;
+
+  --shadow-card: 0 1px 2px rgb(17 17 17 / 0.03), 0 6px 20px rgb(17 17 17 / 0.04);
+  --shadow-flutuante: 0 4px 12px rgb(17 17 17 / 0.06), 0 16px 40px rgb(17 17 17 / 0.1);
+  --shadow-barra: 0 -1px 0 rgb(17 17 17 / 0.05), 0 -8px 24px rgb(17 17 17 / 0.04);
+
+  --font-sans: var(--fonte-texto), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: var(--fonte-marca), "Times New Roman", Georgia, serif;
+}
+
+/*
+  Tudo daqui para baixo entra em @layer: sem camada, uma regra de elemento
+  venceria as utilitárias do Tailwind na cascata — foi assim que `button {
+  color: inherit }` chegou a apagar o texto dourado do botão de entrar.
+*/
+@layer base {
+  :root {
+    color-scheme: light;
+    /* Altura da barra inferior + área segura do iPhone. */
+    --altura-barra: 68px;
+    --area-segura: env(safe-area-inset-bottom, 0px);
+  }
+
+  html,
+  body {
+    background: var(--color-branco);
+    color: var(--color-tinta);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    overscroll-behavior-y: none;
+  }
+
+  /* O app roda em tela cheia no celular; texto não deve dar zoom ao girar. */
+  @media (max-width: 640px) {
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
+  }
+
+  /* Campo com fonte menor que 16px faz o iOS dar zoom ao focar. */
+  input,
+  select,
+  textarea,
+  button {
+    font-size: max(16px, 1em);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ouro);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+}
+
+@layer utilities {
+  /* Rolagem horizontal dos filtros sem barra à mostra. */
+  .rolagem-invisivel {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .rolagem-invisivel::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Números tabulares: coluna de valores não "dança" ao atualizar. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+
+  .marca {
+    font-family: var(--font-serif);
+    letter-spacing: 0.01em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

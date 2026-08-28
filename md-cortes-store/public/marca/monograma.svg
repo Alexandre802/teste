@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="MD Cortes Store">
+  <title>MD Cortes Store</title>
+  <defs>
+    <linearGradient id="ouro" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#E8B84B"/>
+      <stop offset="55%" stop-color="#C98A13"/>
+      <stop offset="100%" stop-color="#A96F0B"/>
+    </linearGradient>
+  </defs>
+  <g fill="url(#ouro)">
+    <text x="100" y="104" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
+          font-size="104" font-weight="700" letter-spacing="-2">MD</text>
+  </g>
+  <!-- Cabide: gancho, ombro e barra. -->
+  <g fill="none" stroke="url(#ouro)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M100 112c0-9 7-11 7-17a7 7 0 1 0-14 0" stroke-width="7"/>
+    <path d="M100 122 46 154c-4 2-3 8 2 8h104c5 0 6-6 2-8l-54-32Z" stroke-width="8"/>
+  </g>
+</svg>

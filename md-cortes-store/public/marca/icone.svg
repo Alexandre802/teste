@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#E8B84B"/>
+    <stop offset="55%" stop-color="#C98A13"/>
+    <stop offset="100%" stop-color="#A96F0B"/>
+  </linearGradient></defs>
+  <rect width="512" height="512" rx="0" fill="#FFFFFF"/>
+  <g transform="translate(256 256) scale(0.86) translate(-256 -256)">
+    <text x="256" y="256" text-anchor="middle" fill="url(#g)"
+          font-family="Liberation Serif, DejaVu Serif, Georgia, serif"
+          font-size="236" font-weight="700" letter-spacing="-6">MD</text>
+    <g fill="none" stroke="url(#g)" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M256 292c0-20 16-25 16-38a16 16 0 1 0-32 0" stroke-width="16"/>
+      <path d="M256 316 128 392c-9 6-6 18 5 18h246c11 0 14-12 5-18L256 316Z" stroke-width="18"/>
+    </g>
+  </g>
+</svg>

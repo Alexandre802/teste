@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 300" role="img" aria-label="MD Cortes Store">
+  <title>MD Cortes Store</title>
+  <defs>
+    <linearGradient id="ouroLogo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#E8B84B"/>
+      <stop offset="55%" stop-color="#C98A13"/>
+      <stop offset="100%" stop-color="#A96F0B"/>
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(260 20)">
+    <text x="0" y="84" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
+          font-size="96" font-weight="700" letter-spacing="-2" fill="url(#ouroLogo)">MD</text>
+    <g fill="none" stroke="url(#ouroLogo)" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M0 92c0-8 6-10 6-15a6 6 0 1 0-12 0" stroke-width="6"/>
+      <path d="M0 101-47 129c-3 2-2 7 2 7h90c4 0 5-5 2-7L0 101Z" stroke-width="7"/>
+    </g>
+  </g>
+
+  <text x="260" y="216" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
+        font-size="56" font-weight="700" fill="#111111" letter-spacing="0.5">MD Cortes Store</text>
+
+  <!-- Filete com a coroa, como na referência. -->
+  <g stroke="#DEBE7A" stroke-width="2" stroke-linecap="round">
+    <line x1="90" y1="248" x2="238" y2="248"/>
+    <line x1="282" y1="248" x2="430" y2="248"/>
+  </g>
+  <path d="M243 252l-4-15 8 6 13-12 13 12 8-6-4 15z" fill="#C98A13"/>
+</svg>
