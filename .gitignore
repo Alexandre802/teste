@@ -21,3 +21,6 @@ Thumbs.db
 /next-env.d.ts
 /node_modules
 .vercel
+
+# Preview autocontido gerado por scripts/build-preview.py
+preview.html
