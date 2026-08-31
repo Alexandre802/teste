@@ -51,19 +51,23 @@ export default function ProductCard({
       onMouseMove={reduce ? undefined : onMove}
       onMouseLeave={reduce ? undefined : onLeave}
       style={reduce ? undefined : { rotateX, rotateY, transformPerspective: 900 }}
-      whileHover={reduce ? undefined : { y: -6 }}
+      whileHover={reduce ? undefined : { y: -4 }}
       className="glass group flex flex-col overflow-hidden rounded-[var(--radius-card)] shadow-[0_10px_26px_-16px_rgba(110,40,5,0.6)] transition-shadow duration-300 hover:shadow-[0_26px_50px_-18px_rgba(110,40,5,0.8)]"
     >
       <button
         type="button"
         onClick={() => onOpen(product)}
         aria-label={`Ver detalhes de ${product.name}`}
-        className="relative aspect-[5/3] w-full shrink-0 overflow-hidden"
+        /* 3/2 é a proporção nativa das fotografias da casa (600×400): com
+           `object-cover` nesta caixa, NADA é cortado — nem o topo do pão nem
+           a tábua. As fotos antigas, recortadas do cardápio, se acomodam à
+           mesma caixa, então a grade continua alinhada. */
+        className="relative aspect-[3/2] w-full shrink-0 overflow-hidden"
       >
         <ProductImage
           product={product}
           sizes="(max-width: 640px) 46vw, (max-width: 1024px) 30vw, 19vw"
-          className="transition-transform duration-500 group-hover:scale-105"
+          className="transition-transform duration-[400ms] ease-out group-hover:scale-[1.035]"
         />
         {!product.available && (
           <span className="absolute inset-0 grid place-items-center bg-ember-deep/70 text-[11px] font-extrabold uppercase tracking-[0.16em] text-white">

@@ -58,15 +58,32 @@ def camadas_lanche() -> list[dict]:
 
 
 def embutir_fotos(dados: dict) -> None:
-    """Converte /produtos/x.webp em data URI — a página tem de ser autônoma."""
-    fotos = {
-        f"/produtos/{f.name}": "data:image/webp;base64," + base64.b64encode(f.read_bytes()).decode()
-        for f in sorted((ROOT / "public" / "produtos").glob("*.webp"))
-    }
+    """
+    Converte o caminho da foto em data URI — a página tem de ser autônoma.
+
+    Duas pastas: `produtos/` são os recortes das capturas do cardápio;
+    `images/lanches/` são as fotografias profissionais da casa. As duas
+    entram, porque o catálogo aponta para as duas.
+    """
+    fotos: dict[str, str] = {}
+    for prefixo, pasta in (
+        ("/produtos", ROOT / "public" / "produtos"),
+        ("/images/lanches", ROOT / "public" / "images" / "lanches"),
+    ):
+        for f in sorted(pasta.glob("*.webp")):
+            fotos[f"{prefixo}/{f.name}"] = (
+                "data:image/webp;base64," + base64.b64encode(f.read_bytes()).decode()
+            )
+
+    faltando = [p["image"] for p in dados["products"] if p["image"] and p["image"] not in fotos]
+    if faltando:
+        raise SystemExit(f"foto referenciada e não encontrada: {faltando}")
+
     for p in dados["products"]:
         if p["image"]:
-            p["image"] = fotos.get(p["image"])
-    print(f"fotos embutidas: {len(fotos)}")
+            p["image"] = fotos[p["image"]]
+    reais = sum(1 for k in fotos if k.startswith("/images/lanches"))
+    print(f"fotos embutidas: {len(fotos)} ({reais} fotografias profissionais)")
 
 
 d = carregar_dados()
@@ -230,9 +247,9 @@ h1{{font-size:clamp(2.6rem,9vw,6.5rem);font-weight:800;line-height:.9;letter-spa
 @media(min-width:1280px){{.grid{{grid-template-columns:repeat(5,1fr)}}}}
 .prod{{display:flex;flex-direction:column;overflow:hidden;transition:transform .3s,box-shadow .3s,border-color .3s}}
 .prod:hover{{transform:translateY(-6px);border-color:rgb(255 106 0/.45);box-shadow:0 28px 60px -24px rgb(0 0 0/.95),0 0 44px -14px rgb(255 106 0/.6)}}
-.shot{{position:relative;aspect-ratio:5/3;overflow:hidden;width:100%}}
-.shot img{{width:100%;height:100%;object-fit:cover;transition:transform .5s}}
-.prod:hover .shot img{{transform:scale(1.05)}}
+.shot{{position:relative;aspect-ratio:3/2;overflow:hidden;width:100%}}
+.shot img{{width:100%;height:100%;object-fit:cover;object-position:center;transition:transform .4s ease-out}}
+.prod:hover .shot img{{transform:scale(1.035)}}
 .ph{{width:100%;height:100%;display:grid;place-items:center;gap:.35rem;background:rgb(255 255 255/.12);color:#fff;opacity:.75}}
 .ph svg{{width:2rem;height:2rem}}
 .ph span{{font-size:.6rem;font-weight:800;letter-spacing:.2em;text-transform:uppercase}}
@@ -742,7 +759,7 @@ function openProd(id){{
   const p = byId[id]; if(!p) return;
   document.getElementById('pTitle').textContent = p.name;
   document.getElementById('pBody').innerHTML = `
-    <div style="margin:-1.25rem -1.5rem 1.25rem;aspect-ratio:16/10;overflow:hidden">${{shot(p)}}</div>
+    <div style="margin:-1.25rem -1.5rem 1.25rem;aspect-ratio:3/2;overflow:hidden">${{shot(p)}}</div>
     <p class="price" style="font-size:1.9rem">${{BRL(p.price)}}</p>
     ${{p.description?`<p style="margin-top:.75rem;line-height:1.7;color:var(--muted)">${{p.description}}</p>`:''}}
     ${{p.available?'':'<p class="aviso">Este item está esgotado no momento.</p>'}}

@@ -18,15 +18,29 @@ function ModalBody({ product, onClose }: { product: Product; onClose: () => void
 
   return (
     <>
-      <div className="relative -mx-6 -mt-5 mb-5 aspect-[16/10] overflow-hidden">
-        <ProductImage product={product} sizes="(max-width: 640px) 100vw, 42rem" priority />
+      {/* Foto primeiro no celular, lado a lado no desktop.
+
+          A proporção 3/2 é a nativa das fotografias da casa: com ela o
+          `object-cover` não corta nada — nem o topo do pão nem a tábua. Antes
+          era 16/10, que comia uma faixa do enquadramento. */}
+      <div className="-mx-6 -mt-5 mb-5 flex flex-col gap-4 sm:mb-6 sm:flex-row sm:gap-6">
+        <div className="relative aspect-[3/2] w-full shrink-0 overflow-hidden sm:w-[47%] sm:self-start sm:rounded-r-[var(--radius-card)]">
+          <ProductImage
+            product={product}
+            sizes="(max-width: 640px) 100vw, 20rem"
+            priority
+          />
+        </div>
+
+        <div className="px-6 sm:px-0 sm:pr-6 sm:pt-1">
+          <p className="text-3xl font-extrabold text-white tabular-nums">
+            {formatPrice(product.price)}
+          </p>
+          {product.description && (
+            <p className="mt-3 leading-relaxed text-muted">{product.description}</p>
+          )}
+        </div>
       </div>
-
-      <p className="text-3xl font-extrabold text-white">{formatPrice(product.price)}</p>
-
-      {product.description && (
-        <p className="mt-3 leading-relaxed text-muted">{product.description}</p>
-      )}
 
       {!product.available && (
         <p className="mt-4 rounded-2xl bg-ember-deep/45 px-4 py-3 text-sm font-bold text-white">
