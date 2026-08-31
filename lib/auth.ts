@@ -6,11 +6,11 @@ import { persist } from 'zustand/middleware';
 /**
  * Identificação do cliente antes do pagamento.
  *
- * O que é real e o que depende de você:
- *  - Convidado e e-mail funcionam sem nenhuma chave.
- *  - Google e Facebook precisam de app registrado no provedor. Sem as
- *    variáveis abaixo, a tela entra em modo demonstração e diz isso na cara
- *    do usuário, em vez de fingir que autenticou.
+ * Regra que vale para tudo aqui: método que não funciona de verdade NÃO
+ * APARECE. Antes, sem app registrado no provedor, os botões de Google e
+ * Facebook rodavam uma animação e davam o cliente por autenticado — login
+ * falso, com cliente real. Agora cada botão só existe se as credenciais dele
+ * existirem, e o convidado cobre o resto.
  *
  * O bloqueio por tentativas é uma trava de INTERFACE. Ele vive no navegador,
  * então qualquer pessoa consegue zerar limpando os dados do site. Serve para
@@ -23,10 +23,16 @@ export const MAX_TENTATIVAS = 5;
  *  cliente sem conta no aparelho dele por causa de cinco erros de digitação. */
 export const BLOQUEIO_MINUTOS = 15;
 
+/**
+ * Provedores sociais.
+ *
+ * Ter a credencial é condição necessária, não suficiente: o fluxo OAuth
+ * também precisa das rotas `/api/auth/<provedor>/start` e `/callback`. Elas
+ * ainda não existem, então hoje as duas constantes são falsas na prática e
+ * os botões ficam fora da tela. Ver RELATORIO-PRODUCAO.md.
+ */
 export const GOOGLE_ATIVO = Boolean(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
 export const FACEBOOK_ATIVO = Boolean(process.env.NEXT_PUBLIC_FACEBOOK_APP_ID);
-/** Sem provedor configurado, os botões sociais rodam simulados — e avisam. */
-export const MODO_DEMO = !GOOGLE_ATIVO && !FACEBOOK_ATIVO;
 
 export type Provedor = 'google' | 'facebook' | 'email' | 'telefone' | 'convidado';
 

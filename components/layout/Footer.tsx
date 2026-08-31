@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { business, whatsappUrl } from '@/lib/business';
 import { Logo } from '../ui/Logo';
 import { WhatsAppIcon } from '../ui/Icons';
@@ -68,11 +69,19 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col gap-2 border-t border-white/20 pt-6 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-12 flex flex-col gap-3 border-t border-white/20 pt-6 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {new Date().getFullYear()} {business.name}. Todos os direitos reservados.
           </p>
-          <p>{business.openingNote}</p>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <Link
+              href="/politica-de-privacidade"
+              className="underline underline-offset-2 transition-colors hover:text-white"
+            >
+              Política de privacidade
+            </Link>
+            <p>{business.openingNote}</p>
+          </div>
         </div>
       </div>
     </footer>

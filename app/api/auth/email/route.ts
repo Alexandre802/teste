@@ -5,21 +5,40 @@ import { identificadorAnonimo, limitarTaxa } from '@/lib/seguranca';
 /**
  * Código de acesso por e-mail, sem banco de dados.
  *
- * O código não é guardado no servidor: ele é derivado por HMAC de
- * (e-mail + janela de tempo + segredo). Isso dá um código de 6 dígitos válido
- * por ~10 minutos, verificável sem estado, o que mantém a rota funcionando em
- * ambiente serverless sem sessão compartilhada.
+ * O código é derivado por HMAC de (e-mail + janela de tempo + segredo). Isso
+ * dá 6 dígitos válidos por ~10 minutos, verificáveis sem estado, o que mantém
+ * a rota funcionando em serverless sem sessão compartilhada.
  *
- * Para enviar de fato o e-mail é preciso um provedor de envio (Resend,
- * SendGrid, SES) e a chave correspondente. Sem `EMAIL_FROM` + `RESEND_API_KEY`
- * a rota responde em modo demonstração e devolve o código na própria resposta,
- * marcado como tal — a tela mostra isso ao usuário, para ninguém achar que
- * recebeu um e-mail que não foi enviado.
+ * ── Por que a rota se desliga sozinha em produção ──
+ *
+ * A segurança inteira do código mora no `AUTH_SECRET`. Antes havia um valor
+ * padrão escrito no arquivo; como o repositório é público, qualquer pessoa
+ * podia calcular o código de acesso de qualquer e-mail e entrar como o
+ * cliente. Agora, em produção, sem segredo forte configurado a rota
+ * simplesmente não existe — falha fechada.
+ *
+ * Do mesmo jeito, sem provedor de envio o código NÃO volta na resposta em
+ * produção: devolver o código para quem pediu não é login nenhum.
  */
 
-const SEGREDO = process.env.AUTH_SECRET ?? 'michel-food-house-dev-secret';
-const JANELA_MS = 10 * 60_000;
+const PRODUCAO = process.env.NODE_ENV === 'production';
+
+/** Em desenvolvimento vale um segredo de conveniência; em produção, nunca. */
+const SEGREDO = process.env.AUTH_SECRET ?? (PRODUCAO ? '' : 'apenas-desenvolvimento-local');
+const SEGREDO_FORTE = SEGREDO.length >= 24;
+
 const ENVIO_ATIVO = Boolean(process.env.RESEND_API_KEY && process.env.EMAIL_FROM);
+
+/**
+ * O login por e-mail está disponível?
+ *
+ * Produção exige as duas pernas: segredo forte e envio configurado. Em
+ * desenvolvimento basta o segredo, e o código aparece na resposta para dar
+ * para testar o fluxo.
+ */
+export const loginEmailAtivo = PRODUCAO ? SEGREDO_FORTE && ENVIO_ATIVO : SEGREDO_FORTE;
+
+const JANELA_MS = 10 * 60_000;
 
 function codigoPara(email: string, janela: number): string {
   const mac = createHmac('sha256', SEGREDO).update(`${email.toLowerCase()}:${janela}`).digest();
@@ -32,7 +51,23 @@ function conferem(a: string, b: string): boolean {
   return x.length === y.length && timingSafeEqual(x, y);
 }
 
+const indisponivel = () =>
+  NextResponse.json(
+    { erro: 'O login por e-mail está indisponível. Siga como convidado — o pedido sai igual.' },
+    { status: 503 },
+  );
+
+/** A tela de identificação consulta isto para não oferecer o que não funciona. */
+export async function GET() {
+  return NextResponse.json(
+    { ativo: loginEmailAtivo, envio: ENVIO_ATIVO },
+    { headers: { 'Cache-Control': 'no-store' } },
+  );
+}
+
 export async function POST(request: Request) {
+  if (!loginEmailAtivo) return indisponivel();
+
   // dois tetos: um por solicitante, para o site não virar disparador de
   // e-mail, e outro mais folgado para a conferência do código
   const taxa = limitarTaxa(`auth:${identificadorAnonimo(request)}`, 12, 300_000);
@@ -61,7 +96,7 @@ export async function POST(request: Request) {
     const codigo = codigoPara(email, janela);
 
     if (!ENVIO_ATIVO) {
-      // Nada foi enviado: devolve o código marcado como demonstração.
+      // Só chega aqui fora de produção: `loginEmailAtivo` já barrou lá em cima.
       return NextResponse.json({ ok: true, demo: true, codigo });
     }
 

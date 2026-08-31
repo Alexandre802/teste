@@ -9,8 +9,23 @@ import { createHash, timingSafeEqual } from 'node:crypto';
  * original não fica em lugar nenhum, nem em memória.
  */
 
-/** Sal do hash de identificação. Troque em produção para o hash não ser previsível. */
+/**
+ * Sal do hash de identificação.
+ *
+ * Sem ele configurado em produção, o hash vira previsível: quem conhece o
+ * valor padrão (o repositório é público) consegue calcular o identificador de
+ * um IP e, com isso, prever quem está perto do limite. Não é falha grave — o
+ * IP continua não sendo guardado —, mas o aviso no log evita que passe
+ * despercebido para sempre.
+ */
 const SAL = process.env.RATE_LIMIT_SALT ?? 'mfh-sal-de-desenvolvimento';
+
+if (process.env.NODE_ENV === 'production' && !process.env.RATE_LIMIT_SALT) {
+  console.warn(
+    '[seguranca] RATE_LIMIT_SALT não configurado: o identificador do limite de taxa usa o sal ' +
+      'padrão, que é público. Defina um valor longo e aleatório nas variáveis de ambiente.',
+  );
+}
 
 /**
  * Identificador anônimo e estável do solicitante, para limitar taxa.

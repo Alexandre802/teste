@@ -8,7 +8,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "checar-config": "node scripts/checar-config-vercel.cjs --exigir"
+    "checar-config": "node scripts/checar-config-vercel.cjs --exigir",
+    "typecheck": "tsc --noEmit",
+    "pretest:e2e": "next build",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.120.0",
@@ -19,6 +22,7 @@
     "zustand": "^5.0.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^22.10.5",
     "@types/react": "^19.0.7",

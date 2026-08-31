@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import { business, fullAddress } from '@/lib/business';
 import { allSearchTerms, restaurantJsonLd } from '@/lib/seo';
+import RegistrarSW from '@/components/pwa/RegistrarSW';
 import './globals.css';
 
 const jakarta = Plus_Jakarta_Sans({
@@ -37,6 +38,21 @@ export const metadata: Metadata = {
     images: ['/og.png'],
   },
   robots: { index: true, follow: true },
+  manifest: '/manifest.webmanifest',
+  // Instalado na tela inicial do iPhone, o site abre em tela cheia com a
+  // barra de status clara sobre o laranja da marca.
+  appleWebApp: {
+    capable: true,
+    title: business.name,
+    statusBarStyle: 'black-translucent',
+  },
+  icons: {
+    apple: [{ url: '/icones/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+    icon: [
+      { url: '/icones/icone-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icones/icone-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+  },
   other: { 'geo.placename': `${business.address.city}, ${business.address.state}`, 'geo.region': 'BR-SP' },
 };
 
@@ -59,6 +75,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           Pular para o cardápio
         </a>
         {children}
+        <RegistrarSW />
         <script
           nonce={nonce}
           type="application/ld+json"

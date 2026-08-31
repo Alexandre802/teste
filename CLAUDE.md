@@ -35,7 +35,46 @@ e `opacity` são animados. `prefers-reduced-motion` entrega o lanche montado e i
 Para peça de **vídeo** (campanha, reels), use a skill `remotion-site` — lá a regra é
 outra: toda animação é função de `useCurrentFrame()`.
 
+## Pedido
+
+O checkout inteiro vive em `components/cart/CartDrawer.tsx`, que orquestra os
+passos: sacola → entrega/retirada → identificação → endereço → pagamento →
+revisão → confirmação. O endereço é pulado na retirada.
+
+- Endereço com campos, validação e formatação: `lib/endereco.ts`. Rua, número e
+  bairro são obrigatórios; o resto é opcional.
+- Forma de pagamento e troco: `lib/pagamento.ts`. O formato das linhas que a
+  cozinha recebe está travado por teste.
+- Taxa, pedido mínimo, área e prazo: `lib/entrega.ts`. **Tudo `null` até o
+  proprietário confirmar** — o site não mostra número que ninguém confirmou.
+- A mensagem do WhatsApp é montada em `lib/whatsapp.ts` e o `wa.me` funciona
+  sem nenhuma credencial. É o caminho garantido; a Cloud API é um extra.
+
+## Nada de função falsa
+
+Regra que vale para o projeto todo: **método que não funciona de verdade não
+aparece na tela.** Sem credencial configurada, a opção some e o site diz o que
+está acontecendo — nunca simula. Isso já foi violado três vezes e cada uma
+podia chegar ao cliente como fraude:
+
+- pagamento em "modo demonstração" que reportava o pedido como pago;
+- botões de Google e Facebook que davam o cliente por autenticado sem verificar
+  nada;
+- código de acesso por e-mail devolvido na própria resposta da API.
+
+Rota que depende de credencial ausente **falha fechada**, com mensagem honesta.
+
+## Testes
+
+`npm run test:e2e` (constrói antes, por `pretest:e2e`). Playwright, em celular e
+desktop. Cobrem o conteúdo exato da mensagem do WhatsApp, endereço obrigatório
+na entrega, ausência de endereço na retirada, troco, proteção das APIs contra
+payload adulterado, responsividade de 360 a 1920 px e o manifesto do PWA.
+
 ## Segredos
 
 `.env.local` e `.mcp.json` leem chaves por variável de ambiente. Nunca escreva chave
 em arquivo versionado. Variáveis documentadas em `.env.example`.
+
+Segredo **jamais** em variável `NEXT_PUBLIC_*` — esse prefixo entrega o valor ao
+navegador. O que falta configurar está em `RELATORIO-PRODUCAO.md`.

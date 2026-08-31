@@ -7,7 +7,6 @@ import {
   FACEBOOK_ATIVO,
   GOOGLE_ATIVO,
   MAX_TENTATIVAS,
-  MODO_DEMO,
   emailValido,
   formatarEspera,
   nomeDoEmail,
@@ -24,6 +23,12 @@ import { FacebookIcon, GoogleIcon, LockIcon, MailIcon } from '../ui/Icons';
  * Entrar é opcional: o modo convidado fica sempre disponível, inclusive
  * quando o login está bloqueado por tentativas. Ninguém deixa de comprar
  * porque errou a senha.
+ *
+ * Só aparece o que funciona. Google e Facebook dependem de app registrado no
+ * provedor; o e-mail depende de segredo forte e provedor de envio, e a tela
+ * pergunta isso ao servidor (`GET /api/auth/email`) porque a chave de envio é
+ * secreta e não pode ser lida pelo navegador. O que não estiver pronto some
+ * da tela em vez de simular.
  */
 export default function LoginStep({ onDone }: { onDone: () => void }) {
   const reduce = useReducedMotion();
@@ -44,9 +49,27 @@ export default function LoginStep({ onDone }: { onDone: () => void }) {
   const [erro, setErro] = useState('');
   const [aviso, setAviso] = useState('');
   const [agora, setAgora] = useState(() => Date.now());
+  /** null enquanto o servidor não respondeu se o login por e-mail existe. */
+  const [emailAtivo, setEmailAtivo] = useState<boolean | null>(null);
 
   const bloqueado = Boolean(bloqueadoAte && bloqueadoAte > agora);
   const restantes = Math.max(0, MAX_TENTATIVAS - tentativas);
+  /** Há algum método além do convidado? Se não, a tela nem mostra o "ou". */
+  const temOutroMetodo = GOOGLE_ATIVO || FACEBOOK_ATIVO || emailAtivo === true;
+
+  // pergunta ao servidor se o login por e-mail está de pé; enquanto não
+  // souber, o botão não aparece — melhor faltar opção do que oferecer uma
+  // que devolve erro
+  useEffect(() => {
+    let vivo = true;
+    fetch('/api/auth/email')
+      .then((r) => (r.ok ? r.json() : { ativo: false }))
+      .then((d) => vivo && setEmailAtivo(Boolean(d?.ativo)))
+      .catch(() => vivo && setEmailAtivo(false));
+    return () => {
+      vivo = false;
+    };
+  }, []);
 
   // relógio de 1s só enquanto o bloqueio está de pé
   useEffect(() => {
@@ -78,24 +101,11 @@ export default function LoginStep({ onDone }: { onDone: () => void }) {
     setErro('');
     setOcupado(provedor);
 
-    const configurado = provedor === 'google' ? GOOGLE_ATIVO : FACEBOOK_ATIVO;
-    if (!configurado) {
-      // Sem app registrado no provedor não existe login de verdade. Em vez de
-      // simular por baixo dos panos, o fluxo roda e diz o que está faltando.
-      await new Promise((r) => setTimeout(r, 700));
-      concluir({
-        name: clienteAtual?.name || 'Cliente',
-        phone: clienteAtual?.phone ?? '',
-        provider: provedor,
-      });
-      return;
-    }
-
     try {
       const r = await fetch(`/api/auth/${provedor}/start`, { method: 'POST' });
       if (!r.ok) throw new Error();
       const { url } = (await r.json()) as { url: string };
-      window.location.href = url;
+      window.location.assign(url);
     } catch {
       falhou(`Não conseguimos entrar com ${provedor === 'google' ? 'Google' : 'Facebook'}.`);
     }
@@ -194,14 +204,6 @@ export default function LoginStep({ onDone }: { onDone: () => void }) {
         )}
       </AnimatePresence>
 
-      {MODO_DEMO && !bloqueado && (
-        <p className="rounded-2xl border border-white/40 bg-white/12 p-3 text-xs leading-relaxed text-white/90">
-          <strong className="font-extrabold text-white">Modo demonstração.</strong> Google e
-          Facebook ainda não têm app registrado, então esses botões apenas simulam a entrada. O
-          e-mail e o convidado funcionam de verdade.
-        </p>
-      )}
-
       <AnimatePresence mode="wait" initial={false}>
         {/* ─────────────── escolha do método ─────────────── */}
         {tela === 'escolha' && (
@@ -213,44 +215,52 @@ export default function LoginStep({ onDone }: { onDone: () => void }) {
             transition={{ duration: 0.22 }}
             className="flex flex-col gap-3"
           >
-            <button
-              type="button"
-              onClick={() => entrarSocial('google')}
-              disabled={bloqueado || ocupado !== null}
-              className="flex w-full items-center justify-center gap-3 rounded-full bg-white px-6 py-3.5 font-extrabold text-cocoa transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0"
-            >
-              <GoogleIcon className="h-5 w-5" />
-              {ocupado === 'google' ? 'Entrando…' : 'Continuar com Google'}
-            </button>
+            {GOOGLE_ATIVO && (
+              <button
+                type="button"
+                onClick={() => entrarSocial('google')}
+                disabled={bloqueado || ocupado !== null}
+                className="flex w-full items-center justify-center gap-3 rounded-full bg-white px-6 py-3.5 font-extrabold text-cocoa transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0"
+              >
+                <GoogleIcon className="h-5 w-5" />
+                {ocupado === 'google' ? 'Entrando…' : 'Continuar com Google'}
+              </button>
+            )}
 
-            <button
-              type="button"
-              onClick={() => entrarSocial('facebook')}
-              disabled={bloqueado || ocupado !== null}
-              className="flex w-full items-center justify-center gap-3 rounded-full bg-[#1877F2] px-6 py-3.5 font-extrabold text-white transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0"
-            >
-              <FacebookIcon className="h-5 w-5" />
-              {ocupado === 'facebook' ? 'Entrando…' : 'Continuar com Facebook'}
-            </button>
+            {FACEBOOK_ATIVO && (
+              <button
+                type="button"
+                onClick={() => entrarSocial('facebook')}
+                disabled={bloqueado || ocupado !== null}
+                className="flex w-full items-center justify-center gap-3 rounded-full bg-[#1877F2] px-6 py-3.5 font-extrabold text-white transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0"
+              >
+                <FacebookIcon className="h-5 w-5" />
+                {ocupado === 'facebook' ? 'Entrando…' : 'Continuar com Facebook'}
+              </button>
+            )}
 
-            <button
-              type="button"
-              onClick={() => {
-                setErro('');
-                setTela('email');
-              }}
-              disabled={bloqueado || ocupado !== null}
-              className="flex w-full items-center justify-center gap-3 rounded-full border-2 border-white/60 px-6 py-3.5 font-extrabold text-white transition-all hover:-translate-y-0.5 hover:bg-white hover:text-cocoa disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0 disabled:hover:bg-transparent disabled:hover:text-white"
-            >
-              <MailIcon className="h-5 w-5" />
-              Entrar com e-mail
-            </button>
+            {emailAtivo && (
+              <button
+                type="button"
+                onClick={() => {
+                  setErro('');
+                  setTela('email');
+                }}
+                disabled={bloqueado || ocupado !== null}
+                className="flex w-full items-center justify-center gap-3 rounded-full border-2 border-white/60 px-6 py-3.5 font-extrabold text-white transition-all hover:-translate-y-0.5 hover:bg-white hover:text-cocoa disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0 disabled:hover:bg-transparent disabled:hover:text-white"
+              >
+                <MailIcon className="h-5 w-5" />
+                Entrar com e-mail
+              </button>
+            )}
 
-            <div className="my-1 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.2em] text-white/70">
-              <span className="h-px flex-1 bg-white/30" />
-              ou
-              <span className="h-px flex-1 bg-white/30" />
-            </div>
+            {temOutroMetodo && (
+              <div className="my-1 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.2em] text-white/70">
+                <span className="h-px flex-1 bg-white/30" />
+                ou
+                <span className="h-px flex-1 bg-white/30" />
+              </div>
+            )}
 
             <button
               type="button"
@@ -260,8 +270,9 @@ export default function LoginStep({ onDone }: { onDone: () => void }) {
               Continuar como convidado
             </button>
             <p className="text-center text-xs leading-relaxed text-white/75">
-              Como convidado o pedido segue normalmente. Entrar só serve para a casa lembrar de
-              você no próximo.
+              {temOutroMetodo
+                ? 'Como convidado o pedido segue normalmente. Entrar só serve para a casa lembrar de você no próximo.'
+                : 'É só isso: informe um nome e o pedido segue. Nenhuma conta é criada.'}
             </p>
           </motion.div>
         )}

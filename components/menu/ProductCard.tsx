@@ -38,15 +38,19 @@ export default function ProductCard({
 
   return (
     <motion.article
-      layout
+      // `layout` e a inclinação seguindo o mouse ficam de fora quando o
+      // sistema pede menos movimento: os dois animam o tempo todo, e é
+      // exatamente esse tipo de movimento contínuo que incomoda quem tem
+      // sensibilidade vestibular.
+      layout={!reduce}
       initial={reduce ? false : { opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       exit={reduce ? undefined : { opacity: 0 }}
       transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
       ref={tiltRef}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
-      style={{ rotateX, rotateY, transformPerspective: 900 }}
+      onMouseMove={reduce ? undefined : onMove}
+      onMouseLeave={reduce ? undefined : onLeave}
+      style={reduce ? undefined : { rotateX, rotateY, transformPerspective: 900 }}
       whileHover={reduce ? undefined : { y: -6 }}
       className="glass group flex flex-col overflow-hidden rounded-[var(--radius-card)] shadow-[0_10px_26px_-16px_rgba(110,40,5,0.6)] transition-shadow duration-300 hover:shadow-[0_26px_50px_-18px_rgba(110,40,5,0.8)]"
     >

@@ -59,9 +59,15 @@ export function Sheet({
     <AnimatePresence>
       {open && (
         <div className="fixed inset-0 z-[70]">
-          <motion.button
-            type="button"
-            aria-label="Fechar"
+          {/*
+            Fundo escurecido. Fecha ao toque, mas fica FORA da árvore de
+            acessibilidade: como botão rotulado "Fechar", ele duplicava o X do
+            cabeçalho — dois controles com o mesmo nome, e o leitor de tela
+            anunciava os dois. Quem navega por teclado ou leitor fecha pelo X
+            ou pelo Esc, que continuam valendo.
+          */}
+          <motion.div
+            aria-hidden
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

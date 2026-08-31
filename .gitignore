@@ -24,3 +24,11 @@ Thumbs.db
 
 # Preview autocontido gerado por scripts/build-preview.py
 preview.html
+
+# Saída dos testes de ponta a ponta
+/test-results
+/playwright-report
+/blob-report
+
+# Cache incremental do TypeScript
+tsconfig.tsbuildinfo

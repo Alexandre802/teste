@@ -20,7 +20,20 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 // Caminhos que dispensam cabeçalho de segurança: imagem não executa script.
 // Filtrar aqui, e não por `config.matcher`, é deliberado — ver a nota no fim.
-const SEM_CABECALHO = ['/_next/static', '/_next/image', '/produtos/', '/lanche/', '/marca/'];
+//
+// `/sw.js` entra na lista por outro motivo: a CSP da página usa nonce com
+// `strict-dynamic`, e nonce não existe no contexto de um service worker — o
+// cabeçalho ali só atrapalharia. O arquivo é servido do próprio domínio e não
+// carrega script de lugar nenhum.
+const SEM_CABECALHO = [
+  '/_next/static',
+  '/_next/image',
+  '/produtos/',
+  '/lanche/',
+  '/marca/',
+  '/icones/',
+  '/sw.js',
+];
 
 export function proxy(request: NextRequest) {
   const caminho = request.nextUrl.pathname;
@@ -97,5 +110,7 @@ export function proxy(request: NextRequest) {
  * leitor da Vercel sobre o projeto.
  */
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon|apple-icon|produtos/|lanche/|marca/).*)'],
+  matcher: [
+    '/((?!_next/static|_next/image|favicon|apple-icon|produtos/|lanche/|marca/|icones/|sw.js).*)',
+  ],
 };

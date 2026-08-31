@@ -1,7 +1,20 @@
 /**
  * Dados do negócio. Ponto único de verdade — alterar aqui reflete no site
  * inteiro (header, footer, contato, WhatsApp, JSON-LD, metadata).
+ *
+ * TUDO AQUI PRECISA SER CONFIRMADO PELO PROPRIETÁRIO antes de virar
+ * propaganda. O que está escrito veio do perfil público da casa no Google e
+ * do cardápio impresso; nada foi deduzido. O horário, em particular, está
+ * incompleto de propósito: só a abertura foi confirmada.
  */
+
+/**
+ * Endereço de produção enquanto não há domínio próprio.
+ *
+ * É o alias que o cliente já divulga. Não trocar sem combinar: link antigo
+ * quebrado custa mais que domínio bonito.
+ */
+const PRODUCAO_ATUAL = 'https://teste-steel-five-45.vercel.app';
 export const business = {
   name: 'Michel Food House',
   slogan: 'O sabor que impressiona na primeira mordida.',
@@ -38,15 +51,21 @@ export const business = {
   /**
    * Endereço público do site, usado em canônico, Open Graph, sitemap e JSON-LD.
    *
-   * Ordem: o que estiver configurado; senão a URL que a Vercel gera sozinha;
-   * e só então o domínio próprio. Sem o degrau da Vercel, um site publicado
-   * antes de ter domínio anuncia ao Google um endereço que ainda não existe.
+   * Ordem de precedência:
+   *   1. NEXT_PUBLIC_SITE_URL — o domínio próprio, quando existir. Trocar
+   *      esta variável é a única coisa necessária no dia da migração.
+   *   2. O alias de produção da Vercel, que é estável entre publicações.
+   *   3. O endereço de produção atual, escrito abaixo.
+   *
+   * Repare que NEXT_PUBLIC_VERCEL_URL não entra: ela aponta para o deployment
+   * específico (muda a cada publicação), e usá-la no canônico faria o Google
+   * indexar um endereço diferente por publicação.
    */
   siteUrl:
     process.env.NEXT_PUBLIC_SITE_URL ??
-    (process.env.NEXT_PUBLIC_VERCEL_URL
-      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-      : 'https://michelfoodhouse.com.br'),
+    (process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL}`
+      : PRODUCAO_ATUAL),
 } as const;
 
 export const fullAddress = `${business.address.street} - ${business.address.district}, ${business.address.city} - ${business.address.state}, ${business.address.postalCode}`;
