@@ -59,11 +59,23 @@ export const categories: Category[] = [
 
 const img = (slug: string) => `/produtos/${slug}.webp`;
 
+/**
+ * Fotografia profissional do produto, feita pela casa.
+ *
+ * Tem prioridade sobre `img()`, que aponta para os recortes das capturas do
+ * cardápio digital — baixa resolução, e alguns com texto impresso no
+ * enquadramento. Onde existe `foto()`, é ela que o cliente vê.
+ *
+ * Só recebe foto o produto cujos ingredientes visíveis batem com a descrição
+ * do cardápio. Ver scripts/importar-fotos.py para a associação, item a item.
+ */
+const foto = (slug: string) => `/images/lanches/${slug}.webp`;
+
 export const products: Product[] = [
   // ─────────────────────────── TRADICIONAIS ───────────────────────────
   { id: 'americano', group: 'Clássicos da casa', name: 'Americano', category: 'tradicionais', price: 23.5, available: true, image: null,
     description: 'Pão de hambúrguer, presunto, queijo, ovo, batata palha, vinagrete ou tomate, alface…' },
-  { id: 'hot-dog', group: 'Hot Dog', name: 'Hot Dog', category: 'tradicionais', price: 17.5, available: true, image: img('hot-dog'),
+  { id: 'hot-dog', group: 'Hot Dog', name: 'Hot Dog', category: 'tradicionais', price: 17.5, available: true, image: foto('hot-dog'), featured: true,
     description: 'Pão de hambúrguer, 2 salsichas, queijo, batata palha, purê, vinagrete ou tomate…' },
   { id: 'hot-bacon', group: 'Hot Dog', name: 'Hot Bacon', category: 'tradicionais', price: 22.9, available: true, image: img('hot-bacon'),
     description: 'Pão de hambúrguer, 2 salsichas, bacon, queijo, batata palha, purê, vinagrete ou tomate…' },
@@ -91,25 +103,25 @@ export const products: Product[] = [
     description: 'Pão de hambúrguer, queijo, batata palha, vinagrete ou tomate, alface, maionese…' },
   { id: 'bauru', group: 'Clássicos da casa', name: 'Bauru', category: 'tradicionais', price: 22.9, available: true, image: null,
     description: 'Pão de hambúrguer, presunto, queijo, orégano, batata palha, vinagrete ou tomate…' },
-  { id: 'hamburguer', group: 'X Tradicional', name: 'Hambúrguer', category: 'tradicionais', price: 14.5, available: true, image: null,
+  { id: 'hamburguer', group: 'X Tradicional', name: 'Hambúrguer', category: 'tradicionais', price: 14.5, available: true, image: foto('hamburguer'),
     description: 'Pão de hambúrguer, hambúrguer, batata palha, maionese e ketchup.' },
-  { id: 'x-burguer', group: 'X Tradicional', name: 'X Burguer', category: 'tradicionais', price: 17.5, available: true, image: null,
+  { id: 'x-burguer', group: 'X Tradicional', name: 'X Burguer', category: 'tradicionais', price: 17.5, available: true, image: foto('x-burguer'), featured: true,
     description: 'Pão de hambúrguer, hambúrguer, queijo, batata palha, maionese e ketchup.' },
-  { id: 'x-salada', group: 'X Tradicional', name: 'X Salada', category: 'tradicionais', price: 21.5, available: true, image: null, featured: true,
+  { id: 'x-salada', group: 'X Tradicional', name: 'X Salada', category: 'tradicionais', price: 21.5, available: true, image: null,
     description: 'Pão de hambúrguer, hambúrguer, queijo, batata palha, vinagrete ou tomate, alface.' },
   { id: 'x-bacon', group: 'X Tradicional', name: 'X Bacon', category: 'tradicionais', price: 28.5, available: true, image: null,
     description: 'Pão de hambúrguer, hambúrguer, bacon, queijo, batata palha, vinagrete ou tomate.' },
-  { id: 'x-egg', group: 'X Tradicional', name: 'X Egg', category: 'tradicionais', price: 26.0, available: true, image: img('x-egg'),
+  { id: 'x-egg', group: 'X Tradicional', name: 'X Egg', category: 'tradicionais', price: 26.0, available: true, image: foto('x-egg'), featured: true,
     description: 'Pão de hambúrguer, hambúrguer, ovo, queijo, batata palha, vinagrete ou tomate, alface.' },
-  { id: 'x-egg-bacon', group: 'X Tradicional', name: 'X Egg Bacon', category: 'tradicionais', price: 29.9, available: true, image: img('x-egg-bacon'), featured: true,
+  { id: 'x-egg-bacon', group: 'X Tradicional', name: 'X Egg Bacon', category: 'tradicionais', price: 29.9, available: true, image: img('x-egg-bacon'),
     description: 'Pão de hambúrguer, hambúrguer, ovo, bacon, queijo, batata palha, vinagrete ou tomate.' },
-  { id: 'x-frango', group: 'X Frango', name: 'X Frango', category: 'tradicionais', price: 26.9, available: true, image: null,
+  { id: 'x-frango', group: 'X Frango', name: 'X Frango', category: 'tradicionais', price: 26.9, available: true, image: foto('x-frango'),
     description: 'Pão de hambúrguer, frango (filé cortado), queijo, orégano, batata palha, vinagrete ou tomate…' },
-  { id: 'x-frango-bacon', group: 'X Frango', name: 'X Frango Bacon', category: 'tradicionais', price: 29.9, available: true, image: null,
+  { id: 'x-frango-bacon', group: 'X Frango', name: 'X Frango Bacon', category: 'tradicionais', price: 29.9, available: true, image: foto('x-frango-bacon'), featured: true,
     description: 'Pão de hambúrguer, frango (filé cortado), bacon, queijo, orégano, batata palha…' },
-  { id: 'x-frango-egg', group: 'X Frango', name: 'X Frango Egg', category: 'tradicionais', price: 27.3, available: true, image: null,
+  { id: 'x-frango-egg', group: 'X Frango', name: 'X Frango Egg', category: 'tradicionais', price: 27.3, available: true, image: foto('x-frango-egg'),
     description: 'Pão de hambúrguer, frango (filé cortado), ovo, queijo, orégano, batata palha, vinagrete ou tomate…' },
-  { id: 'x-frango-egg-bacon', group: 'X Frango', name: 'X Frango Egg Bacon', category: 'tradicionais', price: 31.5, available: true, image: null,
+  { id: 'x-frango-egg-bacon', group: 'X Frango', name: 'X Frango Egg Bacon', category: 'tradicionais', price: 31.5, available: true, image: foto('x-frango-egg-bacon'), featured: true,
     description: 'Pão de hambúrguer, frango (filé cortado), ovo, bacon, queijo, orégano, batata palha…' },
   { id: 'x-frango-calabresa', group: 'X Frango', name: 'X Frango Calabresa', category: 'tradicionais', price: 29.7, available: true, image: null,
     description: 'Pão de hambúrguer, frango (filé cortado), calabresa, queijo, orégano, batata palha…' },
@@ -125,9 +137,9 @@ export const products: Product[] = [
     description: 'Pão quadrado, frango (filé cortado), calabresa, queijo, orégano, batata palha…' },
   { id: 'x-calabresa', group: 'Os reforçados', name: 'X Calabresa', category: 'tradicionais', price: 28.9, available: true, image: img('x-calabresa'),
     description: 'Pão quadrado, calabresa, queijo, orégano, batata palha, vinagrete ou tomate, alface…' },
-  { id: 'x-churrasco', group: 'Os reforçados', name: 'X Churrasco', category: 'tradicionais', price: 29.9, available: true, image: img('x-churrasco'), featured: true,
+  { id: 'x-churrasco', group: 'Os reforçados', name: 'X Churrasco', category: 'tradicionais', price: 29.9, available: true, image: img('x-churrasco'),
     description: 'Pão de hambúrguer, bife de contra-filé, queijo, batata palha, vinagrete ou tomate, alface.' },
-  { id: 'x-tudo', group: 'Os reforçados', name: 'X Tudo', category: 'tradicionais', price: 41.5, available: true, image: img('x-tudo'), featured: true,
+  { id: 'x-tudo', group: 'Os reforçados', name: 'X Tudo', category: 'tradicionais', price: 41.5, available: true, image: img('x-tudo'),
     description: 'Pão quadrado, hambúrguer, frango em filé cortado, bacon, ovo, calabresa e salsicha.' },
 
   // ───────────────────────────── BEIRUTES ─────────────────────────────
@@ -206,15 +218,41 @@ export const products: Product[] = [
     description: 'Pão de brioche, hambúrguer caseiro 100% bovino de 180 g ao ponto da casa, queijo cheddar…' },
   { id: 'x-salada-gourmet', group: 'Gourmet', name: 'X Salada Gourmet', category: 'gourmet', price: 29.0, available: true, image: img('x-salada-gourmet'),
     description: 'Pão de brioche, hambúrguer caseiro 100% bovino de 180 g ao ponto da casa, queijo cheddar…' },
-  { id: 'x-bacon-gourmet', group: 'Gourmet', name: 'X Bacon Gourmet', category: 'gourmet', price: 35.0, available: true, image: img('x-bacon-gourmet'), featured: true,
+  { id: 'x-bacon-gourmet', group: 'Gourmet', name: 'X Bacon Gourmet', category: 'gourmet', price: 35.0, available: true, image: img('x-bacon-gourmet'),
     description: 'Pão de brioche, hambúrguer caseiro 100% bovino de 180 g ao ponto da casa, queijo cheddar…' },
-  { id: 'especial-da-casa', group: 'Gourmet', name: 'Especial da Casa', category: 'gourmet', price: 42.0, available: true, image: img('especial-da-casa'), featured: true,
+  { id: 'especial-da-casa', group: 'Gourmet', name: 'Especial da Casa', category: 'gourmet', price: 42.0, available: true, image: img('especial-da-casa'),
     description: 'Pão de brioche, hambúrguer caseiro 100% bovino de 180 g ao ponto da casa, queijo cheddar…' },
 ];
 
 export const productsById = new Map(products.map((p) => [p.id, p]));
 
-export const featuredProducts = products.filter((p) => p.featured);
+/**
+ * Destaques da home.
+ *
+ * Só entra produto com FOTOGRAFIA REAL — a seção existe para mostrar o que o
+ * cliente vai receber, e destacar um item que cai no marcador da marca faz o
+ * contrário disso.
+ *
+ * A ordem é escolhida, não alfabética: primeiro o que tem mais ingrediente
+ * visível na foto, porque é esse que ocupa a peça grande da seção.
+ */
+const ORDEM_DESTAQUE = [
+  'x-frango-egg-bacon',
+  'x-egg',
+  'x-frango-bacon',
+  'hot-dog',
+  'x-burguer',
+];
+
+export const featuredProducts = products
+  .filter((p) => p.featured && p.image)
+  .sort((a, b) => {
+    const posicao = (id: string) => {
+      const i = ORDEM_DESTAQUE.indexOf(id);
+      return i < 0 ? ORDEM_DESTAQUE.length : i;
+    };
+    return posicao(a.id) - posicao(b.id);
+  });
 
 export function productsByCategory(id: CategoryId): Product[] {
   return products.filter((p) => p.category === id);
