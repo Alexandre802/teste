@@ -306,3 +306,50 @@ test.describe('SEO', () => {
     await expect(page.getByText(/LGPD|13\.709/).first()).toBeVisible();
   });
 });
+
+test.describe('service worker não atrapalha a primeira visita', () => {
+  test('a página não recarrega sozinha quando o worker assume', async ({ page }) => {
+    await bloquearExternos(page);
+    await page.goto('/');
+    await page.waitForLoadState('load');
+
+    /**
+     * Marca o contexto de execução da página.
+     *
+     * Contar evento de navegação não serve: o roteador do Next faz
+     * `replaceState` ao hidratar, e isso conta como navegação sem a página
+     * ter recarregado. Um recarregamento DE VERDADE destrói o contexto de
+     * JavaScript, e com ele esta marca — que é justamente o que o cliente
+     * perderia se estivesse preenchendo o endereço.
+     */
+    await page.evaluate(() => {
+      (window as unknown as { __marca?: number }).__marca = 1;
+    });
+
+    // tempo de sobra para o worker instalar, ativar e chamar clients.claim()
+    await page.waitForTimeout(3000);
+
+    const sobreviveu = await page.evaluate(
+      () => (window as unknown as { __marca?: number }).__marca === 1,
+    );
+    expect(
+      sobreviveu,
+      'o service worker recarregou a página na primeira visita e apagaria o que o cliente tivesse digitado',
+    ).toBe(true);
+  });
+
+  test('o worker fica no comando depois de instalar', async ({ page }) => {
+    await bloquearExternos(page);
+    await page.goto('/');
+    await page.waitForLoadState('load');
+
+    // `clients.claim()` faz o worker assumir a página já aberta — é o que
+    // permite servir do cache sem esperar o próximo carregamento
+    await expect(async () => {
+      const controlada = await page.evaluate(
+        () => Boolean(navigator.serviceWorker?.controller),
+      );
+      expect(controlada).toBe(true);
+    }).toPass({ timeout: 15_000 });
+  });
+});

@@ -38,12 +38,26 @@ export default function RegistrarSW() {
       });
     };
 
+    /**
+     * Já existia um service worker no comando desta página?
+     *
+     * Isto precisa ser lido ANTES do registro, e é o que separa os dois
+     * casos que disparam `controllerchange`:
+     *
+     *  - primeira visita: o worker instala e chama `clients.claim()`, o que
+     *    dispara o evento sem nada ter mudado de versão. Recarregar aqui faz
+     *    todo visitante novo ver a página piscar e recomeçar — e quem
+     *    estivesse preenchendo o endereço perderia o que digitou.
+     *  - versão nova assumindo: aí sim a página em execução está rodando
+     *    código velho, e recarregar é o certo.
+     */
+    const jaTinhaControlador = Boolean(navigator.serviceWorker.controller);
+
     navigator.serviceWorker.register('/sw.js').then(observar).catch(() => undefined);
 
-    // a troca de controlador recarrega a página uma única vez
     let recarregou = false;
     const aoTrocar = () => {
-      if (recarregou) return;
+      if (!jaTinhaControlador || recarregou) return;
       recarregou = true;
       window.location.reload();
     };
