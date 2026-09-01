@@ -59,6 +59,9 @@ Na Vercel, aponte o **Root Directory** para `md-cortes-store` e repita as
 variáveis de ambiente. O `vercel.json` já agenda o disparo dos lembretes a cada
 30 minutos.
 
+O passo a passo completo, com o que conferir no fim, está em
+[PUBLICAR.md](PUBLICAR.md).
+
 ---
 
 ## Instalar no celular
@@ -149,7 +152,24 @@ npm run lint       # ESLint
 npm run typecheck  # TypeScript
 npm test           # lógica + fluxo de venda
 npm run icons      # regera os ícones do app a partir da marca
+npm run demo       # empacota o app num HTML único, sem servidor
+npm run demo:testar # empacota e percorre o fluxo de venda num navegador
 ```
+
+### O build de demonstração
+
+`npm run demo` gera `demo/saida/index.html`: o app inteiro num arquivo só, que
+abre sem servidor e sem banco. Serve para mostrar o sistema para alguém antes de
+publicar, ou para testar as telas sem depender do Supabase.
+
+Não é um app separado — são as mesmas telas. O que muda são os atalhos de
+`demo/atalhos/`, que trocam `next/link`, `next/navigation`, `next/image` e o
+cliente do Supabase por equivalentes locais. Nenhum componente é reescrito, então
+a demonstração não tem como divergir do app de verdade.
+
+Nessa forma não há login nem sincronização: os dados ficam no IndexedDB do
+navegador, e as vendas aparecem como pendentes de envio — que é exatamente o
+comportamento do app quando falta internet.
 
 ---
 

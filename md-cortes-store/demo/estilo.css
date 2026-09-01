@@ -1,0 +1,15 @@
+@import "../app/globals.css";
+
+/* O Tailwind v4 procura as fontes de classe a partir do arquivo de CSS; no
+   build da demonstração o ponto de partida é esta pasta, então as outras são
+   declaradas na mão. */
+@source "../app";
+@source "../components";
+@source "../demo";
+
+/* Sem next/font: as variáveis que o @theme espera vêm do Google Fonts,
+   carregado no <head> da página. */
+:root {
+  --fonte-texto: "Inter";
+  --fonte-marca: "Playfair Display";
+}

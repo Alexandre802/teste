@@ -5,7 +5,7 @@ const config = [
   ...nextCoreWebVitals,
   ...nextTypescript,
   {
-    ignores: [".next/**", ".vercel/**", "node_modules/**", "next-env.d.ts", "public/sw.js"],
+    ignores: [".next/**", ".vercel/**", "node_modules/**", "next-env.d.ts", "public/sw.js", "demo/saida/**"],
   },
   {
     rules: {
