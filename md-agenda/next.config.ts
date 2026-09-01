@@ -2,6 +2,9 @@ import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // O repositório já tem um CLAUDE.md próprio na raiz; o arquivo que o Next
+  // gera aqui sozinho só duplicaria instrução.
+  agentRules: false,
   // O repositório hospeda outro projeto na raiz; sem isto o Turbopack elege
   // o lockfile errado como raiz do workspace.
   turbopack: { root: import.meta.dirname },

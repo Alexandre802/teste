@@ -41,23 +41,28 @@ npm run dev     # desenvolvimento
 npm run build && npm start   # produção
 ```
 
-### Rodar sem Supabase
-
-Para ver o produto funcionando antes de ter o banco, existe um armazenamento
-local em memória:
+### Experimentar sem Supabase, em um comando
 
 ```bash
-MD_AGENDA_LOCAL_STORE=1 \
-MD_AGENDA_LOCAL_STORE_TOKEN=um-token-qualquer \
-MD_AGENDA_LOCAL_ADMIN_EMAIL=voce@exemplo.test \
-MD_AGENDA_LOCAL_ADMIN_PASSWORD=uma-senha \
-MD_AGENDA_LOCAL_ADMIN_SECRET=um-segredo \
-npm run dev
+npm install
+npm run demo
 ```
 
-Ele só liga quando **não** há Supabase configurado, e enquanto está ativo a
-interface avisa na tela que os dados não são permanentes. Um ambiente com banco
-real nunca cai nele por acidente.
+Sobe o servidor com um banco local em memória e semeia um cenário de
+**exemplo** — expediente, serviços e preços fictícios. O terminal imprime os
+endereços e as credenciais do painel:
+
+```
+Agendar:  http://127.0.0.1:3000
+Painel:   http://127.0.0.1:3000/admin
+   e-mail: maicon@demo.local
+   senha:  demo-md-agenda
+```
+
+O banco local só liga quando **não** há Supabase configurado, e enquanto está
+ativo a interface avisa na tela que os dados não são permanentes — eles somem
+quando o servidor para. Um ambiente com banco real nunca cai nele por acidente:
+com `.env.local` preenchido, `npm run demo` não semeia nada e usa o Supabase.
 
 ---
 
