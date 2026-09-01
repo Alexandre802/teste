@@ -1,0 +1,133 @@
+@import "tailwindcss";
+
+@theme {
+  /* ---- Superfícies ---- */
+  --color-base: #070d14;
+  --color-surface: #0d1621;
+  --color-surface-2: #111c28;
+  --color-surface-3: #16222f;
+
+  /* ---- Dourado (somente destaque) ---- */
+  --color-gold: #d89b32;
+  --color-gold-light: #e8b457;
+  --color-gold-dim: #8a6520;
+
+  /* ---- Texto ---- */
+  --color-ink: #ffffff;
+  --color-muted: #9ca6b2;
+
+  /* ---- Semânticos ---- */
+  --color-success: #37b866;
+  --color-danger: #d85454;
+  --color-warning: #d8a832;
+
+  /* ---- Linhas ---- */
+  --color-line: rgba(255, 255, 255, 0.07);
+  --color-line-strong: rgba(255, 255, 255, 0.13);
+  --color-line-gold: rgba(216, 155, 50, 0.38);
+
+  /* ---- Tipografia ---- */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-display), ui-serif, Georgia, serif;
+
+  /* ---- Raios ---- */
+  --radius-card: 16px;
+  --radius-field: 12px;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--color-base);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+/* Foco visível e consistente em todo o produto. */
+:where(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+@utility surface-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+}
+
+@utility text-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Régua fina com rótulo, usada nos títulos de seção. */
+@utility rule-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+}
+
+.rule-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--color-line-gold), transparent);
+}
+
+/* Esqueletos de carregamento. */
+@keyframes md-shimmer {
+  0% { background-position: -320px 0; }
+  100% { background-position: 320px 0; }
+}
+
+.skeleton {
+  background-color: var(--color-surface-2);
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.045),
+    transparent
+  );
+  background-size: 320px 100%;
+  background-repeat: no-repeat;
+  animation: md-shimmer 1.25s linear infinite;
+  border-radius: 10px;
+}
+
+/* Faixa horizontal de datas sem barra de rolagem visível. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .skeleton {
+    animation: none;
+  }
+}
