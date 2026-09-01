@@ -41,6 +41,9 @@ npm run dev     # desenvolvimento
 npm run build && npm start   # produção
 ```
 
+Para publicar em um link de verdade (Supabase + Vercel), o passo a passo está
+em [`DEPLOY.md`](DEPLOY.md).
+
 ### Experimentar sem Supabase, em um comando
 
 ```bash
