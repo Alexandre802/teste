@@ -17,6 +17,7 @@
     "test:db": "bash scripts/testar-banco.sh"
   },
   "dependencies": {
+    "@remotion/player": "^4.0.0",
     "@supabase/ssr": "^0.12.5",
     "@supabase/supabase-js": "^2.112.4",
     "framer-motion": "^11.15.0",
@@ -25,6 +26,7 @@
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "recharts": "^3.10.1",
+    "remotion": "^4.0.0",
     "server-only": "^0.0.1",
     "zustand": "^5.0.2"
   },
