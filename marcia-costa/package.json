@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/atualizar-cardapio-oficial.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
@@ -11,6 +12,7 @@
     "imagens": "python3 scripts/extrair-imagens.py",
     "pretest:e2e": "next build",
     "test:e2e": "playwright test",
+    "sincronizar-cardapio": "node scripts/atualizar-cardapio-oficial.mjs",
     "sincronizar-produtos": "node scripts/sincronizar-produtos.mjs",
     "test:db": "bash scripts/testar-banco.sh"
   },
