@@ -44,37 +44,35 @@ function apiStrings(body: string) {
   return [...found].slice(0, 500);
 }
 
+async function discoverFrontend() {
+  const shellRes = await fetch(ORIGIN + STORE_PATH, { cache: "no-store", headers });
+  const html = await shellRes.text();
+  const scriptSrcs = [...html.matchAll(/<script[^>]+src=["']([^"']+)["']/gi)].map((m) => m[1]);
+  const endpointSet = new Set<string>();
+  const relevant: Array<{ src:string; status:number; length:number; endpoints:string[] }> = [];
+  for (const src of scriptSrcs.slice(0, 30)) {
+    const url = new URL(src, ORIGIN).toString();
+    try {
+      const r = await fetch(url, { cache:"no-store", headers });
+      const text = await r.text();
+      const endpoints = apiStrings(text);
+      for (const e of endpoints) endpointSet.add(e);
+      if (endpoints.length || /by-slug|menu_group|menu-group|is_invisible|always_display/i.test(text)) {
+        relevant.push({ src:url, status:r.status, length:text.length, endpoints });
+      }
+    } catch {}
+  }
+  return { shellStatus:shellRes.status, scriptSrcs, endpoints:[...endpointSet], relevant };
+}
+
 export async function GET(request: NextRequest) {
   const asset = request.nextUrl.searchParams.get("asset");
   const q = request.nextUrl.searchParams.get("q");
   const api = request.nextUrl.searchParams.get("api");
 
-  if (api === "discover") {
-    const shellRes = await fetch(ORIGIN + STORE_PATH, { cache: "no-store", headers });
-    const html = await shellRes.text();
-    const scriptSrcs = [...html.matchAll(/<script[^>]+src=["']([^"']+)["']/gi)].map((m) => m[1]);
-    const results: Array<{ src:string; status:number; length:number; apiStrings:string[]; snippets:any[] }> = [];
-    for (const src of scriptSrcs.slice(0, 30)) {
-      const url = new URL(src, ORIGIN).toString();
-      try {
-        const r = await fetch(url, { cache:"no-store", headers });
-        const text = await r.text();
-        results.push({
-          src:url,
-          status:r.status,
-          length:text.length,
-          apiStrings:apiStrings(text),
-          snippets:snippets(text,["by-slug","menu_group","menu-group","groups","itens","items","store_id","is_invisible","always_display"]).slice(0,80)
-        });
-      } catch {
-        results.push({ src:url, status:0, length:0, apiStrings:[], snippets:[] });
-      }
-    }
-    return NextResponse.json({ shellStatus:shellRes.status, scriptSrcs, results });
-  }
+  if (api === "discover") return NextResponse.json(await discoverFrontend());
 
   let target = api === "store" || api === "summary" ? STORE_API : ORIGIN + STORE_PATH;
-
   if (asset) {
     if (!asset.startsWith("/") || asset.includes("..")) return NextResponse.json({ error: "asset invalido" }, { status: 400 });
     target = ORIGIN + asset;
@@ -98,11 +96,13 @@ export async function GET(request: NextRequest) {
             }))
           }))
         }));
+        const discovery = await discoverFrontend();
         return NextResponse.json({
           fetched_at: new Date().toISOString(),
           store: { id:data.id, name:data.name, phone:data.phone, whatsapp:data.whatsapp, pix:data.pix, pix_type:data.pix_type, pix_infos:data.pix_infos, address:data.address, city:data.city, state:data.state, wait_time:data.wait_time, take_out:data.take_out, minimum_order:data.minimum_order, payment_methods:data.payment_methods, times:data.times, design:data.design },
           fee_count:(data.fees||[]).length, fees:data.fees||[], group_count:groups.length,
-          item_count:groups.reduce((n:number,g:any)=>n+g.items.length,0), groups
+          item_count:groups.reduce((n:number,g:any)=>n+g.items.length,0), groups,
+          discovery
         });
       }
       return NextResponse.json({ target, status: response.status, data });
@@ -113,11 +113,9 @@ export async function GET(request: NextRequest) {
 
   const scripts = [...body.matchAll(/<script[^>]+src=["']([^"']+)["']/gi)].map((m) => m[1]);
   const links = [...body.matchAll(/<link[^>]+href=["']([^"']+)["']/gi)].map((m) => m[1]);
-
   if (q) {
     const terms = q.split(",").map((v) => v.trim()).filter(Boolean).slice(0, 20);
     return NextResponse.json({ target, status: response.status, contentType: response.headers.get("content-type"), bodyLength: body.length, urlMatches:apiStrings(body), snippets: snippets(body, terms) });
   }
-
   return NextResponse.json({ target, status: response.status, contentType: response.headers.get("content-type"), scripts, links, body });
 }
