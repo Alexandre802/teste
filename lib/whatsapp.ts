@@ -21,13 +21,14 @@ const rotuloTipo = {
  * Quando a taxa de entrega ainda nao foi confirmada pela casa, a mensagem diz
  * "a combinar" em vez de mostrar um valor que ninguem confirmou.
  */
-export function montarMensagem(pedido: Order): string {
+export function montarMensagem(pedido: Order, numero?: number | null): string {
   const linhas: string[] = [];
 
   linhas.push(
     `Olá! Gostaria de fazer um pedido na ${restaurant.name} 🍽️`,
     "",
-    "*PEDIDO*",
+    // O numero so aparece depois que o pedido foi mesmo gravado no caixa.
+    numero ? `*PEDIDO #${numero}*` : "*PEDIDO*",
     "",
   );
 
@@ -100,10 +101,14 @@ export function montarMensagem(pedido: Order): string {
  * Link wa.me pronto. Devolve null quando o numero da casa ainda nao foi
  * cadastrado -- a tela entao explica isso em vez de abrir um link quebrado.
  */
-export function linkWhatsapp(pedido: Order): string | null {
+export function linkWhatsapp(
+  pedido: Order,
+  numeroPedido?: number | null,
+): string | null {
   const numero = restaurant.whatsapp.replace(/\D/g, "");
   if (numero.length < 12) return null;
-  return `https://wa.me/${numero}?text=${encodeURIComponent(montarMensagem(pedido))}`;
+  const texto = encodeURIComponent(montarMensagem(pedido, numeroPedido));
+  return `https://wa.me/${numero}?text=${texto}`;
 }
 
 /** Link de conversa simples, sem pedido. null se nao houver numero. */
