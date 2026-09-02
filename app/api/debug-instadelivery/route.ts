@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
   const asset = request.nextUrl.searchParams.get("asset");
   const q = request.nextUrl.searchParams.get("q");
   const api = request.nextUrl.searchParams.get("api");
-  let target = api === "store" ? STORE_API : ORIGIN + STORE_PATH;
+  let target = api === "store" || api === "summary" ? STORE_API : ORIGIN + STORE_PATH;
 
   if (asset) {
     if (!asset.startsWith("/") || asset.includes("..")) return NextResponse.json({ error: "asset invalido" }, { status: 400 });
@@ -44,9 +44,47 @@ export async function GET(request: NextRequest) {
   });
 
   const body = await response.text();
-  if (api === "store") {
+  if (api === "store" || api === "summary") {
     try {
-      return NextResponse.json({ target, status: response.status, data: JSON.parse(body) });
+      const data = JSON.parse(body);
+      if (api === "summary") {
+        const groups = (data.groups || []).filter((g: any) => !g.deleted_at && !g.is_invisible).map((g: any) => ({
+          id: g.id,
+          name: g.name,
+          order: g.order,
+          image: g.image,
+          start_time: g.start_time,
+          end_time: g.end_time,
+          items: (g.itens || []).filter((i: any) => !i.deleted_at && !i.is_invisible).map((i: any) => ({
+            id: i.id,
+            name: i.name,
+            description: i.description,
+            price1: i.price1,
+            price2: i.price2,
+            from_price: i.from_price,
+            strike_price: i.strike_price,
+            image: i.image,
+            order: i.order,
+            start_time: i.start_time,
+            end_time: i.end_time,
+            days: { sun:i.sun, mon:i.mon, tue:i.tue, wed:i.wed, thu:i.thu, fri:i.fri, sat:i.sat },
+            complementos: (i.complementos || []).filter((c:any)=>!c.deleted_at).map((c:any)=>({
+              name:c.name, description:c.description, min:c.min, max:c.max, order:c.order,
+              choices:(c.complements||[]).filter((x:any)=>!x.deleted_at && !x.is_invisible).map((x:any)=>({name:x.name, price:x.price, order:x.order, image:x.image}))
+            }))
+          }))
+        }));
+        return NextResponse.json({
+          fetched_at: new Date().toISOString(),
+          store: { id:data.id, name:data.name, phone:data.phone, whatsapp:data.whatsapp, pix:data.pix, pix_type:data.pix_type, pix_infos:data.pix_infos, address:data.address, city:data.city, state:data.state, wait_time:data.wait_time, take_out:data.take_out, minimum_order:data.minimum_order, payment_methods:data.payment_methods, times:data.times, design:data.design },
+          fee_count:(data.fees||[]).length,
+          fees:data.fees||[],
+          group_count:groups.length,
+          item_count:groups.reduce((n:number,g:any)=>n+g.items.length,0),
+          groups
+        });
+      }
+      return NextResponse.json({ target, status: response.status, data });
     } catch {
       return NextResponse.json({ target, status: response.status, body }, { status: response.ok ? 200 : response.status });
     }
