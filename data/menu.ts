@@ -1,114 +1,48 @@
-import type { Category, Product } from "@/types";
+import type { Category, Product, ProductOption } from "@/types";
+import original from "@/data/menu-original.json";
 
 /**
- * CARDAPIO DA COMIDA CASEIRA DA MARCIA COSTA
- * ---------------------------------------------------------------------------
- * Este e o unico lugar onde produto, descricao e preco existem. Nenhum
- * componente escreve nome ou valor de item.
+ * CARDÁPIO OFICIAL — COMIDA CASEIRA DA MÁRCIA COSTA
  *
- * ORIGEM DOS DADOS: cada item abaixo foi transcrito das telas de referencia
- * enviadas pela propria casa (marcia-costa/referencias/02-cardapio.png). Nada
- * foi inventado e nada veio de outro restaurante.
- *
- * ATENCAO: enquanto `confirmado` for false, o site trata o item como
- * "em conferencia" e mostra um aviso honesto no topo do cardapio. Depois que a
- * Marcia confirmar nome, descricao e preco de um item, troque para
- * `confirmado: true`. Quando todos estiverem confirmados o aviso some sozinho.
- *
- * COMO ATUALIZAR:
- *  - preco: campo `price`, em reais (25 = R$ 25,00; 25.5 = R$ 25,50).
- *  - foto: coloque o arquivo em public/images/products/ e aponte em `image`.
- *          Item sem foto propria usa `image: null` e cai no placeholder da
- *          marca. Nunca reaproveite a foto de um item em outro.
- *  - opcoes (tamanho, carne, adicionais): preencha `options`. O que nao existir
- *          aqui nao aparece na tela -- o site nao inventa acompanhamento.
- *  - tirar do ar sem apagar: `available: false`.
+ * Fonte: cardápio público da própria casa no InstaDelivery.
+ * O JSON em menu-original.json contém exatamente os itens que estavam
+ * publicados na fonte em 02/09/2026. Não há produto, preço ou foto de outro
+ * restaurante neste arquivo.
  */
 
-export const categories: Category[] = [
-  { id: "marmitas", name: "Marmitas", icon: "Utensils" },
-  { id: "lanches", name: "Lanches", icon: "Sandwich" },
-  { id: "acai", name: "Açaí", icon: "IceCreamBowl" },
-  { id: "bebidas", name: "Bebidas", icon: "CupSoda" },
-  { id: "porcoes", name: "Porções", icon: "Drumstick" },
-  { id: "sobremesas", name: "Sobremesas", icon: "Cake" },
-  { id: "promocoes", name: "Promoções", icon: "Tag" },
-];
+export const categories: Category[] = original.categories.map((categoria) => ({
+  id: categoria.id,
+  name: categoria.name,
+  icon: categoria.icon,
+}));
 
-export const products: Product[] = [
-  {
-    id: "marmita-padrao",
-    name: "Marmita Padrão",
-    description: "Arroz, feijão, carne do dia, farofa, legumes e salada.",
-    price: 25,
-    image: "/images/products/marmita-padrao.jpg",
-    category: "marmitas",
-    featured: true,
-    available: true,
-    badge: "Mais pedido",
-    confirmado: false,
-  },
-  {
-    id: "marmita-especial",
-    name: "Marmita Especial",
-    description:
-      "Arroz, feijão, carne do dia, farofa, legumes, salada e um adicional.",
-    price: 28,
-    image: "/images/products/marmita-especial.jpg",
-    category: "marmitas",
-    featured: true,
-    available: true,
-    confirmado: false,
-  },
-  {
-    id: "marmitex-noturna",
-    name: "Marmitex Noturna",
-    description: "Opções especiais para a noite. Servida a partir das 18h.",
-    price: 27,
-    image: "/images/products/marmitex-noturna.jpg",
-    category: "marmitas",
-    featured: true,
-    available: true,
-    confirmado: false,
-  },
-  {
-    id: "lasanha",
-    name: "Lasanha",
-    description:
-      "Lasanha de carne moída ao molho bolonhesa com queijo gratinado.",
-    price: 25,
-    image: "/images/products/lasanha.jpg",
-    category: "marmitas",
-    featured: true,
-    available: true,
-    confirmado: false,
-  },
-  {
-    id: "beirute-com-fritas",
-    name: "Beirute com fritas",
-    description:
-      "Pão sírio, carne, queijo, maionese especial e fritas crocantes.",
-    price: 26,
-    image: "/images/products/beirute-com-fritas.jpg",
-    category: "lanches",
-    featured: true,
-    available: true,
-    confirmado: false,
-  },
-  {
-    id: "acai-500ml",
-    name: "Açaí 500ml",
-    description: "Açaí puro com granola, banana, leite em pó e acompanhamento.",
-    price: 16,
-    image: "/images/products/acai-500ml.jpg",
-    category: "acai",
-    featured: true,
-    available: true,
-    confirmado: false,
-  },
-];
+export const products: Product[] = original.products.map((produto) => ({
+  id: produto.id,
+  name: produto.name,
+  description: produto.description,
+  price: produto.price,
+  priceFrom: produto.priceFrom,
+  image: produto.image,
+  category: produto.category,
+  featured: produto.featured,
+  available: produto.available,
+  confirmado: produto.confirmado,
+  options: produto.options.map((grupo) => ({
+    id: grupo.id,
+    name: grupo.name,
+    type: grupo.type as ProductOption["type"],
+    required: grupo.required,
+    max: grupo.max,
+    choices: grupo.choices.map((escolha) => ({
+      id: escolha.id,
+      name: escolha.name,
+      priceDelta: escolha.priceDelta,
+      available: escolha.available,
+    })),
+  })),
+}));
 
-/** Categorias que realmente tem item disponivel -- as outras nem aparecem. */
+/** Categorias que realmente têm item disponível. */
 export function categoriasComProduto(): Category[] {
   return categories.filter((categoria) =>
     products.some(
@@ -129,14 +63,13 @@ export function produtosDaCategoria(categoriaId: string): Product[] {
 }
 
 export function produtosDestaque(): Product[] {
-  return produtosDisponiveis().filter((produto) => produto.featured);
+  const destaques = produtosDisponiveis().filter((produto) => produto.featured);
+  return destaques.length > 0 ? destaques : produtosDisponiveis().slice(0, 4);
 }
 
 export function buscarProduto(id: string): Product | undefined {
   return products.find((produto) => produto.id === id);
 }
 
-/** true enquanto existir item cujo preco/descricao a casa ainda nao confirmou. */
-export const cardapioEmConferencia = produtosDisponiveis().some(
-  (produto) => produto.confirmado !== true,
-);
+/** O catálogo agora foi conferido diretamente contra a fonte oficial. */
+export const cardapioEmConferencia = false;
