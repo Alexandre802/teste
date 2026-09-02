@@ -10,7 +10,9 @@ import {
   Info,
   Instagram,
   Bike,
+  MapPin,
   MessageCircle,
+  Star,
   X,
 } from "lucide-react";
 
@@ -52,7 +54,9 @@ export function MenuLateral({
     { nome: "Cardápio", href: "/cardapio", icone: BookOpen },
     { nome: "Mais pedidos", href: "/#mais-pedidos", icone: Flame },
     { nome: "Delivery", href: "/#delivery", icone: Bike },
+    { nome: "Avaliações", href: "/#avaliacoes", icone: Star },
     { nome: "Informações", href: "/#informacoes", icone: Info },
+    { nome: "Onde estamos", href: "/#onde-estamos", icone: MapPin },
   ];
 
   // So entra na lista o que existe de verdade: sem perfil cadastrado, sem link.
@@ -79,7 +83,7 @@ export function MenuLateral({
         <div className="fixed inset-0 z-50">
           <motion.button
             type="button"
-            aria-label="Fechar menu"
+            aria-label="Fechar o menu tocando fora"
             tabIndex={-1}
             onClick={aoFechar}
             initial={{ opacity: 0 }}

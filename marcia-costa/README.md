@@ -189,3 +189,70 @@ painel quanto nas variáveis `NEXT_PUBLIC_*`. O **site público lê as variávei
 o painel guarda o registro interno. A tela de Configurações avisa isso em
 destaque. As **taxas de entrega não** têm esse problema: site e servidor leem a
 mesma tabela `comida_caseira_delivery_zones`.
+
+---
+
+## Avaliações animadas (Remotion)
+
+A seção **Avaliações** da home é uma peça Remotion: toda animação é função de
+`useCurrentFrame()`, sem `setTimeout` nem transição de CSS, então o mesmo frame
+sempre gera o mesmo pixel — no player e no render.
+
+```
+remotion/
+  index.ts                        registerRoot
+  Root.tsx                        composições e duração calculada dos dados
+  compositions/AvaliacoesReel.tsx a peça em si
+```
+
+```bash
+npm run remotion          # abre o Remotion Studio para editar
+npm run remotion:render   # gera out/avaliacoes.mp4 (para Instagram, por exemplo)
+```
+
+O `@remotion/player` entra por import dinâmico (`components/home/AvaliacoesPlayer.tsx`),
+então o bundle do Remotion não pesa no primeiro carregamento da home. A peça só
+toca quando a seção entra na tela, e **não toca** para quem configurou
+`prefers-reduced-motion`.
+
+**Avaliações são reais ou não existem.** `data/avaliacoes.ts` começa vazio. Sem
+depoimento cadastrado, a peça mostra a marca e o site diz que ainda não há
+avaliações — nada de elogio inventado. O `aggregateRating` do schema.org só é
+emitido quando existe avaliação de verdade: estrela falsa no resultado de busca
+é motivo de penalização e é mentira para quem clica.
+
+**Licença:** o Remotion é gratuito para pessoas físicas e organizações de até 3
+pessoas, e exige licença de empresa acima disso. Confira os termos atuais em
+<https://remotion.dev/license> antes de publicar comercialmente.
+
+## Mapa
+
+A seção **Onde estamos** usa o Google Maps Embed API. Três situações, nenhuma
+delas fingindo:
+
+| Situação | O que aparece |
+| --- | --- |
+| Endereço + `NEXT_PUBLIC_GOOGLE_MAPS_KEY` | Mapa embutido |
+| Endereço sem chave | O endereço e um botão que abre o Google Maps |
+| Sem endereço | "Informação a cadastrar" |
+
+Iframe do Maps sem chave carrega uma vez e depois passa a devolver erro — seria
+um mapa quebrado na frente do cliente, e por isso o site não tenta.
+
+## As 100 palavras-chave
+
+Estão em `data/palavras-chave.ts`, em sete grupos, e aparecem em **conteúdo
+visível** na seção "O que entregamos, e onde"
+(`components/sections/BuscaLocal.tsx`).
+
+Duas coisas que valem dizer com todas as letras:
+
+1. **`<meta name="keywords">` é ignorado pelo Google desde 2009.** A lista está
+   lá porque não custa nada, mas quem ranqueia é o texto que o cliente lê.
+2. **Texto escondido para buscador é cloaking** e pode custar o domínio. Por
+   isso cada termo está numa lista visível, sob um título e uma frase de
+   verdade sobre o que a casa faz. Um teste automatizado falha se qualquer
+   termo ficar invisível.
+
+Nenhum termo promete prato que a casa não faz: entram os produtos confirmados,
+as categorias atendidas, a forma de pedir e as cidades.

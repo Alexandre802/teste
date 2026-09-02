@@ -7,6 +7,8 @@ import {
   temInstagram,
 } from "@/data/restaurant";
 import { cidadesAtendidas } from "@/data/deliveryZones";
+import { palavrasChave } from "@/data/palavras-chave";
+import { avaliacoes, mediaDasNotas } from "@/data/avaliacoes";
 
 const descricao =
   "Marmitas frescas, comida caseira, lanches e açaí com entrega em " +
@@ -21,16 +23,13 @@ export const metadataPadrao: Metadata = {
   },
   description: descricao,
   applicationName: restaurant.name,
-  keywords: [
-    "marmita",
-    "comida caseira",
-    "marmitex",
-    "lanches",
-    "açaí",
-    "delivery",
-    "Jacareí",
-    "São José dos Campos",
-  ],
+  /**
+   * As mesmas 100 palavras que aparecem na seção "O que entregamos, e onde".
+   * O Google ignora esta meta tag desde 2009 — quem ranqueia é o conteúdo
+   * visível. Ela fica aqui porque alguns buscadores menores ainda leem, e
+   * porque não custa nada. O trabalho de verdade está em BuscaLocal.tsx.
+   */
+  keywords: palavrasChave,
   openGraph: {
     type: "website",
     locale: "pt_BR",
@@ -95,6 +94,32 @@ export function schemaRestaurante(): Record<string, unknown> {
     schema.openingHours = restaurant.openingHours.map(
       (faixa) => `${faixa.dias} ${faixa.horario}`,
     );
+  }
+
+  // Nota agregada só entra no schema se existir avaliação de verdade.
+  // Estrela inventada em resultado de busca é motivo de penalização — e é
+  // mentira para quem clica.
+  const media = mediaDasNotas();
+  if (media !== null) {
+    schema.aggregateRating = {
+      "@type": "AggregateRating",
+      ratingValue: media,
+      reviewCount: avaliacoes.length,
+      bestRating: 5,
+      worstRating: 1,
+    };
+    schema.review = avaliacoes.map((avaliacao) => ({
+      "@type": "Review",
+      author: { "@type": "Person", name: avaliacao.nome },
+      datePublished: avaliacao.data,
+      reviewBody: avaliacao.texto,
+      reviewRating: {
+        "@type": "Rating",
+        ratingValue: avaliacao.nota,
+        bestRating: 5,
+        worstRating: 1,
+      },
+    }));
   }
 
   return schema;

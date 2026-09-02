@@ -12,9 +12,13 @@
     "pretest:e2e": "next build",
     "test:e2e": "playwright test",
     "sincronizar-produtos": "node scripts/sincronizar-produtos.mjs",
-    "test:db": "bash scripts/testar-banco.sh"
+    "test:db": "bash scripts/testar-banco.sh",
+    "remotion": "remotion studio",
+    "remotion:render": "remotion render AvaliacoesReel out/avaliacoes.mp4"
   },
   "dependencies": {
+    "@remotion/cli": "^4.0.520",
+    "@remotion/player": "^4.0.520",
     "@supabase/ssr": "^0.12.5",
     "@supabase/supabase-js": "^2.112.4",
     "framer-motion": "^11.15.0",
@@ -23,6 +27,7 @@
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "recharts": "^3.10.1",
+    "remotion": "^4.0.520",
     "server-only": "^0.0.1",
     "zustand": "^5.0.2"
   },

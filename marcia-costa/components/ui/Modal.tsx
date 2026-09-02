@@ -58,7 +58,7 @@ export function Modal({
         <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
           <motion.button
             type="button"
-            aria-label="Fechar"
+            aria-label="Fechar tocando fora"
             tabIndex={-1}
             onClick={aoFechar}
             initial={{ opacity: 0 }}

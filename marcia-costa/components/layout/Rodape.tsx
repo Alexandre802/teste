@@ -43,6 +43,8 @@ export function Rodape() {
               {[
                 { nome: "Cardápio", href: "/cardapio" },
                 { nome: "Sobre", href: "/#diferenciais" },
+                { nome: "Avaliações", href: "/#avaliacoes" },
+                { nome: "Onde estamos", href: "/#onde-estamos" },
                 { nome: "Contato", href: "/#informacoes" },
               ].map((item) => (
                 <li key={item.nome}>

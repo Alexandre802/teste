@@ -6,6 +6,9 @@ import { BannerDelivery } from "@/components/home/BannerDelivery";
 import { Destaques } from "@/components/home/Destaques";
 import { Informacoes } from "@/components/home/Informacoes";
 import { FeedInstagram } from "@/components/home/Instagram";
+import { Avaliacoes } from "@/components/home/Avaliacoes";
+import { Mapa } from "@/components/home/Mapa";
+import { BuscaLocal } from "@/components/sections/BuscaLocal";
 import { BarraPedido } from "@/components/cart/BarraPedido";
 
 /**
@@ -21,8 +24,11 @@ export default function Home() {
         <Diferenciais />
         <BannerDelivery />
         <Destaques />
+        <Avaliacoes />
         <FeedInstagram />
         <Informacoes />
+        <Mapa />
+        <BuscaLocal />
       </main>
       <Rodape />
       <BarraPedido />

@@ -117,7 +117,7 @@ test.describe("cardapio e carrinho", () => {
     await abrir();
     await expect(folha).toBeVisible();
     // Toque fora da folha.
-    await page.getByRole("button", { name: "Fechar", exact: true }).first().click();
+    await page.getByRole("button", { name: "Fechar tocando fora" }).click();
     await expect(folha).toHaveCount(0);
   });
 

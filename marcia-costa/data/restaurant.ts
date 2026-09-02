@@ -39,6 +39,20 @@ export const restaurant = {
   /** Endereco da cozinha, usado tambem na retirada. Vazio = a cadastrar. */
   address: env("NEXT_PUBLIC_ENDERECO"),
 
+  /**
+   * Chave do Google Maps Embed API. Sem ela o site nao mostra mapa embutido:
+   * mostra o endereco e um link que abre o Google Maps. Iframe sem chave
+   * carrega uma vez e depois passa a devolver erro -- seria um mapa quebrado
+   * na cara do cliente.
+   */
+  googleMapsKey: env("NEXT_PUBLIC_GOOGLE_MAPS_KEY"),
+
+  /**
+   * Link do perfil da casa no Google (Maps ou Busca), para o cliente avaliar.
+   * Vazio = o botao de avaliar nao aparece.
+   */
+  googleAvaliacoes: env("NEXT_PUBLIC_GOOGLE_AVALIACOES"),
+
   /** Cidades atendidas, confirmadas nas pecas da propria casa. */
   cities: ["Jacareí - SP", "São José dos Campos - SP"] as const,
 
@@ -68,6 +82,8 @@ export const paymentMethods = [
 export const temWhatsapp = restaurant.whatsapp.length >= 12;
 export const temInstagram = restaurant.instagram.length > 0;
 export const temEndereco = restaurant.address.length > 0;
+export const temMapa = temEndereco && restaurant.googleMapsKey.length > 0;
+export const temLinkDeAvaliacao = restaurant.googleAvaliacoes.length > 0;
 export const temHorarios = restaurant.openingHours.length > 0;
 
 export const INFORMACAO_A_CADASTRAR = "Informação a cadastrar";
