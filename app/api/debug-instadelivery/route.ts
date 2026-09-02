@@ -11,17 +11,17 @@ const headers = {
   accept: "application/json,text/html,application/xhtml+xml,application/javascript,*/*;q=0.8",
 };
 
-function snippets(body: string, terms: string[]) {
+function snippets(body: string, terms: string[], perTerm = 8) {
   const lower = body.toLowerCase();
   const out: Array<{ term: string; at: number; text: string }> = [];
   for (const raw of terms) {
     const term = raw.toLowerCase();
     let from = 0;
     let count = 0;
-    while (count < 30) {
+    while (count < perTerm) {
       const at = lower.indexOf(term, from);
       if (at < 0) break;
-      out.push({ term: raw, at, text: body.slice(Math.max(0, at - 350), Math.min(body.length, at + term.length + 650)) });
+      out.push({ term: raw, at, text: body.slice(Math.max(0, at - 500), Math.min(body.length, at + term.length + 900)) });
       from = at + term.length;
       count += 1;
     }
@@ -30,18 +30,18 @@ function snippets(body: string, terms: string[]) {
 }
 
 function apiStrings(body: string) {
-  const patterns = [
-    /["'`](https?:\\?\/\\?\/[^"'`\\s]{1,400})["'`]/gi,
-    /["'`](\/(?:api|v1|v2)\/[A-Za-z0-9_?&=./{}:\\-]{1,300})["'`]/gi,
-  ];
   const found = new Set<string>();
-  for (const pattern of patterns) {
-    for (const match of body.matchAll(pattern)) {
-      const value = (match[1] || "").replace(/\\\//g, "/");
-      if (/api|store|menu|group|item|catalog|product/i.test(value)) found.add(value);
+  const regexes = [
+    /https?:\\?\/\\?\/[^"'`\\s)]+/gi,
+    /\/(?:api|v1|v2)\/[A-Za-z0-9_?&=./{}:$+\\-]{2,300}/gi,
+  ];
+  for (const re of regexes) {
+    for (const m of body.matchAll(re)) {
+      const value = (m[0] || "").replace(/\\\//g, "/").replace(/[),;]+$/g, "");
+      if (/api|store|menu|group|item|catalog|product/i.test(value) && value.length < 450) found.add(value);
     }
   }
-  return [...found].slice(0, 500);
+  return [...found].slice(0, 800);
 }
 
 async function discoverFrontend() {
@@ -49,27 +49,28 @@ async function discoverFrontend() {
   const html = await shellRes.text();
   const scriptSrcs = [...html.matchAll(/<script[^>]+src=["']([^"']+)["']/gi)].map((m) => m[1]);
   const endpointSet = new Set<string>();
-  const relevant: Array<{ src:string; status:number; length:number; endpoints:string[] }> = [];
-  for (const src of scriptSrcs.slice(0, 30)) {
+  const terms = ["by-slug","stores/by","app.instadelivery","store_time","menu_group","menu-group","is_invisible","always_display","schedule_interval","menuGroup","menuGroups","itens","groups","store_id","currentStore","getStore"];
+  const relevant: Array<{ src:string; status:number; length:number; endpoints:string[]; snippets:Array<{term:string;at:number;text:string}> }> = [];
+
+  for (const src of scriptSrcs) {
+    if (/googletagmanager|jquery|popper|slick|magnific|isotope|bootstrap|cloudflare/i.test(src)) continue;
     const url = new URL(src, ORIGIN).toString();
     try {
       const r = await fetch(url, { cache:"no-store", headers });
       const text = await r.text();
       const endpoints = apiStrings(text);
       for (const e of endpoints) endpointSet.add(e);
-      if (endpoints.length || /by-slug|menu_group|menu-group|is_invisible|always_display/i.test(text)) {
-        relevant.push({ src:url, status:r.status, length:text.length, endpoints });
-      }
+      const hits = snippets(text, terms, 5);
+      if (endpoints.length || hits.length) relevant.push({ src:url, status:r.status, length:text.length, endpoints, snippets:hits.slice(0,60) });
     } catch {}
   }
-  return { shellStatus:shellRes.status, scriptSrcs, endpoints:[...endpointSet], relevant };
+  return { shellStatus:shellRes.status, scriptCount:scriptSrcs.length, scriptSrcs, endpoints:[...endpointSet], relevant };
 }
 
 export async function GET(request: NextRequest) {
   const asset = request.nextUrl.searchParams.get("asset");
   const q = request.nextUrl.searchParams.get("q");
   const api = request.nextUrl.searchParams.get("api");
-
   if (api === "discover") return NextResponse.json(await discoverFrontend());
 
   let target = api === "store" || api === "summary" ? STORE_API : ORIGIN + STORE_PATH;
@@ -77,9 +78,9 @@ export async function GET(request: NextRequest) {
     if (!asset.startsWith("/") || asset.includes("..")) return NextResponse.json({ error: "asset invalido" }, { status: 400 });
     target = ORIGIN + asset;
   }
-
   const response = await fetch(target, { cache: "no-store", headers });
   const body = await response.text();
+
   if (api === "store" || api === "summary") {
     try {
       const data = JSON.parse(body);
@@ -101,8 +102,7 @@ export async function GET(request: NextRequest) {
           fetched_at: new Date().toISOString(),
           store: { id:data.id, name:data.name, phone:data.phone, whatsapp:data.whatsapp, pix:data.pix, pix_type:data.pix_type, pix_infos:data.pix_infos, address:data.address, city:data.city, state:data.state, wait_time:data.wait_time, take_out:data.take_out, minimum_order:data.minimum_order, payment_methods:data.payment_methods, times:data.times, design:data.design },
           fee_count:(data.fees||[]).length, fees:data.fees||[], group_count:groups.length,
-          item_count:groups.reduce((n:number,g:any)=>n+g.items.length,0), groups,
-          discovery
+          item_count:groups.reduce((n:number,g:any)=>n+g.items.length,0), groups, discovery
         });
       }
       return NextResponse.json({ target, status: response.status, data });
