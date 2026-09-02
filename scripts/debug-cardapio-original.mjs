@@ -1,47 +1,34 @@
 const BASE = 'https://app.instadelivery.com.br/api/';
 const SLUG = 'comidacaseiradamarciacosta';
+const STORE_ID = 170308;
 const UA = { accept: 'application/json,text/html,application/javascript,*/*', 'user-agent': 'Mozilla/5.0' };
 
-async function json(url) {
-  const r = await fetch(url, { headers: UA });
-  const text = await r.text();
-  try { return { status:r.status, data:JSON.parse(text) }; }
-  catch { return { status:r.status, text:text.slice(0,2000) }; }
+async function probe(label, path) {
+  try {
+    const r = await fetch(BASE + path, { headers: UA });
+    const text = await r.text();
+    let data = null;
+    try { data = JSON.parse(text); } catch {}
+    const arr = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : null);
+    const sample = arr ? arr.slice(0,5).map(x => ({ id:x?.id, name:x?.name, menu_group_id:x?.menu_group_id, is_invisible:x?.is_invisible, deleted_at:x?.deleted_at, order:x?.order })) : null;
+    console.log('[PROBE]' + JSON.stringify({ label, path, status:r.status, type:Array.isArray(data)?'array':typeof data, keys:data && !Array.isArray(data)?Object.keys(data).slice(0,40):[], count:arr?.length ?? null, sample, text: data ? undefined : text.slice(0,500) }));
+    return data;
+  } catch (e) {
+    console.log('[PROBE_ERROR]' + JSON.stringify({ label, path, message:String(e) }));
+  }
 }
 
-const standard = await json(BASE + 'stores/by-slug/' + SLUG);
-const store = standard.data || {};
-const groups = Array.isArray(store.groups) ? store.groups : [];
-console.log('[BASE_MENU]' + JSON.stringify({ status:standard.status, id:store.id, groupCount:groups.length, itemCount:groups.reduce((n,g)=>n+(g.itens?.length||0),0), groups:groups.map(g=>({id:g.id,name:g.name,order:g.order,itemCount:g.itens?.length||0})) }));
+const store = await probe('bySlug', `stores/by-slug/${SLUG}`);
+await probe('bySlugTable', `stores/by-slug/${SLUG}/table`);
+await probe('groupPath', `stores/group/${STORE_ID}`);
+await probe('groupQuery', `stores/group?store_id=${STORE_ID}`);
+await probe('itemPath', `stores/item/${STORE_ID}`);
+await probe('itemQuery', `stores/item?store_id=${STORE_ID}`);
+await probe('complementsPath', `stores/group-complements/${STORE_ID}`);
+await probe('complementsQuery', `stores/group-complements?store_id=${STORE_ID}`);
+await probe('cashierStore', `cashier/store/${STORE_ID}`);
+await probe('internalStore', `stores/internal/${STORE_ID}`);
 
-const table = await json(BASE + 'stores/by-slug/' + SLUG + '/table');
-const tableGroups = Array.isArray(table.data?.groups) ? table.data.groups : [];
-console.log('[TABLE_MENU]' + JSON.stringify({ status:table.status, keys:table.data?Object.keys(table.data):[], groupCount:tableGroups.length, itemCount:tableGroups.reduce((n,g)=>n+(g.itens?.length||0),0), groups:tableGroups.map(g=>({id:g.id,name:g.name,order:g.order,itemCount:g.itens?.length||0})) }));
-
-try {
-  const shell = await fetch('https://instadelivery.com.br/' + SLUG, { headers: UA }).then(r => r.text());
-  const srcs = [...shell.matchAll(/<script[^>]+src=["']([^"']+)["']/gi)].map(m => m[1]).filter(src => src.startsWith('/js/'));
-  const targetSrc = srcs.find(s => /^\/js\/45\./.test(s)) || srcs.at(-1);
-  if (!targetSrc) throw new Error('chunk de serviços não encontrado');
-  const text = await fetch(new globalThis.URL(targetSrc, 'https://instadelivery.com.br').toString(), { headers: UA }).then(r => r.text());
-
-  const routes = new Set();
-  for (const m of text.matchAll(/\.a\.(get|post|put|delete)\(\"([^\"]+)\"/g)) routes.add(m[1].toUpperCase() + ' ' + m[2]);
-  for (const m of text.matchAll(/\.a\.(get|post|put|delete)\(\"([^\"]+)\"\.concat\(/g)) routes.add(m[1].toUpperCase() + ' ' + m[2] + '{...}');
-  const filtered = [...routes].filter(x => /store|menu|group|item|complement|product|catalog/i.test(x));
-  console.log('[API_ROUTES]' + JSON.stringify({ chunk:targetSrc, count:filtered.length, routes:filtered }));
-
-  const terms = ['menu-groups','menu_groups','menuGroups','menu group','complements','items','itens','groups','store_time','schedule','by-slug'];
-  for (const term of terms) {
-    const lower = text.toLowerCase();
-    let pos = 0; let n = 0;
-    while (n < 8) {
-      const at = lower.indexOf(term.toLowerCase(), pos);
-      if (at < 0) break;
-      console.log('[CHUNK_SNIP]' + JSON.stringify({ term, at, text:text.slice(Math.max(0,at-650), Math.min(text.length,at+term.length+1200)) }));
-      pos = at + term.length; n++;
-    }
-  }
-} catch (e) {
-  console.log('[DISCOVERY_ERROR]' + JSON.stringify({ message:String(e) }));
+if (store?.groups) {
+  console.log('[CURRENT_GROUPS]' + JSON.stringify(store.groups.map(g => ({id:g.id,name:g.name,is_invisible:g.is_invisible,always_display:g.always_display,start_time:g.start_time,end_time:g.end_time,itemCount:g.itens?.length||0}))));
 }
