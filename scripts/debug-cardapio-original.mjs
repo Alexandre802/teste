@@ -1,6 +1,6 @@
-const URL = 'https://app.instadelivery.com.br/api/stores/by-slug/comidacaseiradamarciacosta';
+const STORE_URL = 'https://app.instadelivery.com.br/api/stores/by-slug/comidacaseiradamarciacosta';
 const UA = { accept: 'application/json,text/html,application/javascript,*/*', 'user-agent': 'Mozilla/5.0' };
-const response = await fetch(URL, { headers: UA });
+const response = await fetch(STORE_URL, { headers: UA });
 if (!response.ok) throw new Error(`InstaDelivery ${response.status}`);
 const store = await response.json();
 const groups = Array.isArray(store.groups) ? store.groups : [];
@@ -32,7 +32,7 @@ try {
   console.log('[FRONTEND_SCRIPTS]' + JSON.stringify({ count: srcs.length, srcs }));
   const terms = ['by-slug','stores/by','app.instadelivery','menu_group','menu-group','is_invisible','always_display','schedule_interval','store_time','groups','itens','menuGroups','getStore'];
   for (const src of srcs) {
-    const text = await fetch(new URL(src, 'https://instadelivery.com.br').toString(), { headers: UA }).then(r => r.text());
+    const text = await fetch(new globalThis.URL(src, 'https://instadelivery.com.br').toString(), { headers: UA }).then(r => r.text());
     const lower = text.toLowerCase();
     const hits = [];
     for (const term of terms) {
