@@ -19,7 +19,7 @@ export const restaurant = {
   logo: "/images/brand/logo.png",
 
   whatsapp: env("NEXT_PUBLIC_WHATSAPP") || "5512996011026",
-  phone: "5512981892680",
+  whatsappLabel: "(12) 99601-1026",
   instagram: env("NEXT_PUBLIC_INSTAGRAM"),
   address:
     env("NEXT_PUBLIC_ENDERECO") ||
@@ -36,7 +36,7 @@ export const restaurant = {
   ifood: env("NEXT_PUBLIC_IFOOD"),
   siteUrl: env("NEXT_PUBLIC_SITE_URL") || "http://localhost:3000",
   retiradaDisponivel: true,
-  tempoEstimadoMinutos: 30,
+  tempoEstimadoMinutos: { minimo: 30, maximo: 50 },
 } as const;
 
 /** Métodos confirmados no cardápio original. O checkout próprio usa os quatro

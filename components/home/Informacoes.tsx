@@ -9,7 +9,7 @@ import {
 
 import {
   INFORMACAO_A_CADASTRAR,
-  paymentMethods,
+  acceptedPaymentLabels,
   restaurant,
   temEndereco,
   temHorarios,
@@ -47,7 +47,7 @@ export function Informacoes() {
               rel="noopener noreferrer"
               className="font-semibold text-whatsapp-escuro underline underline-offset-2"
             >
-              Chamar no WhatsApp
+              {restaurant.whatsappLabel} · chamar no WhatsApp
             </a>
           ) : (
             INFORMACAO_A_CADASTRAR
@@ -68,12 +68,17 @@ export function Informacoes() {
           )}
         </Bloco>
 
+        <Bloco icone={Clock} termo="Tempo médio de entrega">
+          {restaurant.tempoEstimadoMinutos.minimo} a{" "}
+          {restaurant.tempoEstimadoMinutos.maximo} minutos
+        </Bloco>
+
         <Bloco icone={ShoppingBasket} termo="Região atendida">
           {cidadesAtendidas.join(" e ")}
         </Bloco>
 
         <Bloco icone={CreditCard} termo="Formas de pagamento">
-          {paymentMethods.map((forma) => forma.label).join(" · ")}
+          {acceptedPaymentLabels.join(" · ")}
         </Bloco>
 
         <Bloco icone={Instagram} termo="Instagram">

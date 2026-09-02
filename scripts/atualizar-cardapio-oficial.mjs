@@ -65,8 +65,5 @@ const categorias = [...categoriasAtuais];
 for (const c of cache.categories ?? []) if (!categorias.some((x) => x.id === c.id)) categorias.push(c);
 const novo = { source: fonte, syncedAt: new Date().toISOString(), storeId: String(loja.id ?? "170308"), categories: categorias, products: [...atuais, ...historicos] };
 writeFileSync(arquivo, `${JSON.stringify(novo, null, 2)}\n`, "utf8");
-for (const produto of novo.products) {
-  console.log(`[cardapio-produto] ${JSON.stringify(produto)}`);
-}
 console.log(`[cardapio] Sincronizado: ${atuais.length} disponíveis agora; ${historicos.length} oficiais rotativos preservados; ${categoriasAtuais.length} categorias ativas.`);
 console.log(`[cardapio] Itens atuais: ${atuais.map((p) => p.name).join(" | ")}`);
