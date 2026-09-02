@@ -1,4 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
+import { SUPABASE_ANON_KEY, SUPABASE_URL, caixaConfigurado } from '@/lib/admin/config';
 
 /**
  * Cabeçalhos de segurança em toda resposta.
@@ -35,11 +37,98 @@ const SEM_CABECALHO = [
   '/sw.js',
 ];
 
-export function proxy(request: NextRequest) {
+/**
+ * Origem do Supabase liberada na CSP.
+ *
+ * O painel fala com o banco por HTTPS e escuta pedido novo por websocket.
+ * Sem `wss:` a lista de pedidos simplesmente não atualiza sozinha, e o
+ * navegador não avisa em lugar nenhum. Fica derivado da própria variável de
+ * ambiente para não haver domínio escrito à mão que envelheça.
+ */
+const ORIGEM_SUPABASE = (() => {
+  if (!caixaConfigurado) return '';
+  try {
+    const url = new URL(SUPABASE_URL);
+    return `${url.origin} wss://${url.host}`;
+  } catch {
+    return '';
+  }
+})();
+
+/**
+ * Rotas do painel exigem sessão.
+ *
+ * Esta checagem é a PRIMEIRA porta, não a única: ela evita que a tela do
+ * caixa chegue a renderizar para quem não entrou. Quem realmente protege o
+ * dado é a RLS do banco, que nega tudo a quem não está na tabela de
+ * administradores — um cookie forjado aqui não traz nenhuma linha junto.
+ */
+/** O formato que o `@supabase/ssr` entrega em `setAll`. */
+type CookieRenovado = Parameters<
+  NonNullable<Parameters<typeof createServerClient>[2]['cookies']['setAll']>
+>[0][number];
+
+interface Guarda {
+  /** Preenchido quando a pessoa precisa ser mandada para o login. */
+  redirecionar?: NextResponse;
+  /**
+   * Cookies que o Supabase renovou durante a checagem.
+   *
+   * Precisam ser copiados para a resposta final. Descartá-los aqui faria o
+   * token vencer sem nunca ser renovado, e a dona seria deslogada no meio do
+   * expediente sem motivo aparente.
+   */
+  cookies: CookieRenovado[];
+}
+
+async function guardaDoPainel(request: NextRequest): Promise<Guarda> {
+  const vazio: Guarda = { cookies: [] };
+  const caminho = request.nextUrl.pathname;
+  if (!caminho.startsWith('/admin') || caminho.startsWith('/admin/login')) return vazio;
+
+  // Sem banco configurado não há login possível. Deixa passar: a própria tela
+  // explica o que falta configurar, em vez de mandar para um login inútil.
+  if (!caixaConfigurado) return vazio;
+
+  const renovados: CookieRenovado[] = [];
+
+  const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    cookies: {
+      getAll: () => request.cookies.getAll(),
+      setAll: (novos) => {
+        renovados.push(...novos);
+      },
+    },
+  });
+
+  // `getUser` valida o token no servidor do Supabase e renova quando está
+  // perto de expirar. `getSession` só lê o cookie — que é justamente o que
+  // não dá para acreditar aqui.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    const destino = request.nextUrl.clone();
+    destino.pathname = '/admin/login';
+    // volta para onde a pessoa queria ir depois de entrar
+    destino.searchParams.set('proximo', caminho);
+    const redirecionar = NextResponse.redirect(destino);
+    for (const c of renovados) redirecionar.cookies.set(c.name, c.value, c.options);
+    return { redirecionar, cookies: [] };
+  }
+
+  return { cookies: renovados };
+}
+
+export async function proxy(request: NextRequest) {
   const caminho = request.nextUrl.pathname;
   if (SEM_CABECALHO.some((prefixo) => caminho.startsWith(prefixo))) {
     return NextResponse.next();
   }
+
+  const guarda = await guardaDoPainel(request);
+  if (guarda.redirecionar) return guarda.redirecionar;
 
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
   const dev = process.env.NODE_ENV !== 'production';
@@ -53,7 +142,7 @@ export function proxy(request: NextRequest) {
     "img-src 'self' data: blob: https://lh3.googleusercontent.com",
     // mapa do Google embutido na seção de contato
     "frame-src https://www.google.com https://maps.google.com",
-    "connect-src 'self'",
+    `connect-src 'self'${ORIGEM_SUPABASE ? ` ${ORIGEM_SUPABASE}` : ''}`,
     "form-action 'self'",
     // ninguém pode embutir o site num iframe: barra clickjacking
     "frame-ancestors 'none'",
@@ -68,6 +157,8 @@ export function proxy(request: NextRequest) {
   headers.set('x-nonce', nonce);
 
   const resposta = NextResponse.next({ request: { headers } });
+
+  for (const c of guarda.cookies) resposta.cookies.set(c.name, c.value, c.options);
 
   resposta.headers.set('Content-Security-Policy', csp);
   // HTTPS obrigatório por 2 anos, incluindo subdomínios

@@ -20,13 +20,21 @@
 const VERSAO = 'mfh-v1';
 const CACHE_ESTATICO = `${VERSAO}-estatico`;
 
-/** Nada aqui pode ser servido do cache, em hipótese alguma. */
+/**
+ * Nada aqui pode ser servido do cache, em hipótese alguma.
+ *
+ * `/admin` entra pelo mesmo motivo do login: é a área do caixa. Uma página
+ * administrativa guardada continuaria abrindo depois de a pessoa sair — e num
+ * aparelho compartilhado, para outra pessoa. O painel também não teria o que
+ * fazer offline: todo número dele vem do banco, ao vivo.
+ */
 const NUNCA_CACHEAR = [
   '/api/checkout',
   '/api/pedido',
   '/api/auth/',
   '/api/webhook/',
   '/api/whatsapp/',
+  '/admin',
 ];
 
 /** Caminhos cujo conteúdo é versionado ou imutável. */

@@ -64,12 +64,53 @@ podia chegar ao cliente como fraude:
 
 Rota que depende de credencial ausente **falha fechada**, com mensagem honesta.
 
+## Fluxo de caixa (`/admin`)
+
+Área administrativa privada, separada do site público. Todo pedido fechado no
+site é gravado ANTES de o WhatsApp abrir (`app/api/pedido/registrar`), e o
+número volta para a mensagem como `*PEDIDO #XXXX*`.
+
+- Banco: Supabase, migrations em `supabase/migrations`, tudo com o prefixo
+  `comida_caseira_`. Rodar em ordem; o primeiro administrador é criado pela
+  instrução no fim de `0006`.
+- **Dinheiro é sempre inteiro em centavos**, do banco à tela (`lib/admin/dinheiro.ts`).
+  Nenhuma coluna nem variável de valor é float.
+- **Datas no fuso `America/Sao_Paulo`** (`lib/admin/datas.ts`). O banco guarda
+  `timestamptz`; quem decide o que é "hoje" é essa camada.
+- **Preço nunca vem do navegador.** `comida_caseira_create_order` recebe id do
+  produto e quantidade; preço, custo, taxa e total saem da tabela. Vale o mesmo
+  para a taxa de entrega, cuja única fonte é `comida_caseira_delivery_zones`.
+- **Pedido feito ≠ dinheiro recebido.** O pedido nasce `pending`. Só ao marcar
+  como pago é que nasce um lançamento em `comida_caseira_entries`. Estorno é
+  linha negativa, nunca exclusão.
+- **RLS em tudo.** O visitante do site não lê pedido, caixa, despesa, cliente
+  nem custo. A chave `service_role` não é usada em lugar nenhum do projeto.
+- O custo do produto (`cost_cents`) é exclusivo do admin e **nunca** aparece no
+  site.
+- Sem as variáveis do Supabase configuradas, o painel diz o que falta e o site
+  segue pelo WhatsApp — a regra do "nada de função falsa" vale aqui também.
+
 ## Testes
 
 `npm run test:e2e` (constrói antes, por `pretest:e2e`). Playwright, em celular e
 desktop. Cobrem o conteúdo exato da mensagem do WhatsApp, endereço obrigatório
 na entrega, ausência de endereço na retirada, troco, proteção das APIs contra
 payload adulterado, responsividade de 360 a 1920 px e o manifesto do PWA.
+
+Do fluxo de caixa: `e2e/fluxo-de-caixa.spec.ts` (registro antes do WhatsApp,
+falha fechada, idempotência) e `e2e/painel.spec.ts`.
+
+O banco tem teste próprio, que roda num Postgres local sem Supabase:
+
+```
+psql -f supabase/tests/00_shim_supabase.sql
+psql -f supabase/migrations/0001_...   # e os demais, em ordem
+psql -f supabase/tests/01_fluxo.sql
+```
+
+Ele confere o caminho todo — pedido criado pelo anônimo, preço recalculado,
+idempotência, RLS fechada, pendente ≠ recebido, marcar pago, despesa,
+cancelamento, estorno e auditoria — e apaga o que criou.
 
 ## Segredos
 

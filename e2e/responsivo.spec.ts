@@ -243,7 +243,7 @@ test.describe('instalável na tela inicial', () => {
     await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveCount(1);
   });
 
-  test('o service worker nunca guarda pedido, pagamento nem login', async ({ request }) => {
+  test('o service worker nunca guarda pedido, pagamento, login nem painel', async ({ request }) => {
     const sw = await (await request.get('/sw.js')).text();
     for (const rota of [
       '/api/checkout',
@@ -251,6 +251,8 @@ test.describe('instalável na tela inicial', () => {
       '/api/auth/',
       '/api/webhook/',
       '/api/whatsapp/',
+      // a área do caixa: guardada, continuaria abrindo depois do logout
+      '/admin',
     ]) {
       expect(sw, `${rota} precisa estar na lista de nunca cachear`).toContain(rota);
     }

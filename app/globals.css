@@ -126,3 +126,120 @@
 @utility animate-bob {
   animation: mfh-bob 2.2s ease-in-out infinite;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PAINEL ADMINISTRATIVO  (/admin)
+
+   O site público é laranja da borda ao rodapé. O painel é o contrário: fundo
+   quase branco, cartão branco, laranja só onde precisa chamar. São duas
+   leituras diferentes — o cliente olha por segundos e decide; a dona olha por
+   minutos, conferindo número. Laranja atrás de tabela cansa a vista.
+
+   O bloco abaixo NÃO toca em nada do site: tudo mora dentro de `.admin-app`.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* O `body` tem gradiente laranja fixo. Sem isto, o laranja aparece na área de
+   rolagem elástica do celular, por baixo do painel. */
+body:has(.admin-app) {
+  background: var(--admin-fundo);
+  background-image: none;
+}
+
+.admin-app {
+  --admin-fundo: #f4f5f7;
+  --admin-superficie: #ffffff;
+  --admin-borda: #e6e8ec;
+  --admin-tinta: #14181f;
+  --admin-tinta-suave: #667085;
+  --admin-laranja: #f2620c;
+  --admin-laranja-claro: #fff2e8;
+  --admin-verde: #0f9d58;
+  --admin-vermelho: #e5484d;
+  --admin-azul: #2563eb;
+
+  min-height: 100dvh;
+  background: var(--admin-fundo);
+  color: var(--admin-tinta);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Cartão do painel: branco, canto redondo, sombra que só sugere elevação.
+   Sombra forte em tela cheia de cartão vira sujeira visual. */
+.admin-card {
+  background: var(--admin-superficie);
+  border: 1px solid var(--admin-borda);
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px rgb(16 24 40 / 0.04);
+}
+
+/* Campos de formulário, num lugar só: são dezenas, e repetir a classe em cada
+   um é como um deles acaba com altura diferente dos outros. */
+.admin-campo {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid var(--admin-borda);
+  background: var(--admin-superficie);
+  padding: 0.625rem 0.875rem;
+  font-size: 0.9375rem;
+  color: var(--admin-tinta);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.admin-campo::placeholder {
+  color: #98a2b3;
+}
+
+.admin-campo:focus {
+  outline: none;
+  border-color: var(--admin-laranja);
+  box-shadow: 0 0 0 3px rgb(242 98 12 / 0.14);
+}
+
+.admin-campo:disabled {
+  background: #f8f9fb;
+  color: var(--admin-tinta-suave);
+  cursor: not-allowed;
+}
+
+.admin-rotulo {
+  display: block;
+  margin-bottom: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #344054;
+}
+
+/* O foco no painel é laranja, não branco: fundo claro engole contorno branco. */
+.admin-app :where(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--admin-laranja);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+/* Tabela larga rola dentro do próprio quadro. A página nunca rola na
+   horizontal — no celular isso esconde a coluna do valor, justamente a que
+   importa. */
+.admin-rolagem-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Esqueleto de carregamento. */
+@keyframes admin-pulsar {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+.admin-esqueleto {
+  background: #eceef2;
+  border-radius: 0.5rem;
+  animation: admin-pulsar 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-esqueleto {
+    animation: none;
+    opacity: 0.7;
+  }
+}

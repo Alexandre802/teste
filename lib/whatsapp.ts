@@ -20,6 +20,15 @@ export interface OrderMessageInput {
   paidOnline?: boolean;
   /** Identificador do pedido, para a casa referenciar. */
   reference?: string;
+  /**
+   * Número do pedido no fluxo de caixa, devolvido por
+   * `comida_caseira_create_order`.
+   *
+   * Quando existe, vira a primeira linha da mensagem — é por ele que a casa
+   * acha o pedido no painel enquanto atende no WhatsApp. Sem ele a mensagem
+   * sai exatamente como saía antes: o site funciona com ou sem banco.
+   */
+  orderNumber?: number | null;
 }
 
 /**
@@ -39,17 +48,20 @@ export function buildOrderMessage({
   note,
   paidOnline = false,
   reference,
+  orderNumber,
 }: OrderMessageInput): string {
   const entrega = mode === 'entrega';
   const subtotal = cartTotal(lines);
   const total = orderTotal(lines, mode);
   const taxa = entrega ? taxaPara(subtotal) : null;
 
-  const partes: string[] = [
-    `Olá! Gostaria de fazer um pedido na ${business.name}.`,
-    '',
-    'Pedido:',
-  ];
+  const partes: string[] = [];
+
+  // O número vai em cima, em negrito, porque é o que a casa procura primeiro
+  // quando abre a conversa com dez pedidos na fila.
+  if (orderNumber) partes.push(`*PEDIDO #${orderNumber}*`, '');
+
+  partes.push(`Olá! Gostaria de fazer um pedido na ${business.name}.`, '', 'Pedido:');
 
   for (const line of lines) {
     const product = productsById.get(line.productId);

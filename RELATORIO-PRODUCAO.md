@@ -140,13 +140,60 @@ para `public/galeria/` e trocar o endereço resolve.
 
 ---
 
-## 4. Banco de dados: o que muda com e sem
+## 4. Banco de dados e fluxo de caixa
 
-**O escopo atual não precisa de banco.** O site é cardápio + pedido pelo
-WhatsApp; o histórico fica no navegador do próprio cliente (`lib/store.ts`), e o
-pedido vive na conversa do WhatsApp, que a casa já usa.
+O site continua funcionando **sem banco nenhum**: cardápio + pedido pelo
+WhatsApp, com o histórico no navegador do cliente (`lib/store.ts`). Esse
+caminho não mudou e não depende de credencial nenhuma.
 
-Duas coisas *precisariam* de armazenamento compartilhado:
+Com `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+configuradas, o **painel administrativo em `/admin`** entra em cena e todo
+pedido fechado no site passa a ser gravado antes de o WhatsApp abrir. Sem
+essas variáveis, `/admin` diz o que falta configurar em vez de mostrar um
+painel de números zerados.
+
+### Para ligar o painel
+
+1. Criar um projeto no Supabase.
+2. Rodar `supabase/migrations/*.sql` em ordem, no SQL editor.
+3. Criar a conta da proprietária: Authentication → Add user, e depois o
+   `insert` que está documentado no fim de
+   `0006_comida_caseira_dados_iniciais.sql`. **Não existe cadastro público de
+   administrador** — conta de autenticação, sozinha, não dá acesso ao caixa.
+4. Preencher as duas variáveis de ambiente e publicar.
+5. No painel: Produtos → *Sincronizar cardápio*, e informar o custo de cada
+   item. Sem custo, o lucro do relatório sai igual ao faturamento.
+6. Configurações → Taxas de entrega. É a **única** fonte da taxa: o servidor
+   recalcula o frete por essa tabela ao fechar o pedido.
+
+### O que o painel garante
+
+- **Nenhum preço vem do navegador.** A função `comida_caseira_create_order`
+  lê preço, custo e taxa do banco e refaz a conta. Payload adulterado é
+  ignorado (testado em `supabase/tests/01_fluxo.sql`).
+- **Pedido feito ≠ dinheiro recebido.** O pedido nasce *a receber*; só vira
+  recebimento quando a casa marca como pago, e aí o lançamento é criado na
+  mesma transação.
+- **Sem pedido duplicado.** `checkout_token` é único no banco: dois toques em
+  enviar, ou uma retentativa depois de a rede cair, devolvem o mesmo pedido.
+- **Falha fechada.** Se o banco recusar, o WhatsApp **não** abre e o cliente
+  vê o erro — nada de pedido dado como registrado sem estar.
+- **RLS ativa.** O visitante do site não lê pedido, caixa, despesa, cliente
+  nem custo. A única porta dele é a função de criar pedido.
+- **Sem `service_role`.** O projeto não usa a chave que ignora RLS, em lugar
+  nenhum. Não há esse segredo para vazar.
+
+### Limitação conhecida: pagamento online e o caixa
+
+Pedido pago pelo Mercado Pago é registrado no painel, mas **entra como *a
+receber***: quem confirma o pagamento é o webhook, e ele não tem como marcar
+o pedido como pago sem uma credencial de servidor que este projeto
+deliberadamente não tem. Até isso ser resolvido, a casa marca o recebimento
+no painel — o aviso do WhatsApp já diz que foi pago pelo site. Fechar essa
+ponta exige decidir entre adicionar `SUPABASE_SERVICE_ROLE_KEY` (só no
+servidor) ou uma função dedicada com segredo próprio.
+
+Duas coisas continuam *precisando* de armazenamento compartilhado:
 
 1. **Idempotência do webhook do Mercado Pago.** Hoje a proteção contra
    processar o mesmo pagamento duas vezes é uma tabela em memória
@@ -159,9 +206,6 @@ Duas coisas *precisariam* de armazenamento compartilhado:
 2. **Limite de taxa distribuído.** Mesma limitação, mesmo remédio
    (`lib/seguranca.ts`). Hoje segura abuso casual, não ataque distribuído.
 
-Se um dia a casa quiser **painel administrativo, status do pedido, fila da
-cozinha ou relatório de vendas**, aí o banco deixa de ser opcional — nenhuma
-dessas coisas existe sem persistir pedido no servidor.
 
 ---
 
@@ -187,7 +231,19 @@ dessas coisas existe sem persistir pedido no servidor.
   guarda pedido, pagamento nem login
 - Política de privacidade em `/politica-de-privacidade`, ligada no rodapé
 - SEO: canônico no endereço de produção real, sitemap, robots, JSON-LD
-- 178 testes automatizados passando, em celular e desktop
+- **Fluxo de caixa em `/admin`**: resumo, pedidos, detalhe com ações, receitas,
+  despesas, relatórios, produtos com custo, clientes, caixa (abertura,
+  sangria, suprimento, fechamento) e configurações
+- **Registro automático do pedido** antes de o WhatsApp abrir, com número
+  `*PEDIDO #XXXX*` na mensagem
+- Separação entre faturamento, recebimento, custo e despesa, com lucro bruto
+  e líquido calculados no banco
+- Exportação CSV (pedidos, receitas, despesas, relatório) no formato que o
+  Excel em português abre direto
+- Tempo real: pedido novo aparece no painel sem recarregar, com aviso e som
+  opcional por aparelho
+- 212 testes automatizados passando, em celular e desktop, mais 10 asserções
+  de banco em `supabase/tests/01_fluxo.sql`
 
 ### ⚠️ Pendente de configuração externa
 - Pagamento online por Pix e cartão — `MP_ACCESS_TOKEN` + `MP_WEBHOOK_SECRET`
@@ -198,9 +254,16 @@ dessas coisas existe sem persistir pedido no servidor.
 - Atendente automático — `ANTHROPIC_API_KEY`
 - Segredos de produção — `AUTH_SECRET`, `RATE_LIMIT_SALT`
 - Domínio próprio — `NEXT_PUBLIC_SITE_URL`
+- Fluxo de caixa — `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+  migrations rodadas e a primeira conta de administrador criada
+- Confirmação automática do pagamento online no caixa (ver a limitação acima)
 
 ### ❓ Pendente de informação do cliente
 - Taxa de entrega, pedido mínimo, entrega grátis, bairros atendidos, prazo
+  (agora configuráveis pelo painel, em Configurações → Taxas de entrega)
+- Custo de cada item do cardápio, para o relatório de lucro sair certo
+- Dados da empresa no painel (nome, telefone, endereço, horários): começam
+  vazios de propósito
 - Horário de fechamento e dias da semana
 - Razão social e CNPJ
 - Fotos dos 43 itens que faltam

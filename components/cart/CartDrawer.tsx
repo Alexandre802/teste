@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { formatPrice } from '@/lib/catalog';
 import { enderecoValido } from '@/lib/endereco';
 import { faltaParaMinimo, taxaPara } from '@/lib/entrega';
@@ -54,9 +54,19 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState('');
   const [referencia, setReferencia] = useState('');
+  const [numeroPedido, setNumeroPedido] = useState<number | null>(null);
   const [urlWhatsapp, setUrlWhatsapp] = useState('');
   /** O gateway está de pé? Só o servidor sabe — a chave dele é secreta. */
   const [onlineDisponivel, setOnlineDisponivel] = useState(false);
+  /**
+   * Existe fluxo de caixa para registrar o pedido?
+   *
+   * Quem responde é o servidor, não uma variável embutida no pacote do
+   * navegador. Assim há uma fonte de verdade só, e o comportamento de
+   * "registrar antes de abrir o WhatsApp" pode ser testado de ponta a ponta
+   * sem depender de como o site foi compilado.
+   */
+  const [caixaAtivo, setCaixaAtivo] = useState(false);
 
   const subtotal = cartTotal(lines);
   const total = orderTotal(lines, mode);
@@ -64,13 +74,31 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
   const falta = faltaParaMinimo(subtotal, mode);
   const vazia = lines.length === 0;
 
-  // pergunta uma vez se o pagamento online existe neste ambiente
+  // pergunta uma vez o que existe neste ambiente: gateway de pagamento e
+  // fluxo de caixa. Os dois se desligam sozinhos sem configuração, e o site
+  // precisa saber disso antes de fechar o primeiro pedido.
   useEffect(() => {
     let vivo = true;
+
     fetch('/api/checkout')
       .then((r) => (r.ok ? r.json() : { online: false }))
-      .then((d) => vivo && setOnlineDisponivel(Boolean(d?.online)))
-      .catch(() => vivo && setOnlineDisponivel(false));
+      .then((d) => {
+        if (vivo) setOnlineDisponivel(Boolean(d?.online));
+      })
+      .catch(() => {
+        if (vivo) setOnlineDisponivel(false);
+      });
+
+    fetch('/api/pedido/registrar')
+      .then((r) => (r.ok ? r.json() : { configurado: false }))
+      .then((d) => {
+        if (vivo) setCaixaAtivo(Boolean(d?.configurado));
+      })
+      .catch(() => {
+        // sem resposta, o site segue como sempre funcionou: pelo WhatsApp
+        if (vivo) setCaixaAtivo(false);
+      });
+
     return () => {
       vivo = false;
     };
@@ -91,7 +119,82 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
   const proximoDepoisDoLogin = (): Passo => (mode === 'entrega' ? 'endereco' : 'pagamento');
 
   /**
+   * Chave de idempotência do envio.
+   *
+   * Vale para UM conteúdo de sacola: enquanto itens, endereço, pagamento e
+   * observação não mudarem, o token é o mesmo, e o banco devolve o pedido já
+   * criado em vez de criar outro. Mexeu na sacola, o token troca — senão a
+   * segunda tentativa reaproveitaria o pedido antigo e o cliente receberia o
+   * total errado.
+   *
+   * É o que protege contra o toque duplo, contra o "voltar e enviar de novo"
+   * e contra a retentativa depois de a rede cair no meio do envio.
+   */
+  const tokenRef = useRef<{ assinatura: string; token: string } | null>(null);
+
+  const tokenDoEnvio = (): string => {
+    const assinatura = JSON.stringify({
+      linhas: lines.map((l) => [l.productId, l.qty, l.note.trim()]),
+      modo: mode,
+      endereco: mode === 'entrega' ? address : null,
+      pagamento: [payment.forma, payment.precisaTroco, payment.trocoPara],
+      observacao: orderNote.trim(),
+      cliente: [customer?.name ?? '', customer?.phone ?? ''],
+    });
+
+    if (tokenRef.current?.assinatura !== assinatura) {
+      tokenRef.current = { assinatura, token: novaReferencia() };
+    }
+    return tokenRef.current.token;
+  };
+
+  /**
+   * Grava o pedido no fluxo de caixa e devolve o número dele.
+   *
+   * Três desfechos, e nenhum deles é "deu erro mas segue assim mesmo":
+   *
+   *   número   — gravado; o número vai para a mensagem do WhatsApp.
+   *   null     — não há fluxo de caixa configurado neste ambiente. O site
+   *              funciona como sempre funcionou, pelo deeplink.
+   *   exceção  — havia banco e ele recusou ou não respondeu. O envio PARA
+   *              aqui: abrir o WhatsApp agora daria ao cliente a impressão de
+   *              pedido registrado que não existe em lugar nenhum.
+   */
+  const registrarNoCaixa = async (checkoutToken: string): Promise<number | null> => {
+    if (!caixaAtivo) return null;
+
+    const resposta = await fetch('/api/pedido/registrar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        checkoutToken,
+        lines,
+        mode,
+        note: orderNote,
+        customer: customer ? { name: customer.name, phone: customer.phone } : null,
+        address: mode === 'entrega' ? address : null,
+        payment,
+      }),
+    });
+
+    const dados = await resposta.json().catch(() => null);
+
+    if (!resposta.ok) {
+      throw new Error(
+        dados?.erro ?? 'Não foi possível registrar seu pedido. Tente novamente.',
+      );
+    }
+    if (dados?.configurado === false) return null;
+
+    return typeof dados?.orderNumber === 'number' ? dados.orderNumber : null;
+  };
+
+  /**
    * Fecha o pedido.
+   *
+   * Antes de qualquer coisa, o pedido é REGISTRADO no fluxo de caixa — é o
+   * que faz a casa não precisar cadastrar venda à mão. Só depois o WhatsApp
+   * abre, já com o número do pedido na mensagem.
    *
    * Dois caminhos, e o que os separa é se o cliente escolheu pagar agora:
    *
@@ -134,12 +237,32 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
       payment,
     };
 
+    const checkoutToken = tokenDoEnvio();
+
+    // Registrar vem ANTES dos dois caminhos. Se o banco recusar, o cliente
+    // fica onde está, com a sacola intacta e uma mensagem que diz a verdade —
+    // nada de WhatsApp aberto sobre um pedido que não foi gravado.
+    let numero: number | null = null;
+    try {
+      numero = await registrarNoCaixa(checkoutToken);
+    } catch (e) {
+      setEnviando(false);
+      setErro(
+        e instanceof Error
+          ? e.message
+          : 'Não foi possível registrar seu pedido. Tente novamente.',
+      );
+      return;
+    }
+
     if (pagarAgora) {
       try {
         const r = await fetch('/api/checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(corpo),
+          // mesma referência do pedido no painel: o pagamento no gateway e a
+          // linha no fluxo de caixa passam a ser rastreáveis um pelo outro
+          body: JSON.stringify({ ...corpo, reference: checkoutToken }),
         });
         const dados = await r.json();
         if (!r.ok || !dados.checkoutUrl) {
@@ -160,7 +283,7 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
       }
     }
 
-    const ref = novaReferencia();
+    const ref = checkoutToken;
     const url = orderWhatsappUrl({
       lines,
       mode,
@@ -169,6 +292,7 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
       payment,
       note: orderNote,
       reference: ref,
+      orderNumber: numero,
     });
 
     void fetch('/api/pedido', {
@@ -183,9 +307,12 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
     window.open(url, '_blank', 'noopener,noreferrer');
 
     setReferencia(ref);
+    setNumeroPedido(numero);
     setUrlWhatsapp(url);
     recordOrder();
     setOrderNote('');
+    // pedido fechado: o próximo envio precisa de um token novo
+    tokenRef.current = null;
     setEnviando(false);
     setPasso('confirmado');
   };
@@ -423,7 +550,12 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
 
       {/* ─────────────── 7. confirmação ─────────────── */}
       {passoAtual === 'confirmado' && (
-        <ConfirmStep referencia={referencia} whatsappUrl={urlWhatsapp} onClose={fecharTudo} />
+        <ConfirmStep
+          referencia={referencia}
+          numeroPedido={numeroPedido}
+          whatsappUrl={urlWhatsapp}
+          onClose={fecharTudo}
+        />
       )}
     </Sheet>
   );
@@ -432,14 +564,43 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
 /**
  * Referência curta do pedido: data em base 36 + sufixo aleatório.
  *
- * Serve para o cliente e a casa falarem do mesmo pedido, e é o
- * `external_reference` que o Mercado Pago usa para não processar o mesmo
- * pagamento duas vezes.
+ * Cumpre três papéis com o mesmo valor, de propósito — assim o pedido no
+ * painel, a conversa no WhatsApp e o pagamento no gateway falam do mesmo
+ * envio:
+ *
+ *  - `checkout_token` no banco, que garante a idempotência;
+ *  - referência que o cliente e a casa citam na conversa;
+ *  - `external_reference` do Mercado Pago, que evita cobrar duas vezes.
  */
 function novaReferencia(): string {
   const tempo = Date.now().toString(36).toUpperCase().slice(-6);
-  const acaso = Math.random().toString(36).toUpperCase().slice(2, 5);
-  return `${tempo}-${acaso}`;
+  return `${tempo}-${acaso(6)}`;
+}
+
+/**
+ * Sufixo aleatório em base 36.
+ *
+ * São seis caracteres, não três, porque este valor virou chave de
+ * idempotência: dois pedidos que colidissem no mesmo token fariam o segundo
+ * cliente receber de volta o pedido do primeiro. Com o carimbo de tempo na
+ * frente, seis caracteres deixam a colisão fora do alcance prático.
+ *
+ * Usa `crypto.getRandomValues` quando existe. `Math.random` é o reserva para
+ * navegador antigo — pior distribuição, mas melhor que travar o checkout.
+ */
+function acaso(tamanho: number): string {
+  const alfabeto = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const cripto = typeof crypto !== 'undefined' && 'getRandomValues' in crypto ? crypto : null;
+
+  if (cripto) {
+    const bytes = new Uint8Array(tamanho);
+    cripto.getRandomValues(bytes);
+    return Array.from(bytes, (b) => alfabeto[b % alfabeto.length]).join('');
+  }
+
+  return Array.from({ length: tamanho }, () =>
+    alfabeto[Math.floor(Math.random() * alfabeto.length)],
+  ).join('');
 }
 
 export function WhatsappFinishButton({ onClick }: { onClick: () => void }) {

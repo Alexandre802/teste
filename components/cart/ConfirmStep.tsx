@@ -15,10 +15,13 @@ import { WhatsAppIcon } from '../ui/Icons';
  */
 export default function ConfirmStep({
   referencia,
+  numeroPedido,
   whatsappUrl,
   onClose,
 }: {
   referencia: string;
+  /** Número no fluxo de caixa. Ausente quando o painel não está configurado. */
+  numeroPedido?: number | null;
   whatsappUrl: string;
   onClose: () => void;
 }) {
@@ -39,9 +42,16 @@ export default function ConfirmStep({
         </p>
       </div>
 
-      <p className="rounded-full bg-white/15 px-4 py-1.5 text-xs font-bold tracking-wide text-white ring-1 ring-inset ring-white/30">
-        Pedido nº {referencia}
-      </p>
+      <div className="flex flex-col items-center gap-2">
+        {numeroPedido ? (
+          <p className="rounded-full bg-white px-5 py-2 text-base font-extrabold tracking-wide text-cocoa">
+            PEDIDO #{numeroPedido}
+          </p>
+        ) : null}
+        <p className="rounded-full bg-white/15 px-4 py-1.5 text-xs font-bold tracking-wide text-white ring-1 ring-inset ring-white/30">
+          Pedido nº {referencia}
+        </p>
+      </div>
 
       <div className="flex w-full flex-col gap-2">
         <a
