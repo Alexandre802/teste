@@ -9,7 +9,7 @@ import {
 import { cidadesAtendidas } from "@/data/deliveryZones";
 
 const descricao =
-  "Marmitas frescas, comida caseira, lanches e açaí com entrega em " +
+  "Marmitas frescas e comida caseira com entrega em " +
   cidadesAtendidas.join(" e ") +
   ". Monte seu pedido e envie pelo WhatsApp.";
 
@@ -25,8 +25,7 @@ export const metadataPadrao: Metadata = {
     "marmita",
     "comida caseira",
     "marmitex",
-    "lanches",
-    "açaí",
+    "bebidas",
     "delivery",
     "Jacareí",
     "São José dos Campos",
@@ -83,8 +82,8 @@ export function schemaRestaurante(): Record<string, unknown> {
     };
   }
 
-  if (restaurant.whatsapp) {
-    schema.telephone = `+${restaurant.whatsapp}`;
+  if (restaurant.phone) {
+    schema.telephone = `+${restaurant.phone}`;
   }
 
   if (temInstagram) {

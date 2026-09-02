@@ -1,1 +1,1 @@
-Catálogo verificado contra o InstaDelivery original: 2 categorias, 13 produtos disponíveis, 1 produto histórico indisponível e 16 grupos de complementos/opções ativos na fonte.
+Catálogo verificado contra o InstaDelivery original: 2 categorias, 13 produtos disponíveis, 1 produto histórico indisponível e 16 grupos de complementos/opções ativos na fonte. Também foram conferidos telefone, WhatsApp, endereço, horários, tempo de entrega, avaliação e as 5 formas de pagamento.

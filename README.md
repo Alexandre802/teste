@@ -41,9 +41,10 @@ Os tipos estão em `types/index.ts`.
 
 ## O que ainda falta cadastrar
 
-O site **não inventa dado que a casa não confirmou**. O WhatsApp, o endereço,
-os horários, o tempo médio de entrega, as formas de pagamento e o cardápio foram
-conferidos na fonte oficial. O que ainda está pendente hoje:
+O site **não inventa dado que a casa não confirmou**. O telefone, o WhatsApp, o
+endereço, os horários, o tempo médio de entrega, a avaliação, as formas de
+pagamento e o cardápio foram conferidos na fonte oficial. O que ainda está
+pendente hoje:
 
 - **Instagram** (`NEXT_PUBLIC_INSTAGRAM`). Sem perfil, a seção de feed some.
 - **Taxa de entrega, pedido mínimo e prazo** (`data/deliveryZones.ts`, hoje

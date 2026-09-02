@@ -15,9 +15,11 @@ export const restaurant = {
   shortName: "Comida Caseira",
   tagline: "Sabor de comida caseira de verdade",
   description:
-    "Marmitas frescas e saborosas, com pedidos para entrega ou retirada.",
+    "Seja bem-vindo(a) à Comida Caseira da Márcia Costa. Faça seu pedido abaixo!",
   logo: "/images/brand/logo.png",
 
+  phone: "5512981892680",
+  phoneLabel: "(12) 98189-2680",
   whatsapp: env("NEXT_PUBLIC_WHATSAPP") || "5512996011026",
   whatsappLabel: "(12) 99601-1026",
   instagram: env("NEXT_PUBLIC_INSTAGRAM"),
@@ -34,9 +36,12 @@ export const restaurant = {
     env("NEXT_PUBLIC_INSTADELIVERY") ||
     "https://instadelivery.com.br/comidacaseiradamarciacosta",
   ifood: env("NEXT_PUBLIC_IFOOD"),
-  siteUrl: env("NEXT_PUBLIC_SITE_URL") || "http://localhost:3000",
+  siteUrl:
+    env("NEXT_PUBLIC_SITE_URL") ||
+    "https://comida-caseira-marcia-costa.vercel.app",
   retiradaDisponivel: true,
   tempoEstimadoMinutos: { minimo: 30, maximo: 50 },
+  avaliacaoMedia: 4.73,
 } as const;
 
 /** Métodos confirmados no cardápio original. O checkout próprio usa os quatro

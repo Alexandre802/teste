@@ -98,7 +98,7 @@ on conflict (id) do update set
   ativo = excluded.ativo;
 
 update comida_caseira_settings
-set telefone = '5512996011026',
+set telefone = '5512981892680',
     whatsapp = '5512996011026',
     endereco = 'Av. Augusto Rodrigues, 511 - Jardim Maria Amelia, Jacareí - SP',
     horarios = '[{"dias":"Todos os dias","horario":"08:30 às 15:00"},{"dias":"Domingo a quinta","horario":"16:00 às 23:00"},{"dias":"Sexta e sábado","horario":"16:00 às 23:30"}]'::jsonb,

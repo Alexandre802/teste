@@ -4,7 +4,9 @@ import {
   Instagram,
   MapPin,
   MessageCircle,
+  Phone,
   ShoppingBasket,
+  Star,
 } from "lucide-react";
 
 import {
@@ -54,6 +56,15 @@ export function Informacoes() {
           )}
         </Bloco>
 
+        <Bloco icone={Phone} termo="Telefone">
+          <a
+            href={`tel:+${restaurant.phone}`}
+            className="font-semibold text-laranja underline underline-offset-2"
+          >
+            {restaurant.phoneLabel}
+          </a>
+        </Bloco>
+
         <Bloco icone={Clock} termo="Horários">
           {temHorarios ? (
             <ul className="space-y-0.5">
@@ -71,6 +82,14 @@ export function Informacoes() {
         <Bloco icone={Clock} termo="Tempo médio de entrega">
           {restaurant.tempoEstimadoMinutos.minimo} a{" "}
           {restaurant.tempoEstimadoMinutos.maximo} minutos
+        </Bloco>
+
+        <Bloco icone={Star} termo="Avaliação no cardápio oficial">
+          {restaurant.avaliacaoMedia.toLocaleString("pt-BR", {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1,
+          })}{" "}
+          de 5
         </Bloco>
 
         <Bloco icone={ShoppingBasket} termo="Região atendida">

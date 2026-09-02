@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Bike, CookingPot, CreditCard, Heart, Sandwich } from "lucide-react";
+import { Bike, CookingPot, CreditCard, Heart, Utensils } from "lucide-react";
 
 /**
  * Os cinco diferenciais da casa. Nenhum promete prazo, taxa ou horario:
@@ -19,9 +19,9 @@ const DIFERENCIAIS = [
     texto: "Práticas, saborosas e prontas para você.",
   },
   {
-    icone: Sandwich,
-    titulo: "Lanches Deliciosos",
-    texto: "Sanduíches preparados na hora.",
+    icone: Utensils,
+    titulo: "Tamanhos P, M e G",
+    texto: "Escolha o tamanho ideal da sua marmita.",
   },
   {
     icone: Bike,
