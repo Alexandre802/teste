@@ -13,6 +13,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "instadelivery-public.nyc3.cdn.digitaloceanspaces.com",
       },
+      {
+        protocol: "https",
+        hostname: "instadelivery-public.nyc3.digitaloceanspaces.com",
+      },
     ],
   },
 };
