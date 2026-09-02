@@ -1,155 +1,191 @@
-# Michel Food House
+# Comida Caseira da Márcia Costa
 
-Site oficial da **Michel Food House** — lanchonete no Bandeira Branca I, em Jacareí-SP.
-Cardápio completo, sacola, pagamento e fechamento de pedido pelo WhatsApp.
+Site e PWA de pedidos da **Comida Caseira da Márcia Costa** — marmitas, comida
+caseira, lanches e açaí com entrega em Jacareí e São José dos Campos.
+
+Next.js 16 (App Router), TypeScript, Tailwind v4, Framer Motion, Zustand e
+Lucide. Projeto independente: nenhum dado, texto, foto ou componente de outro
+restaurante do repositório é usado aqui.
+
+## Rodar
 
 ```bash
 npm install
-npm run dev     # http://localhost:3000
-npm run build   # produção
+npm run dev      # http://localhost:3000
+npm run build && npm start
+npm run typecheck
 npm run lint
+npm run test:e2e # Playwright, celular e desktop (constrói antes)
 ```
 
-## Stack
+## Fluxo do cliente
 
-Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Framer Motion · Zustand.
+`/` (home) → `/cardapio` → produto → `/pedido` → `/pagamento` → `/confirmacao`
+→ WhatsApp. A home vem antes de qualquer produto, como pedido no briefing.
 
-Sem backend próprio: a sacola, a identificação do cliente e o histórico ficam no
-navegador; pagamento e WhatsApp são rotas de API que falam com serviços externos.
+O carrinho fica no `localStorage`, então recarregar a página não perde o pedido.
 
-## Como atualizar o conteúdo
+## Onde ficam os dados
 
-Nenhum produto ou dado da casa está escrito dentro de componente. Tudo sai de dois
-arquivos:
+Nenhum produto, preço, endereço ou horário mora dentro de componente. Para
+atualizar o site, mexa só nestes três arquivos:
 
-| O que mudar | Arquivo |
-|---|---|
-| Produtos, preços, descrições, categorias, esgotados, destaques | `lib/catalog.ts` |
-| Endereço, telefone, WhatsApp, horário, avaliações, textos institucionais | `lib/business.ts` |
-| Fotos de ambiente da galeria | `lib/photos.ts` |
-| Promoções | array `promocoes` em `components/sections/Promocoes.tsx` |
-| Termos de busca local | `lib/seo.ts` |
+| Arquivo | O que guarda |
+| --- | --- |
+| `data/menu.ts` | Produtos, preços, descrições, fotos, categorias e opções |
+| `data/restaurant.ts` | Nome, logo, WhatsApp, Instagram, endereço, horários, links |
+| `data/deliveryZones.ts` | Cidades atendidas, taxa, pedido mínimo e prazo |
 
-### Mudar um preço
+Os tipos estão em `types/index.ts`.
 
-`lib/catalog.ts`, campo `price` (número, sem `R$`). A formatação em real é automática.
+## O que ainda falta cadastrar
 
-### Marcar um item como esgotado
+O site **não inventa dado que a casa não confirmou**. Enquanto faltar, a tela
+mostra "Informação a cadastrar" e o recurso que depende do dado fica desligado,
+com aviso honesto. O que está pendente hoje:
 
-`available: false`. O card mostra "Esgotado" e desabilita o botão sozinho.
+- **Número do WhatsApp** (`NEXT_PUBLIC_WHATSAPP`). Sem ele o botão de enviar não
+  aparece: no lugar entra "Copiar mensagem do pedido", que copia o texto pronto.
+- **Endereço da cozinha** (`NEXT_PUBLIC_ENDERECO`).
+- **Instagram** (`NEXT_PUBLIC_INSTAGRAM`). Sem perfil, a seção de feed some.
+- **Horários** (`restaurant.openingHours`, hoje uma lista vazia).
+- **Taxa de entrega, pedido mínimo e prazo** (`data/deliveryZones.ts`, hoje
+  `null`). Enquanto forem `null`, o resumo escreve "a combinar no WhatsApp" e o
+  total soma apenas o subtotal.
+- **Preços e descrições do cardápio.** Os itens de `data/menu.ts` foram
+  transcritos das telas de referência enviadas pela casa e estão marcados com
+  `confirmado: false`. Enquanto houver item assim, o cardápio exibe um aviso de
+  "cardápio em conferência". Depois de confirmar cada item, troque para
+  `confirmado: true` e o aviso some sozinho.
 
-### Trocar o número do WhatsApp
+Copie `.env.example` para `.env.local` e preencha o que já estiver confirmado.
+Nenhuma dessas variáveis é segredo — são dados públicos exibidos no próprio
+site. **Nunca** coloque chave de API em variável `NEXT_PUBLIC_*`: esse prefixo
+entrega o valor ao navegador.
 
-`lib/business.ts` → `whatsapp` (formato internacional, só dígitos: `5512988447711`),
-`phoneE164` e `phoneDisplay`. Muda em todos os botões, no rodapé e no JSON-LD de uma vez.
+## Imagens
 
-### Adicionar a foto de um produto
+`public/images/` guarda `brand/`, `products/` e `banners/`. Todas saíram das
+telas de referência da própria casa, em `referencias/`, recortadas por
+`scripts/extrair-imagens.py` (`npm run imagens`).
 
-Coloque o arquivo em `public/produtos/<slug>.webp` e preencha `image: img('<slug>')`
-no produto. **Um produto sem foto própria deve continuar com `image: null`** — ele cai
-no placeholder da marca em vez de exibir a foto de outro item.
+Para trocar por uma fotografia real, basta sobrescrever o arquivo em
+`public/images/` — o script não precisa rodar de novo. Produto sem foto própria
+usa `image: null` e cai no selo da marca; nunca reaproveite a foto de um item em
+outro.
 
-## Fotos
+## Testes
 
-- `public/produtos/` — 34 fotos reais, extraídas do cardápio da casa e mapeadas
-  item a item. São de baixa resolução (≈380 px): servem, mas um ensaio fotográfico
-  melhora muito os cards. 43 dos 77 itens ainda não têm foto e usam o placeholder.
-- `lib/photos.ts` — fotos de ambiente vindas do perfil do Google Maps, por URL.
-  São links do Google e **podem expirar**. O ideal é baixar cada arquivo, salvar em
-  `public/galeria/` e trocar o `src` pelo caminho local; aí dá para remover o
-  `remotePatterns` de `next.config.ts`.
+`npm run test:e2e` roda em viewport de celular e de desktop e cobre: a home
+aparecendo antes dos produtos, carrinho (somar, diminuir, remover, sobreviver ao
+reload), fechamento dos modais pelo X, por fora e pelo Esc, endereço obrigatório
+na entrega e ausente na retirada, troco, todas as formas de pagamento, o texto
+exato da mensagem do WhatsApp, o manifesto do PWA, área de toque mínima de 44px
+e ausência de rolagem horizontal de 360 a 1920 px.
 
-## Configuração externa
+Em ambiente com o Chromium instalado fora do Playwright, aponte
+`PLAYWRIGHT_CHROMIUM_PATH` para o executável.
 
-Copie `.env.example` para `.env.local`. Sem nenhuma variável o site funciona: o pedido
-fecha pelo WhatsApp e o pagamento roda em modo demonstração, que avisa na tela que
-nada foi cobrado.
+---
 
-### Pagamento (Pix e cartão)
+## Fluxo de caixa (área administrativa)
 
-1. Crie uma aplicação no [painel do Mercado Pago](https://www.mercadopago.com.br/developers/panel/app).
-2. Preencha `MP_ACCESS_TOKEN`.
-3. Cadastre o webhook apontando para `https://SEU_DOMINIO/api/webhook/mercadopago`
-   e preencha `MP_WEBHOOK_SECRET` — **sem ele qualquer um pode forjar um
-   "pagamento aprovado"**.
-4. `MP_SANDBOX=1` durante os testes.
+Além do site de pedidos, o projeto tem um painel privado em `/admin` onde a
+Márcia acompanha vendas, recebimentos, despesas e lucro. **Todo pedido feito
+pelo site entra no painel sozinho** — ninguém precisa cadastrar venda à mão.
 
-### WhatsApp automático
+### Como o pedido chega ao caixa
 
-Precisa da [WhatsApp Cloud API](https://developers.facebook.com/docs/whatsapp/cloud-api/get-started)
-com número comercial verificado. Preencha `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`
-e `WHATSAPP_VERIFY_TOKEN`, e aponte o webhook para
-`https://SEU_DOMINIO/api/whatsapp/webhook`.
+Quando o cliente toca em "Enviar pedido no WhatsApp":
 
-Com isso funcionam três coisas:
+1. o navegador manda para o servidor **apenas** id do produto, quantidade e
+   opções escolhidas — nunca preço nem total;
+2. a função `comida_caseira_create_order` recalcula no banco o preço, os
+   adicionais, o custo, a taxa de entrega e o total;
+3. o pedido é gravado e devolve um número;
+4. só então a mensagem é montada, já com `*PEDIDO #XXXX*`, e o WhatsApp abre.
 
-- **pagamento aprovado → a lanchonete recebe o pedido** no WhatsApp, com itens,
-  total, tipo, cliente e endereço;
-- **o cliente recebe a confirmação** no número dele;
-- **atendente automático** responde as mensagens recebidas.
+Se o banco não responder, **o WhatsApp não abre**: a tela diz que não foi
+possível registrar o pedido e pede para tentar de novo. Pedido não some em
+silêncio.
 
-O atendente usa a API da Anthropic (`ANTHROPIC_API_KEY`) e recebe o cardápio inteiro
-no prompt, com instrução explícita de não inventar item, preço, promoção nem prazo —
-quando não sabe, diz que vai confirmar com a equipe.
+Tocar duas vezes em "enviar" não cria dois pedidos: cada checkout carrega uma
+chave de idempotência, e o banco devolve o pedido que já existe. O botão também
+trava enquanto a gravação acontece.
 
-> **Limite da plataforma:** a API só envia mensagens a partir do número **da loja**.
-> Não existe forma de disparar uma mensagem em nome do cliente. Quem manda do número
-> dele é ele mesmo, pelo link `wa.me` do site — que é como o site já fecha o pedido.
+### Dinheiro: as quatro contas
 
-### Login
+O sistema não trata todo pedido como dinheiro recebido.
 
-A identificação por nome + WhatsApp funciona sem configuração e é o que alimenta a
-saudação de retorno, o histórico e a mensagem do pedido. **Não há verificação por SMS**
-— para isso é preciso um provedor (Firebase Auth, Twilio Verify). O botão do Facebook
-só aparece com `NEXT_PUBLIC_FACEBOOK_APP_ID` definido e exige um app Meta configurado.
+| Número | O que é |
+| --- | --- |
+| **Faturamento bruto** | Soma dos pedidos pagos ou concluídos |
+| **Recebimentos** | Dinheiro que entrou de fato (inclui receita manual, desconta estorno) |
+| **A receber** | Pedidos não cancelados que ainda estão como pendentes |
+| **Lucro bruto** | Faturamento − custo dos produtos |
+| **Lucro líquido** | Recebimentos − custo dos produtos − despesas |
 
-O histórico é por aparelho: trocou de celular, ele não vai junto. Para acompanhar o
-cliente entre dispositivos é preciso guardar o histórico no servidor, com login real.
+Um pedido novo nasce como **pendente**. Só quando a casa marca **pago** ele
+vira recebimento. Cancelar tira do faturamento; se já estava pago, o painel
+oferece registrar o **reembolso**, que lança o estorno em vez de apagar o
+histórico.
 
-## SEO
+### Telas
 
-`app/layout.tsx` traz metadata, Open Graph e dois blocos JSON-LD (`Restaurant` com
-cardápio completo e `WebSite`), montados a partir de `lib/business.ts` e `lib/catalog.ts`
-— só com dados confirmados, sem horário de fechamento inventado. Há `sitemap.xml` e
-`robots.txt` gerados.
+Resumo (com gráfico de vendas, formas de pagamento e últimos pedidos), Pedidos,
+detalhe do pedido com as ações de status, Receitas, Despesas, Relatórios,
+Caixa (abertura, sangria, suprimento e fechamento), Produtos (onde se informa o
+**custo**, que nunca aparece no site), Clientes e Configurações.
 
-Os termos de busca local aparecem em **conteúdo visível**, na seção "O que servimos em
-Jacareí" (`components/sections/BuscaLocal.tsx`). Não existe bloco de texto escondido
-para robô: texto que só o buscador enxerga é *cloaking*, contraria as
-[políticas de spam do Google](https://developers.google.com/search/docs/essentials/spam-policies)
-e arrisca rebaixamento ou remoção do índice.
+No computador o menu é uma barra lateral; no celular, uma barra inferior com o
+botão central `+` para lançar receita ou despesa.
 
-## Acessibilidade e movimento
+### Banco de dados
 
-Navegação por teclado, foco visível, HTML semântico, `aria-label` nos controles e
-`alt` descritivo nas fotos. `prefers-reduced-motion` desliga o movimento: o lanche do
-hero aparece montado e imóvel. Em telas pequenas e aparelhos com pouca memória a
-animação usa afastamento menor e dispensa os rótulos.
+Supabase (PostgreSQL). As migrations estão em `supabase/migrations`, com o
+prefixo `comida_caseira_` para nunca se misturar com outro cliente. Dinheiro
+sempre em **centavos** (`bigint`) — float não entra perto de caixa. Cada item
+do pedido guarda um **snapshot** do nome, do preço e do custo: mudar o preço
+amanhã não reescreve o que o cliente pagou ontem.
 
-## Estrutura
+Segurança: a RLS está ativa em todas as tabelas. O cliente anônimo **não lê
+nada** — nem pedido, nem despesa, nem cliente, nem custo — e a única coisa que
+consegue executar é a função de criar pedido. Papéis: `owner`, `manager` e
+`cashier` (o caixa registra, mas não apaga lançamento nem muda preço).
 
+### Configurar
+
+```bash
+# 1. Crie um projeto no Supabase, exclusivo da Comida Caseira.
+# 2. Aplique supabase/migrations/*.sql em ordem (SQL Editor ou CLI).
+# 3. Preencha .env.local:
+#      NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
+# 4. Leve o cardápio para o banco (o servidor precisa dos preços):
+SUPABASE_SERVICE_ROLE_KEY=... npm run sincronizar-produtos
+# 5. Crie o usuário da Márcia em Authentication e libere o acesso:
+#      insert into comida_caseira_users (user_id, nome, role)
+#      values ('<id do usuário>', 'Márcia', 'owner');
 ```
-app/
-  layout.tsx           metadata, fontes, JSON-LD
-  page.tsx             composição das seções
-  globals.css          tokens de cor, glass, utilitários
-  api/checkout         abre o pagamento (Mercado Pago)
-  api/webhook/mercadopago   pagamento aprovado → WhatsApp
-  api/whatsapp/webhook      atendente automático
-components/
-  layout/    Header, Footer
-  hero/      Hero, ExplodedBurger, BurgerLayers
-  menu/      MenuSection, CategoryTabs, ProductCard, ProductModal
-  cart/      CartFab, CartDrawer, PaymentStep
-  account/   LoginSheet, ClienteDeVolta
-  sections/  Featured, About, Reviews, Gallery, Promocoes, Location, BuscaLocal
-  ui/        Button, Sheet, Reveal, ProductImage, Icons
-lib/         business, catalog, photos, store, whatsapp, whatsapp-api, payments, seo
-referencias/ cardápio de origem e prints usados para montar o catálogo
+
+Não existe cadastro público de conta administrativa. Sem o passo 5, um usuário
+autenticado não enxerga absolutamente nada.
+
+### Testes do banco
+
+```bash
+npm run test:db
 ```
 
-## Ferramental de design
+Sobe um Postgres descartável, aplica as migrations e roda 70 verificações:
+o cenário 2× R$ 25,00 + R$ 5,00 de entrega = R$ 55,00, preço enviado pelo
+navegador sendo ignorado, opção de outro produto descartada, idempotência,
+marcar pago, cancelar, reembolsar, fechamento de caixa e a RLS vista pelos
+papéis `anon`, dona, intruso autenticado e caixa.
 
-`.claude/skills/` traz as skills de design (`ui-ux-pro-max` e irmãs) e a skill
-`remotion-site`, para peças de vídeo. `.mcp.json` configura os MCPs de UI. Detalhes em
-`CLAUDE.md`.
+### O que ainda tem duas fontes
+
+Telefone, WhatsApp, Instagram e endereço aparecem tanto nas Configurações do
+painel quanto nas variáveis `NEXT_PUBLIC_*`. O **site público lê as variáveis**;
+o painel guarda o registro interno. A tela de Configurações avisa isso em
+destaque. As **taxas de entrega não** têm esse problema: site e servidor leem a
+mesma tabela `comida_caseira_delivery_zones`.

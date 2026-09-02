@@ -1,128 +1,106 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
-/* ───────────────────────── design tokens ─────────────────────────
-   Laranja vivo em toda a página — não há fundo escuro em lugar nenhum.
-   A profundidade vem de tons dentro do próprio laranja e de vidro branco
-   translúcido, nunca de preto.                                           */
+/* ---------------------------------------------------------------------------
+   Sistema visual da Comida Caseira da Marcia Costa.
+   Fundo branco, laranja forte como cor principal, cinza muito claro nos cards,
+   verde exclusivamente para o WhatsApp. Os valores saem das telas de
+   referencia da propria casa.
+   --------------------------------------------------------------------------- */
+
 @theme {
-  --color-flare: #ff8a2b; /* laranja mais claro — topo do gradiente */
-  --color-flame: #f2620c; /* laranja base da marca */
-  --color-ember: #d8490a; /* laranja queimado */
-  --color-ember-deep: #a8380a; /* profundidade, cantos e rodapé */
-  --color-amber: #ffa43d;
-  --color-gold: #ffd28a; /* dourado claro — detalhes sobre laranja */
+  --color-laranja: #e75c16;
+  --color-laranja-claro: #f0742e;
+  --color-laranja-forte: #e23f05;
+  --color-laranja-queimado: #b8420f;
+  --color-creme: #fdf0e7;
+  --color-creme-forte: #fbdfcd;
+  --color-vermelho: #d62828;
 
-  --color-cream: #ffffff; /* texto principal */
-  --color-muted: #ffe4cf; /* texto auxiliar sobre laranja */
-  --color-cocoa: #5a2005; /* marrom — texto sobre superfície branca */
+  --color-tinta: #1b1512;
+  --color-tinta-media: #57504b;
+  --color-tinta-suave: #857c76;
+  --color-nevoa: #f6f5f4;
+  --color-borda: #ecebe9;
 
-  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Cores do painel administrativo: verde entra, vermelho sai, azul informa. */
+  --color-verde-positivo: #15803d;
+  --color-verde-claro: #dcfce7;
+  --color-azul-info: #1d4ed8;
+  --color-azul-claro: #dbeafe;
+  --color-vermelho-claro: #fee2e2;
 
-  --radius-card: 1.25rem;
+  --color-whatsapp: #25d366;
+  --color-whatsapp-escuro: #128c46;
+
+  --radius-carta: 1.25rem;
+  --radius-bloco: 1.5rem;
+  --radius-gigante: 1.75rem;
+
+  --shadow-carta: 0 1px 2px rgb(27 21 18 / 0.04), 0 8px 24px -12px rgb(27 21 18 / 0.12);
+  --shadow-flutuante: 0 -2px 24px -8px rgb(27 21 18 / 0.18);
+
+  --font-sans: var(--fonte-corpo), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--fonte-titulo), ui-sans-serif, system-ui, sans-serif;
 }
 
-/* ───────────────────────────── base ───────────────────────────── */
-@layer base {
-  * {
-    border-color: rgb(255 255 255 / 0.25);
-  }
-
-  html {
-    scroll-behavior: smooth;
-    scroll-padding-top: 5.5rem;
-    -webkit-text-size-adjust: 100%;
-  }
-
-  body {
-    color: var(--color-cream);
-    font-family: var(--font-sans);
-    /* laranja vivo do topo ao rodapé, com variação suave para dar volume */
-    background-color: var(--color-flame);
-    background-image:
-      radial-gradient(120% 70% at 78% 0%, #ff9a3f 0%, transparent 55%),
-      radial-gradient(90% 60% at 5% 40%, #ff7a18 0%, transparent 60%),
-      linear-gradient(180deg, #ff7a18 0%, #f2620c 38%, #e2530b 70%, #d0450a 100%);
-    background-attachment: fixed;
-  }
-
-  ::selection {
-    background: #fff;
-    color: var(--color-ember);
-  }
-
-  :where(a, button, input, textarea, select, [tabindex]):focus-visible {
-    outline: 2px solid #fff;
-    outline-offset: 3px;
-    border-radius: 0.5rem;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    html {
-      scroll-behavior: auto;
-    }
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.001ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.001ms !important;
-    }
-  }
+html {
+  scroll-behavior: smooth;
+  /* Cabecalho fixo nao pode cobrir a secao alvo de uma ancora. */
+  scroll-padding-top: 6rem;
+  -webkit-text-size-adjust: 100%;
 }
 
-/* ──────────────────────────── utilitários ──────────────────────── */
-
-/* vidro branco sobre laranja — a única fonte de "card" do site */
-@utility glass {
-  /* laranja profundo translúcido: mantém a paleta e devolve contraste para o
-     texto branco, que sobre branco-sobre-laranja ficava ilegível */
-  background: linear-gradient(165deg, rgb(255 255 255 / 0.24) 0%, rgb(150 48 8 / 0.46) 100%);
-  backdrop-filter: blur(16px) saturate(1.15);
-  -webkit-backdrop-filter: blur(16px) saturate(1.15);
-  border: 1px solid rgb(255 255 255 / 0.28);
-  box-shadow:
-    0 14px 34px -16px rgb(120 45 5 / 0.55),
-    inset 0 1px 0 0 rgb(255 255 255 / 0.3);
+body {
+  background: #ffffff;
+  color: var(--color-tinta);
+  font-family: var(--font-sans);
+  overscroll-behavior-y: none;
 }
 
-@utility glass-strong {
-  background: rgb(255 255 255 / 0.2);
-  backdrop-filter: blur(24px) saturate(1.2);
-  -webkit-backdrop-filter: blur(24px) saturate(1.2);
-  border: 1px solid rgb(255 255 255 / 0.36);
-  box-shadow: 0 26px 60px -22px rgb(110 40 5 / 0.7);
+h1,
+h2,
+h3,
+.fonte-titulo {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
 }
 
-/* painéis (sacola, modal): fundo laranja sólido para o texto não competir
-   com o conteúdo atrás */
-@utility panel {
-  background: linear-gradient(170deg, #ff8a2b 0%, #ef5c0a 55%, #d8490a 100%);
-  border: 1px solid rgb(255 255 255 / 0.32);
-  box-shadow: 0 30px 70px -20px rgb(90 32 5 / 0.75);
+/* Foco sempre visivel, inclusive na navegacao por teclado. */
+:focus-visible {
+  outline: 3px solid var(--color-laranja);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
 }
 
-/* Realce quente para uma palavra dentro do título. Fica na família do
-   laranja: vai do branco ao dourado claro, sem introduzir outro matiz. */
-@utility text-realce {
-  background: linear-gradient(100deg, #ffffff 0%, #ffd28a 55%, #ffb35c 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-@utility no-scrollbar {
+/* Carrossel horizontal dos cards no celular, sem barra aparente. */
+.rolagem-horizontal {
   scrollbar-width: none;
   -ms-overflow-style: none;
-  &::-webkit-scrollbar {
-    display: none;
+  scroll-snap-type: x mandatory;
+}
+.rolagem-horizontal::-webkit-scrollbar {
+  display: none;
+}
+.rolagem-horizontal > * {
+  scroll-snap-align: start;
+}
+
+/* Onda laranja que separa o hero do resto da pagina, como na referencia. */
+.onda-laranja {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 40' preserveAspectRatio='none'%3E%3Cpath d='M0 40V16c150-16 300 16 450 8s300-32 450-16 300 24 300 24v8z' fill='%23e75c16'/%3E%3C/svg%3E");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
-}
-
-@keyframes mfh-bob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(6px); }
-}
-
-@utility animate-bob {
-  animation: mfh-bob 2.2s ease-in-out infinite;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }

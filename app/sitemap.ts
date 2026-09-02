@@ -1,19 +1,14 @@
-import type { MetadataRoute } from 'next';
-import { business } from '@/lib/business';
+import type { MetadataRoute } from "next";
+
+import { restaurant } from "@/data/restaurant";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
-  return [
-    { url: business.siteUrl, lastModified: now, changeFrequency: 'weekly', priority: 1 },
-    { url: `${business.siteUrl}/#cardapio`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${business.siteUrl}/#sobre`, lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
-    { url: `${business.siteUrl}/#promocoes`, lastModified: now, changeFrequency: 'weekly', priority: 0.6 },
-    { url: `${business.siteUrl}/#contato`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
-    {
-      url: `${business.siteUrl}/politica-de-privacidade`,
-      lastModified: now,
-      changeFrequency: 'yearly',
-      priority: 0.2,
-    },
-  ];
+  const agora = new Date();
+  const rotas = ["", "/cardapio", "/pedido", "/pagamento"];
+  return rotas.map((rota) => ({
+    url: `${restaurant.siteUrl}${rota}`,
+    lastModified: agora,
+    changeFrequency: rota === "" ? ("weekly" as const) : ("monthly" as const),
+    priority: rota === "" ? 1 : 0.8,
+  }));
 }
