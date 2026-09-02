@@ -255,3 +255,30 @@ Duas coisas que valem dizer com todas as letras:
 
 Nenhum termo promete prato que a casa não faz: entram os produtos confirmados,
 as categorias atendidas, a forma de pedir e as cidades.
+
+
+---
+
+## Versões das dependências
+
+O projeto está no máximo que a cadeia do Next 16 aceita hoje. Duas ficaram
+para trás **de propósito**, e vale saber por quê antes de subir:
+
+| Pacote | Em uso | Última | Por que não subiu |
+| --- | --- | --- | --- |
+| `typescript` | 6.0.3 | 7.0.2 | O `typescript-eslint` que vem no `eslint-config-next` 16 exige `<6.1`. Com o TS 7 o `npm run lint` deixa de rodar — trocar o linter por uma versão do compilador não é ganho. |
+| `eslint` | 9 | 10 | O `eslint-plugin-react` embutido no `eslint-config-next` 16 quebra no ESLint 10. |
+
+As duas destravam quando o `eslint-config-next` publicar uma versão com
+`typescript-eslint` e `eslint-plugin-react` mais novos. Até lá, subir qualquer
+uma custa o lint.
+
+### O que a atualização exigiu de mudança no código
+
+- **`lucide-react` 1.x removeu todos os ícones de marca** (decisão de marca
+  registrada). O ícone do Instagram passou a morar em
+  `components/ui/IconeInstagram.tsx`, desenhado no mesmo traço dos demais. O
+  campo `icone` dos menus deixou de ser amarrado ao tipo do lucide e aceita
+  qualquer componente que desenhe um ícone.
+- **`framer-motion` 13 apertou o tipo da curva de animação**: cubic-bezier
+  agora precisa ser uma tupla de quatro números, não um `number[]` solto.

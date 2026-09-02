@@ -1,7 +1,7 @@
+import type { ComponentType } from "react";
 import {
   Clock,
   CreditCard,
-  Instagram,
   MapPin,
   MessageCircle,
   ShoppingBasket,
@@ -17,6 +17,7 @@ import {
 } from "@/data/restaurant";
 import { cidadesAtendidas } from "@/data/deliveryZones";
 import { linkConversa } from "@/lib/whatsapp";
+import { IconeInstagram } from "@/components/ui/IconeInstagram";
 
 /**
  * Informacoes da casa. O que a Marcia ainda nao confirmou aparece como
@@ -76,7 +77,7 @@ export function Informacoes() {
           {paymentMethods.map((forma) => forma.label).join(" · ")}
         </Bloco>
 
-        <Bloco icone={Instagram} termo="Instagram">
+        <Bloco icone={IconeInstagram} termo="Instagram">
           {temInstagram ? (
             <a
               href={`https://instagram.com/${restaurant.instagram}`}
@@ -127,7 +128,7 @@ function Bloco({
   termo,
   children,
 }: {
-  icone: typeof MapPin;
+  icone: ComponentType<{ className?: string }>;
   termo: string;
   children: React.ReactNode;
 }) {

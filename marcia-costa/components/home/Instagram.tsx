@@ -1,8 +1,8 @@
 import Image from "next/image";
-import { Instagram as IconeInstagram } from "lucide-react";
 
 import { restaurant, temInstagram } from "@/data/restaurant";
 import { produtosDisponiveis } from "@/data/menu";
+import { IconeInstagram } from "@/components/ui/IconeInstagram";
 
 /**
  * Feed do Instagram montado com as fotografias que a propria casa enviou.

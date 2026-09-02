@@ -1,18 +1,22 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { BookOpenText, Bike, Heart } from "lucide-react";
 
 import { BotaoLink } from "@/components/ui/Botao";
 import { restaurant } from "@/data/restaurant";
 
-const surgir = {
+// A curva precisa ser uma tupla de quatro numeros: a partir do framer-motion
+// 13 um `number[]` solto nao e aceito como cubic-bezier.
+const CURVA_SUAVE = [0.22, 1, 0.36, 1] as const;
+
+const surgir: Variants = {
   oculto: { opacity: 0, y: 18 },
   visivel: (atraso: number) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, delay: atraso, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.5, delay: atraso, ease: CURVA_SUAVE },
   }),
 };
 

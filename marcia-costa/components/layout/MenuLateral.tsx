@@ -2,13 +2,12 @@
 
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, type ComponentType } from "react";
 import {
   BookOpen,
   Flame,
   Home,
   Info,
-  Instagram,
   Bike,
   MapPin,
   MessageCircle,
@@ -18,11 +17,12 @@ import {
 
 import { restaurant, temInstagram } from "@/data/restaurant";
 import { linkConversa } from "@/lib/whatsapp";
+import { IconeInstagram } from "@/components/ui/IconeInstagram";
 
 type Item = {
   nome: string;
   href: string;
-  icone: typeof Home;
+  icone: ComponentType<{ className?: string }>;
   externo?: boolean;
 };
 
@@ -64,7 +64,7 @@ export function MenuLateral({
     itens.push({
       nome: "Instagram",
       href: `https://instagram.com/${restaurant.instagram}`,
-      icone: Instagram,
+      icone: IconeInstagram,
       externo: true,
     });
   }

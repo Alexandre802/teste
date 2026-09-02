@@ -1,10 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Instagram, MessageCircle } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 
 import { restaurant, temInstagram } from "@/data/restaurant";
 import { cidadesAtendidas } from "@/data/deliveryZones";
 import { linkConversa } from "@/lib/whatsapp";
+import { IconeInstagram } from "@/components/ui/IconeInstagram";
 
 export function Rodape() {
   const conversa = linkConversa();
@@ -64,7 +65,7 @@ export function Rodape() {
                     rel="noopener noreferrer"
                     className="inline-flex min-h-[44px] items-center gap-2 text-sm text-tinta-media hover:text-laranja"
                   >
-                    <Instagram className="h-4 w-4" aria-hidden="true" />
+                    <IconeInstagram className="h-4 w-4" aria-hidden="true" />
                     Instagram
                   </a>
                 </li>
