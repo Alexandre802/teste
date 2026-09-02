@@ -1,118 +1,87 @@
-/**
- * Endereço de entrega.
- *
- * Antes isto era uma string livre em `Customer.address`, que nunca chegava a
- * ser preenchida por nenhuma tela — o pedido saía para a cozinha sem endereço.
- * Aqui o endereço tem campos, validação e um formato único de escrita, para
- * o entregador receber sempre a mesma coisa.
- *
- * Rua, número e bairro são obrigatórios. Complemento, referência e CEP são
- * opcionais: em bairro de casa térrea o complemento não existe, e exigir CEP
- * afasta cliente que não sabe o dele de cor.
- */
+import type { Address } from "@/types";
+import { cidadesAtendidas } from "@/data/deliveryZones";
 
-export interface Endereco {
-  rua: string;
-  numero: string;
-  bairro: string;
-  complemento: string;
-  referencia: string;
-  cep: string;
-}
-
-export const ENDERECO_VAZIO: Endereco = {
-  rua: '',
-  numero: '',
-  bairro: '',
-  complemento: '',
-  referencia: '',
-  cep: '',
+/** Endereco vazio, usado como estado inicial do formulario. */
+export const enderecoVazio: Address = {
+  cep: "",
+  rua: "",
+  numero: "",
+  bairro: "",
+  complemento: "",
+  cidade: "",
+  referencia: "",
 };
 
-export type CampoEndereco = keyof Endereco;
+export type CampoEndereco = keyof Address;
 
-/** Campos sem os quais o entregador não sai. */
-export const CAMPOS_OBRIGATORIOS: CampoEndereco[] = ['rua', 'numero', 'bairro'];
+/** Campos obrigatorios na entrega. Complemento e referencia sao opcionais. */
+export const camposObrigatorios: CampoEndereco[] = [
+  "rua",
+  "numero",
+  "bairro",
+  "cidade",
+];
+
+export const rotulos: Record<CampoEndereco, string> = {
+  cep: "CEP",
+  rua: "Rua",
+  numero: "Número",
+  bairro: "Bairro",
+  complemento: "Complemento",
+  cidade: "Cidade",
+  referencia: "Ponto de referência",
+};
 
 export type ErrosEndereco = Partial<Record<CampoEndereco, string>>;
 
-/** Deixa só os dígitos e formata como 00000-000. Aceita entrada parcial. */
-export function formatarCep(valor: string): string {
-  const d = valor.replace(/\D/g, '').slice(0, 8);
-  return d.length > 5 ? `${d.slice(0, 5)}-${d.slice(5)}` : d;
-}
-
-/**
- * Erros por campo. Devolve objeto vazio quando está tudo certo.
- *
- * As mensagens dizem o que fazer, não o que está errado: "Informe a rua"
- * resolve mais rápido do que "campo obrigatório".
- */
-export function validarEndereco(endereco: Endereco): ErrosEndereco {
+/** Valida o endereco da entrega e devolve uma mensagem amigavel por campo. */
+export function validarEndereco(endereco: Address): ErrosEndereco {
   const erros: ErrosEndereco = {};
-  const rua = endereco.rua.trim();
-  const numero = endereco.numero.trim();
-  const bairro = endereco.bairro.trim();
-  const cep = endereco.cep.replace(/\D/g, '');
 
-  if (!rua) erros.rua = 'Informe a rua ou avenida.';
-  else if (rua.length < 3) erros.rua = 'Nome muito curto — escreva a rua completa.';
+  for (const campo of camposObrigatorios) {
+    if (!endereco[campo].trim()) {
+      erros[campo] = `Preencha ${rotulos[campo].toLocaleLowerCase("pt-BR")}.`;
+    }
+  }
 
-  if (!numero) erros.numero = 'Informe o número. Se não tiver, escreva “s/n”.';
-  else if (numero.length > 12) erros.numero = 'Número muito longo.';
+  const cepDigitos = endereco.cep.replace(/\D/g, "");
+  if (cepDigitos.length > 0 && cepDigitos.length !== 8) {
+    erros.cep = "O CEP tem 8 dígitos.";
+  }
 
-  if (!bairro) erros.bairro = 'Informe o bairro.';
-  else if (bairro.length < 2) erros.bairro = 'Nome muito curto — escreva o bairro completo.';
-
-  // CEP é opcional, mas pela metade não serve para ninguém
-  if (cep && cep.length !== 8) erros.cep = 'O CEP tem 8 dígitos, ou deixe em branco.';
+  if (endereco.cidade && !cidadesAtendidas.includes(endereco.cidade)) {
+    erros.cidade = "No momento entregamos apenas nas cidades da lista.";
+  }
 
   return erros;
 }
 
-export function enderecoValido(endereco: Endereco | null): endereco is Endereco {
-  return endereco !== null && Object.keys(validarEndereco(endereco)).length === 0;
+export function enderecoValido(endereco: Address): boolean {
+  return Object.keys(validarEndereco(endereco)).length === 0;
 }
 
-/** Uma linha só, para caber em resumo e em parâmetro de template do WhatsApp. */
-export function enderecoEmLinha(endereco: Endereco): string {
+/** Endereco em uma linha, para o resumo da tela. */
+export function enderecoEmUmaLinha(endereco: Address): string {
   const partes = [
-    [endereco.rua.trim(), endereco.numero.trim()].filter(Boolean).join(', '),
-    endereco.complemento.trim(),
-    endereco.bairro.trim(),
-  ].filter(Boolean);
-  const cep = endereco.cep.replace(/\D/g, '');
-  if (cep) partes.push(formatarCep(cep));
-  return partes.join(' — ');
+    [endereco.rua, endereco.numero].filter(Boolean).join(", "),
+    endereco.complemento,
+    endereco.bairro,
+    endereco.cidade,
+  ].filter((parte) => parte.trim().length > 0);
+  return partes.join(" - ");
 }
 
-/**
- * Bloco de linhas para a mensagem do WhatsApp.
- *
- * Cada informação em uma linha própria: o entregador lê no celular, em
- * movimento, e endereço em parágrafo corrido é onde se erra número.
- */
-export function enderecoEmLinhas(endereco: Endereco): string[] {
-  const linhas = [`Endereço: ${endereco.rua.trim()}, ${endereco.numero.trim()}`];
-  if (endereco.complemento.trim()) linhas.push(`Complemento: ${endereco.complemento.trim()}`);
-  linhas.push(`Bairro: ${endereco.bairro.trim()}`);
-  const cep = endereco.cep.replace(/\D/g, '');
-  if (cep) linhas.push(`CEP: ${formatarCep(cep)}`);
-  if (endereco.referencia.trim()) linhas.push(`Referência: ${endereco.referencia.trim()}`);
+/** Endereco em varias linhas, do jeito que a cozinha recebe no WhatsApp. */
+export function enderecoEmLinhas(endereco: Address): string[] {
+  const linhas: string[] = [];
+  const rua = [endereco.rua, endereco.numero].filter(Boolean).join(", ");
+  if (rua) linhas.push(rua);
+  if (endereco.complemento.trim()) linhas.push(endereco.complemento.trim());
+  if (endereco.bairro.trim()) linhas.push(endereco.bairro.trim());
+  if (endereco.cidade.trim()) linhas.push(endereco.cidade.trim());
+  if (endereco.cep.trim()) linhas.push(`CEP ${endereco.cep.trim()}`);
+  if (endereco.referencia.trim()) {
+    linhas.push(`Referência: ${endereco.referencia.trim()}`);
+  }
   return linhas;
-}
-
-/** Corta cada campo no tamanho máximo aceito, para o servidor não confiar no navegador. */
-export function sanearEndereco(bruto: Partial<Endereco> | null | undefined): Endereco | null {
-  if (!bruto || typeof bruto !== 'object') return null;
-  const corta = (v: unknown, max: number) => String(v ?? '').trim().slice(0, max);
-  const endereco: Endereco = {
-    rua: corta(bruto.rua, 120),
-    numero: corta(bruto.numero, 12),
-    bairro: corta(bruto.bairro, 80),
-    complemento: corta(bruto.complemento, 80),
-    referencia: corta(bruto.referencia, 120),
-    cep: corta(bruto.cep, 9),
-  };
-  return enderecoValido(endereco) ? endereco : null;
 }

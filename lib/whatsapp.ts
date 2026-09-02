@@ -1,121 +1,115 @@
-import { business, whatsappUrl } from './business';
-import { formatPrice, productsById } from './catalog';
-import { enderecoEmLinha, enderecoEmLinhas, enderecoValido, type Endereco } from './endereco';
-import { pagamentoEmLinhas, type EscolhaPagamento } from './pagamento';
-import { taxaPara } from './entrega';
-import type { CartLine, Customer, FulfillmentMode } from './store';
-import { cartTotal, orderTotal } from './store';
+import type { Order } from "@/types";
+import { restaurant } from "@/data/restaurant";
+import { formatarPreco } from "@/lib/format";
+import { enderecoEmLinhas } from "@/lib/endereco";
 
-export interface OrderMessageInput {
-  lines: CartLine[];
-  mode: FulfillmentMode;
-  customer?: Customer | null;
-  /** Endereço estruturado. Ignorado na retirada. */
-  address?: Endereco | null;
-  /** Forma de pagamento escolhida. */
-  payment?: EscolhaPagamento | null;
-  /** Observação geral do pedido, além das observações por item. */
-  note?: string;
-  /** Só vira `true` depois que o gateway confirmou de fato. */
-  paidOnline?: boolean;
-  /** Identificador do pedido, para a casa referenciar. */
-  reference?: string;
-}
+/** Rotulo de cada forma de pagamento na mensagem que a cozinha recebe. */
+const rotuloPagamento = {
+  pix: "Pix",
+  dinheiro: "Dinheiro",
+  debito: "Cartão de débito",
+  credito: "Cartão de crédito",
+} as const;
+
+const rotuloTipo = {
+  entrega: "Entrega",
+  retirada: "Retirada no balcão",
+} as const;
 
 /**
- * Monta a mensagem do pedido, usada pelo deeplink wa.me e pelo aviso
- * automático que o servidor manda para a casa.
- *
- * A ordem das linhas é fixa e pensada para quem lê no celular, em pé, na
- * cozinha: primeiro o que produzir, depois quanto cobrar, depois para onde
- * vai e como paga. Endereço em linhas separadas porque é onde se erra número.
+ * Monta a mensagem do pedido. Funcao pura: recebe o pedido e devolve texto.
+ * Quando a taxa de entrega ainda nao foi confirmada pela casa, a mensagem diz
+ * "a combinar" em vez de mostrar um valor que ninguem confirmou.
  */
-export function buildOrderMessage({
-  lines,
-  mode,
-  customer,
-  address,
-  payment,
-  note,
-  paidOnline = false,
-  reference,
-}: OrderMessageInput): string {
-  const entrega = mode === 'entrega';
-  const subtotal = cartTotal(lines);
-  const total = orderTotal(lines, mode);
-  const taxa = entrega ? taxaPara(subtotal) : null;
+export function montarMensagem(pedido: Order): string {
+  const linhas: string[] = [];
 
-  const partes: string[] = [
-    `Olá! Gostaria de fazer um pedido na ${business.name}.`,
-    '',
-    'Pedido:',
-  ];
+  linhas.push(
+    `Olá! Gostaria de fazer um pedido na ${restaurant.name} 🍽️`,
+    "",
+    "*PEDIDO*",
+    "",
+  );
 
-  for (const line of lines) {
-    const product = productsById.get(line.productId);
-    if (!product) continue;
-    partes.push(`${line.qty}x ${product.name} — ${formatPrice(product.price * line.qty)}`);
-    if (line.note.trim()) partes.push(`   obs: ${line.note.trim()}`);
-  }
-
-  partes.push('');
-
-  // A linha da taxa só aparece quando a casa configurou uma. Sem valor
-  // confirmado, o cliente vê só o total dos itens — nunca um frete inventado.
-  if (taxa !== null) {
-    partes.push(`Subtotal: ${formatPrice(subtotal)}`);
-    partes.push(taxa === 0 ? 'Entrega: grátis' : `Taxa de entrega: ${formatPrice(taxa)}`);
-  }
-  partes.push(`Total: ${formatPrice(total)}`);
-
-  partes.push('', `Tipo: ${entrega ? 'Entrega' : 'Retirada'}`);
-
-  if (customer?.name) partes.push(`Cliente: ${customer.name}`);
-  if (customer?.phone) partes.push(`Telefone: ${formatarTelefone(customer.phone)}`);
-
-  if (entrega) {
-    if (address && enderecoValido(address)) {
-      partes.push(...enderecoEmLinhas(address));
-    } else if (customer?.address?.trim()) {
-      // pedido antigo, gravado antes do endereço ter campos
-      partes.push(`Endereço: ${customer.address.trim()}`);
+  for (const item of pedido.items) {
+    linhas.push(
+      `${item.quantity}x ${item.name} — ${formatarPreco(item.unitPrice * item.quantity)}`,
+    );
+    for (const opcao of item.selectedOptions) {
+      if (opcao.choiceNames.length === 0) continue;
+      linhas.push(`   ${opcao.optionName}: ${opcao.choiceNames.join(", ")}`);
     }
-  } else {
-    partes.push('Retirada no local — sem endereço de entrega.');
+    if (item.observation) {
+      linhas.push(`   Obs.: ${item.observation}`);
+    }
   }
 
-  if (payment) partes.push(...pagamentoEmLinhas(payment, total, paidOnline));
+  linhas.push("", `Subtotal: ${formatarPreco(pedido.subtotal)}`);
 
-  if (note?.trim()) partes.push('', `Observações: ${note.trim()}`);
-  if (reference) partes.push('', `Pedido nº ${reference}`);
+  if (pedido.orderType === "entrega") {
+    linhas.push(
+      pedido.deliveryFee === null
+        ? "Entrega: a combinar"
+        : `Entrega: ${formatarPreco(pedido.deliveryFee)}`,
+    );
+  }
 
-  return partes.join('\n');
-}
+  linhas.push("", `*TOTAL: ${formatarPreco(pedido.total)}*`);
 
-/** Link wa.me pronto, com a mensagem já codificada. */
-export function orderWhatsappUrl(input: OrderMessageInput): string {
-  return whatsappUrl(buildOrderMessage(input));
+  if (pedido.orderType === "entrega" && pedido.deliveryFee === null) {
+    linhas.push("(total sem a taxa de entrega, que ainda vamos combinar)");
+  }
+
+  if (pedido.customer.nome.trim()) {
+    linhas.push("", "*Cliente:*", pedido.customer.nome.trim());
+    if (pedido.customer.telefone.trim()) {
+      linhas.push(pedido.customer.telefone.trim());
+    }
+  }
+
+  if (pedido.orderType) {
+    linhas.push("", "*Tipo:*", rotuloTipo[pedido.orderType]);
+  }
+
+  if (pedido.orderType === "entrega") {
+    const endereco = enderecoEmLinhas(pedido.address);
+    if (endereco.length > 0) {
+      linhas.push("", "*Endereço:*", ...endereco);
+    }
+  }
+
+  if (pedido.payment) {
+    linhas.push("", "*Pagamento:*", rotuloPagamento[pedido.payment]);
+    if (pedido.payment === "dinheiro") {
+      if (pedido.precisaTroco && pedido.trocoPara.trim()) {
+        linhas.push(`Troco para ${pedido.trocoPara.trim()}`);
+      } else if (!pedido.precisaTroco) {
+        linhas.push("Não precisa de troco");
+      }
+    }
+  }
+
+  if (pedido.observation.trim()) {
+    linhas.push("", "*Observação:*", pedido.observation.trim());
+  }
+
+  return linhas.join("\n");
 }
 
 /**
- * Resumo do destino em uma linha, para parâmetro de template do WhatsApp —
- * que não aceita quebra de linha.
+ * Link wa.me pronto. Devolve null quando o numero da casa ainda nao foi
+ * cadastrado -- a tela entao explica isso em vez de abrir um link quebrado.
  */
-export function destinoEmLinha(
-  mode: FulfillmentMode,
-  customer?: Customer | null,
-  address?: Endereco | null,
-): string {
-  if (mode !== 'entrega') return 'Retirada no local';
-  if (address && enderecoValido(address)) return enderecoEmLinha(address);
-  if (customer?.address?.trim()) return customer.address.trim();
-  return 'endereço não informado';
+export function linkWhatsapp(pedido: Order): string | null {
+  const numero = restaurant.whatsapp.replace(/\D/g, "");
+  if (numero.length < 12) return null;
+  return `https://wa.me/${numero}?text=${encodeURIComponent(montarMensagem(pedido))}`;
 }
 
-/** (12) 98844-7711 a partir de dígitos soltos. Devolve o original se não reconhecer. */
-export function formatarTelefone(bruto: string): string {
-  const d = bruto.replace(/\D/g, '').replace(/^55/, '');
-  if (d.length === 11) return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
-  if (d.length === 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
-  return bruto;
+/** Link de conversa simples, sem pedido. null se nao houver numero. */
+export function linkConversa(texto?: string): string | null {
+  const numero = restaurant.whatsapp.replace(/\D/g, "");
+  if (numero.length < 12) return null;
+  const base = `https://wa.me/${numero}`;
+  return texto ? `${base}?text=${encodeURIComponent(texto)}` : base;
 }

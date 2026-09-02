@@ -1,21 +1,20 @@
 {
-  "name": "michel-food-house",
-  "version": "1.0.0",
+  "name": "comida-caseira-marcia-costa",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/checar-config-vercel.cjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "checar-config": "node scripts/checar-config-vercel.cjs --exigir",
     "typecheck": "tsc --noEmit",
+    "imagens": "python3 scripts/extrair-imagens.py",
     "pretest:e2e": "next build",
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.120.0",
     "framer-motion": "^11.15.0",
+    "lucide-react": "^0.468.0",
     "next": "^16.3.2",
     "react": "19.0.0",
     "react-dom": "19.0.0",
