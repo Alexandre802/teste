@@ -1,18 +1,12 @@
 /**
- * Ficha da casa. TODO dado comercial do site sai daqui -- nada de endereco,
- * telefone ou horario escrito dentro de componente.
- *
- * O que ainda nao foi confirmado pela Marcia fica como string vazia ou null.
- * O site nunca preenche o buraco com suposicao: a tela mostra
- * "Informacao a cadastrar" e o recurso que depende do dado fica desativado.
+ * Dados comerciais confirmados na fonte pública oficial da Comida Caseira da
+ * Márcia Costa (InstaDelivery). Variáveis de ambiente ainda podem sobrescrever
+ * os canais quando a casa desejar trocar algum dado sem novo deploy.
  */
-
 const env = (chave: string) => (process.env[chave] ?? "").trim();
 
 export type OpeningHour = {
-  /** Rotulo do dia ou faixa de dias, por exemplo "Segunda a sexta". */
   dias: string;
-  /** Horario ja formatado, por exemplo "11h as 15h". Vazio = nao confirmado. */
   horario: string;
 };
 
@@ -21,23 +15,21 @@ export const restaurant = {
   shortName: "Comida Caseira",
   tagline: "Sabor de comida caseira de verdade",
   description:
-    "Marmitas frescas, preparadas todos os dias com ingredientes selecionados e muito amor.",
-
+    "Marmitas frescas e saborosas, com pedidos para entrega ou retirada.",
   logo: "/images/brand/logo.png",
 
-  /**
-   * So digitos, com DDI e DDD. Vem de NEXT_PUBLIC_WHATSAPP.
-   * Enquanto estiver vazio, o botao de enviar pedido nao finge que funciona:
-   * ele explica que o numero ainda nao foi cadastrado e oferece copiar a
-   * mensagem pronta.
-   */
-  whatsapp: env("NEXT_PUBLIC_WHATSAPP"),
-
-  /** Perfil do Instagram sem @. Vazio = secao some do site. */
+  whatsapp: env("NEXT_PUBLIC_WHATSAPP") || "5512996011026",
+  phone: "5512981892680",
   instagram: env("NEXT_PUBLIC_INSTAGRAM"),
 
-  /** Endereco da cozinha, usado tambem na retirada. Vazio = a cadastrar. */
-  address: env("NEXT_PUBLIC_ENDERECO"),
+  /**
+   * Endereco da cozinha, usado tambem na retirada. O valor padrao veio da
+   * pagina oficial da casa no InstaDelivery; a variavel de ambiente continua
+   * podendo sobrescrever sem mexer no codigo.
+   */
+  address:
+    env("NEXT_PUBLIC_ENDERECO") ||
+    "Av. Augusto Rodrigues, 511 - Jardim Maria Amelia, Jacareí - SP",
 
   /**
    * Chave do Google Maps Embed API. Sem ela o site nao mostra mapa embutido:
@@ -55,28 +47,36 @@ export const restaurant = {
 
   /** Cidades atendidas, confirmadas nas pecas da propria casa. */
   cities: ["Jacareí - SP", "São José dos Campos - SP"] as const,
-
-  /**
-   * Horarios. Nenhum horario foi confirmado ate agora, entao a lista esta
-   * vazia e a secao Informacoes mostra "Informacao a cadastrar".
-   * Para publicar, preencha assim:
-   *   { dias: "Segunda a sábado", horario: "11h às 15h" }
-   */
-  openingHours: [] as OpeningHour[],
-
-  /** Links de marketplace. Vazio = o link some da tela. */
-  instadelivery: env("NEXT_PUBLIC_INSTADELIVERY"),
+  openingHours: [
+    { dias: "Todos os dias", horario: "08:30 às 15:00" },
+    { dias: "Domingo a quinta", horario: "16:00 às 23:00" },
+    { dias: "Sexta e sábado", horario: "16:00 às 23:30" },
+  ] as OpeningHour[],
+  instadelivery:
+    env("NEXT_PUBLIC_INSTADELIVERY") ||
+    "https://instadelivery.com.br/comidacaseiradamarciacosta",
   ifood: env("NEXT_PUBLIC_IFOOD"),
-
   siteUrl: env("NEXT_PUBLIC_SITE_URL") || "http://localhost:3000",
+  retiradaDisponivel: true,
+  tempoEstimadoMinutos: 30,
 } as const;
 
-/** Formas de pagamento aceitas na entrega/retirada. */
+/** Métodos confirmados no cardápio original. O checkout próprio usa os quatro
+ * tipos já suportados pelo fluxo financeiro; vale-refeição/alimentação fica
+ * documentado em acceptedPaymentLabels até o caixa ganhar esse enum. */
 export const paymentMethods = [
   { id: "pix", label: "Pix", icon: "QrCode" },
   { id: "dinheiro", label: "Dinheiro", icon: "Banknote" },
   { id: "debito", label: "Débito", icon: "CreditCard" },
   { id: "credito", label: "Crédito", icon: "CreditCard" },
+] as const;
+
+export const acceptedPaymentLabels = [
+  "Dinheiro",
+  "PIX (chave exibida após o envio)",
+  "Cartão de Débito - Maquininha",
+  "Cartão de Crédito - Maquininha",
+  "Vale Refeição / Alimentação",
 ] as const;
 
 export const temWhatsapp = restaurant.whatsapp.length >= 12;
@@ -85,5 +85,4 @@ export const temEndereco = restaurant.address.length > 0;
 export const temMapa = temEndereco && restaurant.googleMapsKey.length > 0;
 export const temLinkDeAvaliacao = restaurant.googleAvaliacoes.length > 0;
 export const temHorarios = restaurant.openingHours.length > 0;
-
 export const INFORMACAO_A_CADASTRAR = "Informação a cadastrar";

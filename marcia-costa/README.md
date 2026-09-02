@@ -32,7 +32,8 @@ atualizar o site, mexa só nestes três arquivos:
 
 | Arquivo | O que guarda |
 | --- | --- |
-| `data/menu.ts` | Produtos, preços, descrições, fotos, categorias e opções |
+| `data/menu-original.json` | O cardápio oficial, como veio da fonte pública da casa |
+| `data/menu.ts` | Tipa e expõe o JSON acima para a interface |
 | `data/restaurant.ts` | Nome, logo, WhatsApp, Instagram, endereço, horários, links |
 | `data/deliveryZones.ts` | Cidades atendidas, taxa, pedido mínimo e prazo |
 
@@ -44,19 +45,17 @@ O site **não inventa dado que a casa não confirmou**. Enquanto faltar, a tela
 mostra "Informação a cadastrar" e o recurso que depende do dado fica desligado,
 com aviso honesto. O que está pendente hoje:
 
-- **Número do WhatsApp** (`NEXT_PUBLIC_WHATSAPP`). Sem ele o botão de enviar não
-  aparece: no lugar entra "Copiar mensagem do pedido", que copia o texto pronto.
-- **Endereço da cozinha** (`NEXT_PUBLIC_ENDERECO`).
+- **Instagram** e **chave do Google Maps** — sem elas o feed some e o mapa vira
+  o endereço com um botão que abre o aplicativo.
 - **Instagram** (`NEXT_PUBLIC_INSTAGRAM`). Sem perfil, a seção de feed some.
 - **Horários** (`restaurant.openingHours`, hoje uma lista vazia).
 - **Taxa de entrega, pedido mínimo e prazo** (`data/deliveryZones.ts`, hoje
   `null`). Enquanto forem `null`, o resumo escreve "a combinar no WhatsApp" e o
   total soma apenas o subtotal.
-- **Preços e descrições do cardápio.** Os itens de `data/menu.ts` foram
-  transcritos das telas de referência enviadas pela casa e estão marcados com
-  `confirmado: false`. Enquanto houver item assim, o cardápio exibe um aviso de
-  "cardápio em conferência". Depois de confirmar cada item, troque para
-  `confirmado: true` e o aviso some sozinho.
+- **Açaí e lanches.** O cardápio oficial da casa no InstaDelivery publica
+  apenas `MARMITEX IRRESISTÍVEL` e `BEBIDAS`. Açaí e lanches apareciam nas
+  telas de referência do começo do projeto, mas **não estão na fonte** — veja
+  `README-CARDAPIO.md`. Enquanto não forem confirmados, o site não os anuncia.
 
 Copie `.env.example` para `.env.local` e preencha o que já estiver confirmado.
 Nenhuma dessas variáveis é segredo — são dados públicos exibidos no próprio

@@ -11,7 +11,7 @@ import { palavrasChave } from "@/data/palavras-chave";
 import { avaliacoes, mediaDasNotas } from "@/data/avaliacoes";
 
 const descricao =
-  "Marmitas frescas, comida caseira, lanches e açaí com entrega em " +
+  "Marmitex de comida caseira feito na hora, com bebida gelada e entrega em " +
   cidadesAtendidas.join(" e ") +
   ". Monte seu pedido e envie pelo WhatsApp.";
 

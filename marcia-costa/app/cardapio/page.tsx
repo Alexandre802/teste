@@ -8,7 +8,7 @@ import { BarraPedido } from "@/components/cart/BarraPedido";
 export const metadata: Metadata = {
   title: "Cardápio",
   description:
-    "Marmitas, lanches e açaí da Comida Caseira da Márcia Costa. Escolha os itens e monte seu pedido.",
+    "Marmitex e bebidas da Comida Caseira da Márcia Costa. Escolha o tamanho, os acompanhamentos e monte seu pedido.",
 };
 
 export default function PaginaCardapio() {

@@ -1,14 +1,39 @@
 import { expect, test } from "@playwright/test";
 
-import { produtosDisponiveis } from "../data/menu";
+import { categoriasComProduto, produtosDisponiveis } from "../data/menu";
 import { formatarPreco } from "../lib/format";
 
-const primeiro = produtosDisponiveis()[0];
-const segundo = produtosDisponiveis()[1];
+/**
+ * O cardápio oficial tem duas formas de item, e os testes precisam das duas:
+ *  - marmitex, com grupo de tamanho OBRIGATÓRIO: o "+" abre a folha;
+ *  - bebida, sem opção nenhuma: o "+" soma direto.
+ */
+const semOpcaoObrigatoria = produtosDisponiveis().filter(
+  (produto) => !(produto.options ?? []).some((grupo) => grupo.required),
+);
+const comOpcaoObrigatoria = produtosDisponiveis().filter((produto) =>
+  (produto.options ?? []).some((grupo) => grupo.required),
+);
+
+const primeiro = semOpcaoObrigatoria[0];
+const segundo = semOpcaoObrigatoria[1];
+const comOpcoes = comOpcaoObrigatoria[0];
 
 /** Card do produto no cardapio, pelo nome. */
 function cartao(pagina: import("@playwright/test").Page, nome: string) {
   return pagina.getByRole("listitem").filter({ hasText: nome }).first();
+}
+
+/** O cardapio abre na primeira categoria; isto leva ate a do produto. */
+async function irParaCategoriaDe(
+  pagina: import("@playwright/test").Page,
+  nomeDoProduto: string,
+) {
+  const produto = produtosDisponiveis().find((item) => item.name === nomeDoProduto);
+  if (!produto) throw new Error(`Produto nao encontrado: ${nomeDoProduto}`);
+  const categoria = categoriasComProduto().find((c) => c.id === produto.category);
+  if (!categoria) throw new Error(`Categoria nao encontrada: ${produto.category}`);
+  await pagina.getByRole("tab", { name: categoria.name }).click();
 }
 
 test.describe("home", () => {
@@ -52,6 +77,8 @@ test.describe("cardapio e carrinho", () => {
   test("adiciona, soma, diminui e o carrinho sobrevive ao reload", async ({ page }) => {
     await page.goto("/cardapio");
 
+    await irParaCategoriaDe(page, primeiro.name);
+
     await cartao(page, primeiro.name)
       .getByRole("button", { name: `Adicionar ${primeiro.name} ao pedido` })
       .click();
@@ -67,9 +94,11 @@ test.describe("cardapio e carrinho", () => {
       .click();
     await expect(page.getByText("2 itens · subtotal")).toBeVisible();
 
-    // O carrinho continua depois de recarregar.
+    // O carrinho continua depois de recarregar. A aba, não: o cardápio volta
+    // para a primeira categoria, então navegamos de novo até o produto.
     await page.reload();
     await expect(page.getByText("2 itens · subtotal")).toBeVisible();
+    await irParaCategoriaDe(page, primeiro.name);
 
     // Diminui de volta para 1.
     await cartao(page, primeiro.name)
@@ -80,6 +109,7 @@ test.describe("cardapio e carrinho", () => {
 
   test("quantidade nunca fica negativa: some do carrinho no zero", async ({ page }) => {
     await page.goto("/cardapio");
+    await irParaCategoriaDe(page, primeiro.name);
     await cartao(page, primeiro.name)
       .getByRole("button", { name: `Adicionar ${primeiro.name} ao pedido` })
       .click();
@@ -97,6 +127,7 @@ test.describe("cardapio e carrinho", () => {
 
   test("a folha do produto fecha pelo X, por fora e pelo Esc", async ({ page }) => {
     await page.goto("/cardapio");
+    await irParaCategoriaDe(page, primeiro.name);
 
     const abrir = () =>
       cartao(page, primeiro.name)
@@ -116,13 +147,17 @@ test.describe("cardapio e carrinho", () => {
 
     await abrir();
     await expect(folha).toBeVisible();
-    // Toque fora da folha.
-    await page.getByRole("button", { name: "Fechar tocando fora" }).click();
+    // Toque fora da folha. No desktop o painel fica centrado e cobre o meio do
+    // fundo, então miramos um canto — que é onde alguém realmente clicaria.
+    await page
+      .getByRole("button", { name: "Fechar tocando fora" })
+      .click({ position: { x: 8, y: 8 } });
     await expect(folha).toHaveCount(0);
   });
 
   test("a folha soma a quantidade escolhida", async ({ page }) => {
     await page.goto("/cardapio");
+    await irParaCategoriaDe(page, primeiro.name);
     await cartao(page, primeiro.name)
       .getByRole("button", { name: `Ver detalhes de ${primeiro.name}` })
       .click();
@@ -132,6 +167,45 @@ test.describe("cardapio e carrinho", () => {
 
     await expect(page.getByRole("dialog")).toHaveCount(0);
     await expect(page.getByText("2 itens · subtotal")).toBeVisible();
+  });
+
+  test("produto com tamanho obrigatorio nao entra sem a escolha", async ({
+    page,
+  }) => {
+    test.skip(!comOpcoes, "nenhum produto do cardápio tem opção obrigatória");
+    await page.goto("/cardapio");
+    await irParaCategoriaDe(page, comOpcoes.name);
+
+    // O "+" desse item abre a folha em vez de somar direto.
+    await cartao(page, comOpcoes.name)
+      .getByRole("button", { name: `Escolher opções de ${comOpcoes.name}` })
+      .click();
+
+    const folha = page.getByRole("dialog");
+    await expect(folha).toBeVisible();
+
+    // Tentar adicionar sem escolher o tamanho tem de ser recusado.
+    await folha.getByRole("button", { name: /Adicionar ao pedido/ }).click();
+    await expect(folha.getByRole("alert")).toContainText(/Escolha uma opção/);
+    await expect(page.getByRole("link", { name: /Continuar pedido/ })).toHaveCount(0);
+
+    // Com o tamanho escolhido, entra.
+    await folha.getByRole("radio").first().check();
+    await folha.getByRole("button", { name: /Adicionar ao pedido/ }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(page.getByText("1 item · subtotal")).toBeVisible();
+  });
+
+  test("preço \"a partir de\" aparece marcado como tal", async ({ page }) => {
+    test.skip(!comOpcoes, "nenhum produto do cardápio usa preço a partir de");
+    await page.goto("/cardapio");
+    await irParaCategoriaDe(page, comOpcoes.name);
+
+    const linha = cartao(page, comOpcoes.name);
+    if (comOpcoes.priceFrom) {
+      // Mostrar só "R$ 21,00" faria o cliente ler como preço final.
+      await expect(linha.getByText("a partir de")).toBeVisible();
+    }
   });
 
   test("so aparece categoria que tem produto", async ({ page }) => {
@@ -150,6 +224,7 @@ test.describe("cardapio e carrinho", () => {
 test.describe("pedido e pagamento", () => {
   async function montarPedido(page: import("@playwright/test").Page) {
     await page.goto("/cardapio");
+    await irParaCategoriaDe(page, primeiro.name);
     await cartao(page, primeiro.name)
       .getByRole("button", { name: `Adicionar ${primeiro.name} ao pedido` })
       .click();
@@ -259,6 +334,7 @@ test.describe("pedido e pagamento", () => {
 test.describe("mensagem do WhatsApp", () => {
   test("monta o texto exato do pedido na entrega", async ({ page }) => {
     await page.goto("/cardapio");
+    await irParaCategoriaDe(page, primeiro.name);
     await cartao(page, primeiro.name)
       .getByRole("button", { name: `Adicionar ${primeiro.name} ao pedido` })
       .click();
@@ -294,6 +370,7 @@ test.describe("mensagem do WhatsApp", () => {
 
   test("na retirada nao vai endereco nenhum na mensagem", async ({ page }) => {
     await page.goto("/cardapio");
+    await irParaCategoriaDe(page, primeiro.name);
     await cartao(page, primeiro.name)
       .getByRole("button", { name: `Adicionar ${primeiro.name} ao pedido` })
       .click();
@@ -314,8 +391,11 @@ test.describe("mensagem do WhatsApp", () => {
     await expect(mensagem).not.toContainText("Entrega:");
   });
 
-  test("sem numero cadastrado o site nao finge que envia", async ({ page }) => {
+  test("com o número da casa cadastrado, o envio pelo WhatsApp aparece", async ({
+    page,
+  }) => {
     await page.goto("/cardapio");
+    await irParaCategoriaDe(page, primeiro.name);
     await cartao(page, primeiro.name)
       .getByRole("button", { name: `Adicionar ${primeiro.name} ao pedido` })
       .click();
@@ -323,15 +403,18 @@ test.describe("mensagem do WhatsApp", () => {
     await page.getByRole("radio", { name: "Retirada" }).click({ force: true });
     await page.getByRole("link", { name: /Ir para o pagamento/ }).click();
 
-    await expect(
-      page.getByText(/O número de WhatsApp da casa ainda não foi cadastrado/),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: "Copiar mensagem do pedido" }),
-    ).toBeVisible();
+    // Com número cadastrado o site oferece o envio, e não o fallback de copiar.
     await expect(
       page.getByRole("button", { name: "Enviar pedido no WhatsApp" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(/O número de WhatsApp da casa ainda não foi cadastrado/),
     ).toHaveCount(0);
+
+    // E não envia pedido incompleto: falta nome e forma de pagamento.
+    await page.getByRole("button", { name: "Enviar pedido no WhatsApp" }).click();
+    await expect(page.getByText("Informe seu nome.")).toBeVisible();
+    await expect(page.getByText("Escolha a forma de pagamento.")).toBeVisible();
   });
 });
 

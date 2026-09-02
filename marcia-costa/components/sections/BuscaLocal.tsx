@@ -25,12 +25,13 @@ export function BuscaLocal() {
           O que entregamos, e onde
         </p>
         <h2 className="fonte-titulo mt-1 text-2xl font-extrabold text-tinta sm:text-3xl">
-          Comida caseira, lanches e açaí no Vale do Paraíba
+          Marmitex de comida caseira no Vale do Paraíba
         </h2>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-tinta-media">
-          Se você procura marmita fresca, lanche feito na hora ou açaí para
-          entrega em Jacareí e São José dos Campos, é isso que a Comida Caseira
-          da Márcia Costa prepara todos os dias.
+          Se você procura marmitex feito na hora, com bife, frango ou omelete,
+          arroz, feijão e acompanhamentos, para entrega em Jacareí e São José
+          dos Campos, é isso que a Comida Caseira da Márcia Costa prepara todos
+          os dias.
         </p>
 
         <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

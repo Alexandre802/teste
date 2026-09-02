@@ -40,7 +40,7 @@ export function ResumoPedido() {
     return (
       <EstadoVazio
         titulo="Seu pedido está vazio"
-        descricao="Escolha suas marmitas, lanches e bebidas no cardápio para continuar."
+        descricao="Escolha seu marmitex e as bebidas no cardápio para continuar."
         acao={<BotaoLink href="/cardapio">Ver cardápio</BotaoLink>}
       />
     );

@@ -1,0 +1,334 @@
+{
+  "source": "https://instadelivery.com.br/comidacaseiradamarciacosta",
+  "syncedAt": "2026-09-02",
+  "categories": [
+    { "id": "marmitex-irresistivel", "name": "MARMITEX IRRESISTÍVEL", "icon": "Utensils" },
+    { "id": "bebidas", "name": "BEBIDAS", "icon": "CupSoda" }
+  ],
+  "products": [
+    {
+      "id": "5030162",
+      "name": "Bife a Cavalo",
+      "description": "Delicie-se com nosso 'Marmitex Irresistível', uma experiência gastronômica inigualável. Apresentamos o Bife à Cavalo, impecavelmente suculento, meticulosamente temperado na medida exata, coroado com um ovo frito, dourado e perfeitamente preparado. O prato é harmonizado com arroz branco, sempre soltinho, e feijão fresco, cozido lentamente para liberar todo o seu sabor. Além disso, oferecemos a opção de personalizar ainda mais sua refeição com dois acompanhamentos à sua escolha, para tornar sua experiência conosco ainda mais memorável e saborosa.",
+      "price": 21,
+      "priceFrom": true,
+      "image": "https://static-images.ifood.com.br/pratos/cf125379-d5c7-4894-b305-951157ea0502/202503010837_H5R5_i.jpg",
+      "category": "marmitex-irresistivel",
+      "featured": true,
+      "available": true,
+      "confirmado": true,
+      "options": [
+        {
+          "id": "5030162:1155279",
+          "name": "Escolha seu Tamanho!",
+          "type": "single",
+          "required": true,
+          "max": 1,
+          "choices": [
+            { "id": "5030162:9462417", "name": "Tamanho P", "priceDelta": 0, "available": true },
+            { "id": "5030162:9462418", "name": "Tamanho M", "priceDelta": 2, "available": true },
+            { "id": "5030162:9462419", "name": "Tamanho G", "priceDelta": 5, "available": true }
+          ]
+        },
+        {
+          "id": "5030162:1162832",
+          "name": "Acompanhamentos",
+          "type": "multiple",
+          "required": false,
+          "max": 2,
+          "choices": [
+            { "id": "5030162:10587628", "name": "Batata Rústica", "priceDelta": 0, "available": true },
+            { "id": "5030162:10635103", "name": "Farofa", "priceDelta": 0, "available": true }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5030182",
+      "name": "Bife Acebolado",
+      "description": "Descubra o prazer de saborear nosso 'Bife Acebolado - Pequena', um destaque em nossa categoria 'Marmitex Irresistível'. Este prato inclui um bife suculento e irresistivelmente temperado, coberto com cebolas cuidadosamente douradas para realçar seu sabor. Acompanha uma generosa porção de arroz fresco e feijão, ambos habilmente preparados e cheios de sabor. Além disso, oferecemos ainda dois acompanhamentos adicionais, que adicionam um toque especial a esta refeição. Uma opção perfeitamente equilibrada e deliciosa para satisfazer o seu apetite!",
+      "price": 21,
+      "priceFrom": true,
+      "image": "https://static-images.ifood.com.br/pratos/cf125379-d5c7-4894-b305-951157ea0502/202502281028_CN7L_i.jpg",
+      "category": "marmitex-irresistivel",
+      "featured": true,
+      "available": true,
+      "confirmado": true,
+      "options": [
+        {
+          "id": "5030182:1155281",
+          "name": "Escolha seu Tamanho!",
+          "type": "single",
+          "required": true,
+          "max": 1,
+          "choices": [
+            { "id": "5030182:9462423", "name": "Tamanho P", "priceDelta": 0, "available": true },
+            { "id": "5030182:9462424", "name": "Tamanho M", "priceDelta": 2, "available": true },
+            { "id": "5030182:9462425", "name": "Tamanho G", "priceDelta": 5, "available": true }
+          ]
+        },
+        {
+          "id": "5030182:1162832",
+          "name": "Acompanhamentos",
+          "type": "multiple",
+          "required": false,
+          "max": 2,
+          "choices": [
+            { "id": "5030182:10587628", "name": "Batata Rústica", "priceDelta": 0, "available": true },
+            { "id": "5030182:10635103", "name": "Farofa", "priceDelta": 0, "available": true }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5030282",
+      "name": "Filé de Frango Grelhado",
+      "description": "Filé de frango grelhado na chapa, suculento e saboroso, servido com arroz soltinho, feijão e dois acompanhamentos do dia. Uma refeição completa e deliciosa!",
+      "price": 18,
+      "priceFrom": true,
+      "image": "https://static-images.ifood.com.br/pratos/cf125379-d5c7-4894-b305-951157ea0502/202507080906_55TL_i.jpg",
+      "category": "marmitex-irresistivel",
+      "featured": true,
+      "available": true,
+      "confirmado": true,
+      "options": [
+        {
+          "id": "5030282:1155313",
+          "name": "Escolha seu Tamanho!",
+          "type": "single",
+          "required": true,
+          "max": 1,
+          "choices": [
+            { "id": "5030282:9462571", "name": "Tamanho P", "priceDelta": 0, "available": true },
+            { "id": "5030282:9462572", "name": "Tamanho M", "priceDelta": 2, "available": true },
+            { "id": "5030282:9462573", "name": "Tamanho G", "priceDelta": 5, "available": true }
+          ]
+        },
+        {
+          "id": "5030282:1162832",
+          "name": "Acompanhamentos",
+          "type": "multiple",
+          "required": false,
+          "max": 2,
+          "choices": [
+            { "id": "5030282:10587628", "name": "Batata Rústica", "priceDelta": 0, "available": true },
+            { "id": "5030282:10635103", "name": "Farofa", "priceDelta": 0, "available": true }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5030174",
+      "name": "Filé de Frango Parmegiana",
+      "description": "Desfrute do nosso irresistível 'Filé de Frango à Parmegiana - Pequena'. Este prato é meticulosamente preparado com um suculento filé de frango, gratinado com um autêntico molho de tomate caseiro e finalizado com generosa camada de queijo derretido e borbulhante. Acompanha perfeitamente temperado arroz, feijão cremoso e mais dois complementos cuidadosamente selecionados. Esta é a essência da nossa categoria 'Marmitex Irresistível', que promete satisfazer seu paladar com uma experiência culinária memorável. Imperdível!",
+      "price": 18,
+      "priceFrom": true,
+      "image": "https://static-images.ifood.com.br/pratos/cf125379-d5c7-4894-b305-951157ea0502/202502261342_QOIH_i.jpg",
+      "category": "marmitex-irresistivel",
+      "featured": true,
+      "available": true,
+      "confirmado": true,
+      "options": [
+        {
+          "id": "5030174:1155315",
+          "name": "Escolha seu Tamanho!",
+          "type": "single",
+          "required": true,
+          "max": 1,
+          "choices": [
+            { "id": "5030174:9462577", "name": "Tamanho P", "priceDelta": 0, "available": true },
+            { "id": "5030174:9462578", "name": "Tamanho M", "priceDelta": 2, "available": true },
+            { "id": "5030174:9462579", "name": "Tamanho G", "priceDelta": 5, "available": true }
+          ]
+        },
+        {
+          "id": "5030174:1162832",
+          "name": "Acompanhamentos",
+          "type": "multiple",
+          "required": false,
+          "max": 2,
+          "choices": [
+            { "id": "5030174:10587628", "name": "Batata Rústica", "priceDelta": 0, "available": true },
+            { "id": "5030174:10635103", "name": "Farofa", "priceDelta": 0, "available": true }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5030171",
+      "name": "Filé de Frango Milanesa",
+      "description": "Desfrute do nosso irresistível 'Filé de Frango à Milanesa - Pequena', cuidadosamente empanado para garantir uma crocância perfeita, contrastando com o interior suculento e repleto de sabor. Acompanha ainda o clássico e amado duo brasileiro, um arroz soltinho e um feijão temperado à perfeição. Para finalizar, oferecemos dois acompanhamentos extras que irão agregar ainda mais ao seu prato. Tudo feito com amor e ingredientes de alta qualidade, especialmente para você!",
+      "price": 18,
+      "priceFrom": true,
+      "image": "https://static-images.ifood.com.br/pratos/cf125379-d5c7-4894-b305-951157ea0502/202502281033_6Q13_i.jpg",
+      "category": "marmitex-irresistivel",
+      "featured": false,
+      "available": true,
+      "confirmado": true,
+      "options": [
+        {
+          "id": "5030171:1155314",
+          "name": "Escolha seu Tamanho!",
+          "type": "single",
+          "required": true,
+          "max": 1,
+          "choices": [
+            { "id": "5030171:9462574", "name": "Tamanho P", "priceDelta": 0, "available": true },
+            { "id": "5030171:9462575", "name": "Tamanho M", "priceDelta": 2, "available": true },
+            { "id": "5030171:9462576", "name": "Tamanho G", "priceDelta": 5, "available": true }
+          ]
+        },
+        {
+          "id": "5030171:1162832",
+          "name": "Acompanhamentos",
+          "type": "multiple",
+          "required": false,
+          "max": 2,
+          "choices": [
+            { "id": "5030171:10587628", "name": "Batata Rústica", "priceDelta": 0, "available": true },
+            { "id": "5030171:10635103", "name": "Farofa", "priceDelta": 0, "available": true }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5030709",
+      "name": "Omelete",
+      "description": "Omeletes feitos com ingredientes frescos e saborosos, uma opção rápida e deliciosa para qualquer refeição do dia.",
+      "price": 18,
+      "priceFrom": true,
+      "image": "https://instadelivery-public.nyc3.cdn.digitaloceanspaces.com/itens/1767797706695e73ca227e8.jpeg",
+      "category": "marmitex-irresistivel",
+      "featured": false,
+      "available": true,
+      "confirmado": true,
+      "options": [
+        {
+          "id": "5030709:1155363",
+          "name": "Escolha seu Tamanho!",
+          "type": "single",
+          "required": true,
+          "max": 1,
+          "choices": [
+            { "id": "5030709:9462809", "name": "Tamanho P", "priceDelta": 0, "available": true },
+            { "id": "5030709:9462810", "name": "Tamanho M", "priceDelta": 2, "available": true },
+            { "id": "5030709:9462811", "name": "Tamanho G", "priceDelta": 4, "available": true }
+          ]
+        },
+        {
+          "id": "5030709:1162832",
+          "name": "Acompanhamentos",
+          "type": "multiple",
+          "required": false,
+          "max": 2,
+          "choices": [
+            { "id": "5030709:10587628", "name": "Batata Rústica", "priceDelta": 0, "available": true },
+            { "id": "5030709:10635103", "name": "Farofa", "priceDelta": 0, "available": true }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5030239",
+      "name": "Parmegiana de Bife",
+      "description": "Desfrute do nosso saboroso Bife à Parmegiana - Pequena, da categoria 'Marmitex Irresistível'. Este prato é preparado com um suculento bife de carne, revestido com uma crosta crocante e coberto com um molho de tomate caseiro generosamente temperado e queijo derretido. Junto a ele, servimos um arroz branco bem soltinho, um feijão caseiro riquíssimo em sabor e dois acompanhamentos complementares, todos cuidadosamente selecionados e preparados para aperfeiçoar sua experiência gastronômica. Venha saborear uma refeição completa e irresistível!",
+      "price": 20,
+      "priceFrom": true,
+      "image": "https://static-images.ifood.com.br/pratos/cf125379-d5c7-4894-b305-951157ea0502/202503270849_2DW6_i.jpg",
+      "category": "marmitex-irresistivel",
+      "featured": false,
+      "available": true,
+      "confirmado": true,
+      "options": [
+        {
+          "id": "5030239:1155342",
+          "name": "Escolha seu Tamanho!",
+          "type": "single",
+          "required": true,
+          "max": 1,
+          "choices": [
+            { "id": "5030239:9462658", "name": "Tamanho P", "priceDelta": 1, "available": true },
+            { "id": "5030239:9462659", "name": "Tamanho M", "priceDelta": 3, "available": true },
+            { "id": "5030239:9462660", "name": "Tamanho G", "priceDelta": 6, "available": true }
+          ]
+        },
+        {
+          "id": "5030239:1162832",
+          "name": "Acompanhamentos",
+          "type": "multiple",
+          "required": false,
+          "max": 2,
+          "choices": [
+            { "id": "5030239:10587628", "name": "Batata Rústica", "priceDelta": 0, "available": true },
+            { "id": "5030239:10635103", "name": "Farofa", "priceDelta": 0, "available": true }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5031534",
+      "name": "Coca Cola Mini",
+      "description": "Garrafa 200 mL",
+      "price": 4,
+      "priceFrom": false,
+      "image": "https://instadelivery-public.nyc3.cdn.digitaloceanspaces.com/itens/1767807446695e99d65fd4e.jpeg",
+      "category": "bebidas",
+      "featured": false,
+      "available": true,
+      "confirmado": true,
+      "options": []
+    },
+    {
+      "id": "5031539",
+      "name": "Coca Cola Lata",
+      "description": "Lata 350 mL",
+      "price": 7,
+      "priceFrom": false,
+      "image": "https://instadelivery-public.nyc3.cdn.digitaloceanspaces.com/itens/1767807473695e99f11a2ed.jpeg",
+      "category": "bebidas",
+      "featured": false,
+      "available": true,
+      "confirmado": true,
+      "options": []
+    },
+    {
+      "id": "5031542",
+      "name": "Fanta Laranja 2L",
+      "description": "Garrafa 2L",
+      "price": 14,
+      "priceFrom": false,
+      "image": "https://instadelivery-public.nyc3.digitaloceanspaces.com/images/U9X0eKrNuIdw3dJvmvxli4klPrSHAUfm0HC7pnJE.jpg",
+      "category": "bebidas",
+      "featured": false,
+      "available": true,
+      "confirmado": true,
+      "options": []
+    },
+    {
+      "id": "5036067",
+      "name": "Frutuba 2L",
+      "description": "Garrafa 2L",
+      "price": 8,
+      "priceFrom": false,
+      "image": "https://instadelivery-public.nyc3.cdn.digitaloceanspaces.com/itens/1767876976695fa970b08de.jpeg",
+      "category": "bebidas",
+      "featured": false,
+      "available": true,
+      "confirmado": true,
+      "options": []
+    },
+    {
+      "id": "5545973",
+      "name": "Coca Cola Normal 2L",
+      "description": "",
+      "price": 17,
+      "priceFrom": false,
+      "image": null,
+      "category": "bebidas",
+      "featured": false,
+      "available": true,
+      "confirmado": true,
+      "options": []
+    }
+  ]
+}

@@ -38,6 +38,9 @@ export default defineConfig({
     timeout: 120_000,
     env: {
       NEXT_PUBLIC_WHATSAPP: process.env.NEXT_PUBLIC_WHATSAPP ?? "",
+      // O mesmo sinalizador do `pretest:e2e`: a config de imagens e resolvida
+      // no build, e aqui ele so mantem o servidor coerente com aquele build.
+      IMAGENS_SEM_OTIMIZACAO: "1",
     },
   },
 });

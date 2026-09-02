@@ -67,13 +67,20 @@ test.describe("palavras-chave", () => {
 });
 
 test.describe("mapa", () => {
-  test("sem endereço cadastrado, não mostra mapa quebrado", async ({ page }) => {
+  test("mostra o endereço e o caminho para o Google Maps, sem iframe quebrado", async ({
+    page,
+  }) => {
     await page.goto("/");
     const secao = page.locator("#onde-estamos");
     await secao.scrollIntoViewIfNeeded();
     await expect(secao).toBeVisible();
-    await expect(secao.getByText("Informação a cadastrar")).toBeVisible();
+
+    // O endereço da casa está cadastrado, mas a chave do Maps não. Nessa
+    // situação o site mostra o endereço e um botão que abre o aplicativo —
+    // iframe sem chave carrega uma vez e depois passa a devolver erro.
+    await expect(secao.getByRole("link", { name: /Abrir no Google Maps/ })).toBeVisible();
     await expect(secao.locator("iframe")).toHaveCount(0);
+    await expect(secao.getByText("Informação a cadastrar")).toHaveCount(0);
   });
 });
 

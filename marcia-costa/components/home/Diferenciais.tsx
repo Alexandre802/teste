@@ -20,8 +20,8 @@ const DIFERENCIAIS = [
   },
   {
     icone: Sandwich,
-    titulo: "Lanches Deliciosos",
-    texto: "Sanduíches preparados na hora.",
+    titulo: "Do seu Jeito",
+    texto: "Escolha o tamanho e os acompanhamentos do seu marmitex.",
   },
   {
     icone: Bike,

@@ -1,5 +1,18 @@
 import { expect, test } from "@playwright/test";
 
+import { categoriasComProduto, produtosDisponiveis } from "../data/menu";
+
+/**
+ * Item que entra na sacola com um toque. No cardápio oficial os marmitex têm
+ * grupo de tamanho obrigatório e abrem a folha; as bebidas somam direto.
+ */
+const semOpcaoObrigatoria = produtosDisponiveis().find(
+  (produto) => !(produto.options ?? []).some((grupo) => grupo.required),
+)!;
+const categoriaDele = categoriasComProduto().find(
+  (categoria) => categoria.id === semOpcaoObrigatoria.category,
+)!;
+
 /**
  * Testes da área administrativa SEM Supabase configurado.
  *
@@ -62,9 +75,11 @@ test.describe("registro do pedido", () => {
     page,
   }) => {
     await page.goto("/cardapio");
+    await page.getByRole("tab", { name: categoriaDele.name }).click();
     await page
-      .getByRole("button", { name: /Adicionar .* ao pedido/ })
-      .first()
+      .getByRole("button", {
+        name: `Adicionar ${semOpcaoObrigatoria.name} ao pedido`,
+      })
       .click();
     await page.getByRole("link", { name: /Continuar pedido/ }).click();
     await page.getByRole("radio", { name: "Retirada" }).click({ force: true });

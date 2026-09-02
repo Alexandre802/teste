@@ -137,8 +137,19 @@ export function FolhaProduto({
                 {produto.description}
               </p>
               <p className="mt-2 text-xl font-extrabold text-laranja">
+                {produto.priceFrom && (
+                  <span className="mr-1.5 text-[13px] font-semibold text-tinta-suave">
+                    a partir de
+                  </span>
+                )}
                 {formatarPreco(produto.price)}
               </p>
+              {produto.priceFrom && (
+                <p className="mt-1 text-[12px] text-tinta-suave">
+                  O valor final depende do tamanho e dos adicionais escolhidos
+                  abaixo.
+                </p>
+              )}
             </div>
 
             {grupos.map((grupo) => (

@@ -107,6 +107,11 @@ export function ProdutoCard({
               de estourar a largura do card. */}
           <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
             <p className="text-[17px] font-extrabold text-laranja">
+              {produto.priceFrom && (
+                <span className="mr-1 text-[12px] font-semibold text-tinta-suave">
+                  a partir de
+                </span>
+              )}
               {formatarPreco(produto.price)}
             </p>
 
