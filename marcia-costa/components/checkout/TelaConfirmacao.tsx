@@ -57,7 +57,7 @@ export function TelaConfirmacao() {
     [estado, subtotal, taxa, total],
   );
 
-  const link = linkWhatsapp(pedido);
+  const link = linkWhatsapp(pedido, estado.pedidoRegistrado?.order_number);
 
   if (!hidratado) {
     return (
@@ -88,7 +88,9 @@ export function TelaConfirmacao() {
           aria-hidden="true"
         />
         <h2 className="fonte-titulo mt-3 text-xl font-extrabold text-tinta">
-          Pedido montado!
+          {estado.pedidoRegistrado
+            ? `Pedido #${estado.pedidoRegistrado.order_number} enviado!`
+            : "Pedido montado!"}
         </h2>
         <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-tinta-media">
           Abrimos a conversa no WhatsApp com todos os detalhes. É lá que a

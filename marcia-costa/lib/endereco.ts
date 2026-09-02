@@ -34,8 +34,16 @@ export const rotulos: Record<CampoEndereco, string> = {
 
 export type ErrosEndereco = Partial<Record<CampoEndereco, string>>;
 
-/** Valida o endereco da entrega e devolve uma mensagem amigavel por campo. */
-export function validarEndereco(endereco: Address): ErrosEndereco {
+/**
+ * Valida o endereco da entrega e devolve uma mensagem amigavel por campo.
+ *
+ * `cidades` permite conferir contra a area de entrega que esta valendo agora
+ * (a que veio do banco). Sem esse argumento, vale a lista local.
+ */
+export function validarEndereco(
+  endereco: Address,
+  cidades: string[] = cidadesAtendidas,
+): ErrosEndereco {
   const erros: ErrosEndereco = {};
 
   for (const campo of camposObrigatorios) {
@@ -49,15 +57,18 @@ export function validarEndereco(endereco: Address): ErrosEndereco {
     erros.cep = "O CEP tem 8 dígitos.";
   }
 
-  if (endereco.cidade && !cidadesAtendidas.includes(endereco.cidade)) {
+  if (endereco.cidade && !cidades.includes(endereco.cidade)) {
     erros.cidade = "No momento entregamos apenas nas cidades da lista.";
   }
 
   return erros;
 }
 
-export function enderecoValido(endereco: Address): boolean {
-  return Object.keys(validarEndereco(endereco)).length === 0;
+export function enderecoValido(
+  endereco: Address,
+  cidades: string[] = cidadesAtendidas,
+): boolean {
+  return Object.keys(validarEndereco(endereco, cidades)).length === 0;
 }
 
 /** Endereco em uma linha, para o resumo da tela. */

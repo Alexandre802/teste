@@ -22,6 +22,13 @@
   --color-nevoa: #f6f5f4;
   --color-borda: #ecebe9;
 
+  /* Cores do painel administrativo: verde entra, vermelho sai, azul informa. */
+  --color-verde-positivo: #15803d;
+  --color-verde-claro: #dcfce7;
+  --color-azul-info: #1d4ed8;
+  --color-azul-claro: #dbeafe;
+  --color-vermelho-claro: #fee2e2;
+
   --color-whatsapp: #25d366;
   --color-whatsapp-escuro: #128c46;
 

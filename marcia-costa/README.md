@@ -85,3 +85,107 @@ e ausência de rolagem horizontal de 360 a 1920 px.
 
 Em ambiente com o Chromium instalado fora do Playwright, aponte
 `PLAYWRIGHT_CHROMIUM_PATH` para o executável.
+
+---
+
+## Fluxo de caixa (área administrativa)
+
+Além do site de pedidos, o projeto tem um painel privado em `/admin` onde a
+Márcia acompanha vendas, recebimentos, despesas e lucro. **Todo pedido feito
+pelo site entra no painel sozinho** — ninguém precisa cadastrar venda à mão.
+
+### Como o pedido chega ao caixa
+
+Quando o cliente toca em "Enviar pedido no WhatsApp":
+
+1. o navegador manda para o servidor **apenas** id do produto, quantidade e
+   opções escolhidas — nunca preço nem total;
+2. a função `comida_caseira_create_order` recalcula no banco o preço, os
+   adicionais, o custo, a taxa de entrega e o total;
+3. o pedido é gravado e devolve um número;
+4. só então a mensagem é montada, já com `*PEDIDO #XXXX*`, e o WhatsApp abre.
+
+Se o banco não responder, **o WhatsApp não abre**: a tela diz que não foi
+possível registrar o pedido e pede para tentar de novo. Pedido não some em
+silêncio.
+
+Tocar duas vezes em "enviar" não cria dois pedidos: cada checkout carrega uma
+chave de idempotência, e o banco devolve o pedido que já existe. O botão também
+trava enquanto a gravação acontece.
+
+### Dinheiro: as quatro contas
+
+O sistema não trata todo pedido como dinheiro recebido.
+
+| Número | O que é |
+| --- | --- |
+| **Faturamento bruto** | Soma dos pedidos pagos ou concluídos |
+| **Recebimentos** | Dinheiro que entrou de fato (inclui receita manual, desconta estorno) |
+| **A receber** | Pedidos não cancelados que ainda estão como pendentes |
+| **Lucro bruto** | Faturamento − custo dos produtos |
+| **Lucro líquido** | Recebimentos − custo dos produtos − despesas |
+
+Um pedido novo nasce como **pendente**. Só quando a casa marca **pago** ele
+vira recebimento. Cancelar tira do faturamento; se já estava pago, o painel
+oferece registrar o **reembolso**, que lança o estorno em vez de apagar o
+histórico.
+
+### Telas
+
+Resumo (com gráfico de vendas, formas de pagamento e últimos pedidos), Pedidos,
+detalhe do pedido com as ações de status, Receitas, Despesas, Relatórios,
+Caixa (abertura, sangria, suprimento e fechamento), Produtos (onde se informa o
+**custo**, que nunca aparece no site), Clientes e Configurações.
+
+No computador o menu é uma barra lateral; no celular, uma barra inferior com o
+botão central `+` para lançar receita ou despesa.
+
+### Banco de dados
+
+Supabase (PostgreSQL). As migrations estão em `supabase/migrations`, com o
+prefixo `comida_caseira_` para nunca se misturar com outro cliente. Dinheiro
+sempre em **centavos** (`bigint`) — float não entra perto de caixa. Cada item
+do pedido guarda um **snapshot** do nome, do preço e do custo: mudar o preço
+amanhã não reescreve o que o cliente pagou ontem.
+
+Segurança: a RLS está ativa em todas as tabelas. O cliente anônimo **não lê
+nada** — nem pedido, nem despesa, nem cliente, nem custo — e a única coisa que
+consegue executar é a função de criar pedido. Papéis: `owner`, `manager` e
+`cashier` (o caixa registra, mas não apaga lançamento nem muda preço).
+
+### Configurar
+
+```bash
+# 1. Crie um projeto no Supabase, exclusivo da Comida Caseira.
+# 2. Aplique supabase/migrations/*.sql em ordem (SQL Editor ou CLI).
+# 3. Preencha .env.local:
+#      NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
+# 4. Leve o cardápio para o banco (o servidor precisa dos preços):
+SUPABASE_SERVICE_ROLE_KEY=... npm run sincronizar-produtos
+# 5. Crie o usuário da Márcia em Authentication e libere o acesso:
+#      insert into comida_caseira_users (user_id, nome, role)
+#      values ('<id do usuário>', 'Márcia', 'owner');
+```
+
+Não existe cadastro público de conta administrativa. Sem o passo 5, um usuário
+autenticado não enxerga absolutamente nada.
+
+### Testes do banco
+
+```bash
+npm run test:db
+```
+
+Sobe um Postgres descartável, aplica as migrations e roda 70 verificações:
+o cenário 2× R$ 25,00 + R$ 5,00 de entrega = R$ 55,00, preço enviado pelo
+navegador sendo ignorado, opção de outro produto descartada, idempotência,
+marcar pago, cancelar, reembolsar, fechamento de caixa e a RLS vista pelos
+papéis `anon`, dona, intruso autenticado e caixa.
+
+### O que ainda tem duas fontes
+
+Telefone, WhatsApp, Instagram e endereço aparecem tanto nas Configurações do
+painel quanto nas variáveis `NEXT_PUBLIC_*`. O **site público lê as variáveis**;
+o painel guarda o registro interno. A tela de Configurações avisa isso em
+destaque. As **taxas de entrega não** têm esse problema: site e servidor leem a
+mesma tabela `comida_caseira_delivery_zones`.

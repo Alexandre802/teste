@@ -10,14 +10,20 @@
     "typecheck": "tsc --noEmit",
     "imagens": "python3 scripts/extrair-imagens.py",
     "pretest:e2e": "next build",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "sincronizar-produtos": "node scripts/sincronizar-produtos.mjs",
+    "test:db": "bash scripts/testar-banco.sh"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.12.5",
+    "@supabase/supabase-js": "^2.112.4",
     "framer-motion": "^11.15.0",
     "lucide-react": "^0.468.0",
     "next": "^16.3.2",
     "react": "19.0.0",
     "react-dom": "19.0.0",
+    "recharts": "^3.10.1",
+    "server-only": "^0.0.1",
     "zustand": "^5.0.2"
   },
   "devDependencies": {

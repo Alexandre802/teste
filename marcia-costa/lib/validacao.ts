@@ -12,7 +12,10 @@ export type Pendencia = {
  * Confere tudo que falta antes de enviar o pedido. Lista vazia = pode enviar.
  * As mensagens sao escritas para o cliente, nao para o desenvolvedor.
  */
-export function pendenciasDoPedido(pedido: Order): Pendencia[] {
+export function pendenciasDoPedido(
+  pedido: Order,
+  cidades?: string[],
+): Pendencia[] {
   const pendencias: Pendencia[] = [];
 
   if (pedido.items.length === 0) {
@@ -33,7 +36,7 @@ export function pendenciasDoPedido(pedido: Order): Pendencia[] {
     pendencias.push({ campo: "nome", mensagem: "Informe seu nome." });
   }
 
-  if (pedido.orderType === "entrega" && !enderecoValido(pedido.address)) {
+  if (pedido.orderType === "entrega" && !enderecoValido(pedido.address, cidades)) {
     pendencias.push({
       campo: "endereco",
       mensagem: "Complete o endereço de entrega: rua, número, bairro e cidade.",
@@ -65,6 +68,9 @@ export function pendenciasDoPedido(pedido: Order): Pendencia[] {
   return pendencias;
 }
 
-export function pedidoPodeSerEnviado(pedido: Order): boolean {
-  return pendenciasDoPedido(pedido).length === 0;
+export function pedidoPodeSerEnviado(
+  pedido: Order,
+  cidades?: string[],
+): boolean {
+  return pendenciasDoPedido(pedido, cidades).length === 0;
 }

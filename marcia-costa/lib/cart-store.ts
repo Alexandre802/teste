@@ -13,7 +13,8 @@ import type {
   SelectedOption,
 } from "@/types";
 import { enderecoVazio } from "@/lib/endereco";
-import { taxaDeEntrega } from "@/data/deliveryZones";
+import { taxaEmUso, useZonas } from "@/lib/zonas-store";
+import { novoTokenDeCheckout } from "@/lib/checkout";
 
 /**
  * Carrinho e dados do pedido, guardados no localStorage do proprio aparelho.
@@ -22,6 +23,13 @@ import { taxaDeEntrega } from "@/data/deliveryZones";
 
 type EstadoPedido = {
   items: CartItem[];
+  /**
+   * Chave de idempotencia deste pedido em andamento. Enquanto ela nao muda,
+   * mandar de novo devolve o mesmo pedido em vez de criar outro no caixa.
+   */
+  checkoutToken: string;
+  /** Numero e id devolvidos pelo caixa depois que o pedido foi gravado. */
+  pedidoRegistrado: { order_id: string; order_number: number } | null;
   orderType: OrderType | null;
   address: Address;
   customer: Customer;
@@ -50,10 +58,13 @@ type AcoesPedido = {
   definirPrecisaTroco: (precisa: boolean) => void;
   definirTrocoPara: (valor: string) => void;
   definirObservacao: (texto: string) => void;
+  definirPedidoRegistrado: (dados: { order_id: string; order_number: number }) => void;
 };
 
 const estadoInicial: EstadoPedido = {
   items: [],
+  checkoutToken: "",
+  pedidoRegistrado: null,
   orderType: null,
   address: enderecoVazio,
   customer: { nome: "", telefone: "" },
@@ -62,6 +73,16 @@ const estadoInicial: EstadoPedido = {
   trocoPara: "",
   observation: "",
 };
+
+/**
+ * Mexer na sacola invalida o pedido que ja foi gravado no caixa e gera uma
+ * chave nova. Sem isso, alterar o carrinho depois de enviar reaproveitaria o
+ * token antigo e o caixa devolveria o pedido velho, com o total velho.
+ */
+function aposMudarItens(estado: EstadoPedido): Partial<EstadoPedido> {
+  if (!estado.pedidoRegistrado) return {};
+  return { pedidoRegistrado: null, checkoutToken: novoTokenDeCheckout() };
+}
 
 /** Duas linhas iguais (mesmo produto, mesmas opcoes, mesma observacao) somam. */
 function chaveDaLinha(
@@ -90,6 +111,7 @@ export const usePedido = create<EstadoPedido & AcoesPedido>()(
           const existente = estado.items.find((item) => item.lineId === lineId);
           if (existente) {
             return {
+              ...aposMudarItens(estado),
               items: estado.items.map((item) =>
                 item.lineId === lineId
                   ? { ...item, quantity: item.quantity + qtd }
@@ -108,12 +130,13 @@ export const usePedido = create<EstadoPedido & AcoesPedido>()(
             selectedOptions: opcoes,
             observation: observacao.trim() || undefined,
           };
-          return { items: [...estado.items, novo] };
+          return { ...aposMudarItens(estado), items: [...estado.items, novo] };
         });
       },
 
       alterarQuantidade: (lineId, quantidade) =>
         set((estado) => ({
+          ...aposMudarItens(estado),
           items:
             quantidade <= 0
               ? estado.items.filter((item) => item.lineId !== lineId)
@@ -126,6 +149,7 @@ export const usePedido = create<EstadoPedido & AcoesPedido>()(
 
       incrementar: (lineId) =>
         set((estado) => ({
+          ...aposMudarItens(estado),
           items: estado.items.map((item) =>
             item.lineId === lineId
               ? { ...item, quantity: item.quantity + 1 }
@@ -135,6 +159,7 @@ export const usePedido = create<EstadoPedido & AcoesPedido>()(
 
       decrementar: (lineId) =>
         set((estado) => ({
+          ...aposMudarItens(estado),
           items: estado.items
             .map((item) =>
               item.lineId === lineId
@@ -146,10 +171,18 @@ export const usePedido = create<EstadoPedido & AcoesPedido>()(
 
       remover: (lineId) =>
         set((estado) => ({
+          ...aposMudarItens(estado),
           items: estado.items.filter((item) => item.lineId !== lineId),
         })),
 
-      limpar: () => set({ ...estadoInicial, address: { ...enderecoVazio } }),
+      limpar: () =>
+        set({
+          ...estadoInicial,
+          address: { ...enderecoVazio },
+          checkoutToken: novoTokenDeCheckout(),
+        }),
+
+      definirPedidoRegistrado: (dados) => set({ pedidoRegistrado: dados }),
 
       definirTipo: (tipo) => set({ orderType: tipo }),
 
@@ -176,7 +209,13 @@ export const usePedido = create<EstadoPedido & AcoesPedido>()(
     {
       name: "comida-caseira-marcia-costa:pedido",
       storage: createJSONStorage(() => localStorage),
-      version: 1,
+      version: 2,
+      // Um pedido salvo de antes da integracao com o caixa nao tem token.
+      onRehydrateStorage: () => (estado) => {
+        if (estado && !estado.checkoutToken) {
+          estado.checkoutToken = novoTokenDeCheckout();
+        }
+      },
     },
   ),
 );
@@ -193,13 +232,18 @@ export function calcularSubtotal(items: CartItem[]): number {
  * Taxa da entrega. null quando a casa ainda nao confirmou a taxa da regiao --
  * nesse caso o site escreve "a combinar" em vez de inventar valor.
  * Sempre 0 na retirada.
+ *
+ * A taxa sai da mesma configuracao que o servidor usa para gravar o pedido
+ * (zonas-store, alimentado por /api/zonas). Nao existe uma segunda tabela de
+ * taxa em lugar nenhum. Isto aqui e so o que a tela mostra: quem decide o
+ * valor cobrado e o banco, na hora de criar o pedido.
  */
 export function calcularTaxa(
   orderType: OrderType | null,
   address: Address,
 ): number | null {
   if (orderType !== "entrega") return 0;
-  return taxaDeEntrega(address.cidade, address.bairro);
+  return taxaEmUso(useZonas.getState().zonas, address.cidade, address.bairro);
 }
 
 /** Total. Enquanto a taxa nao existir, o total e so o subtotal. */

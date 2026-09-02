@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
-import { Copy, Check, MessageCircle, Pencil, User } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Copy, Check, Loader2, MessageCircle, Pencil, User } from "lucide-react";
 
 import type { Order } from "@/types";
 import { Campo, CampoTexto } from "@/components/ui/Campo";
@@ -27,6 +27,13 @@ import { mascaraTelefone } from "@/lib/format";
 import { pendenciasDoPedido } from "@/lib/validacao";
 import { linkWhatsapp, montarMensagem } from "@/lib/whatsapp";
 import { temWhatsapp } from "@/data/restaurant";
+import {
+  ErroDeRegistro,
+  caixaLigado,
+  novoTokenDeCheckout,
+  registrarPedido,
+} from "@/lib/checkout";
+import { useZonas, cidadesEmUso } from "@/lib/zonas-store";
 
 /**
  * Etapa 3: identificacao, endereco, pagamento, observacao e envio.
@@ -40,6 +47,19 @@ export function TelaPagamento() {
   const [tentouEnviar, setTentouEnviar] = useState(false);
   const [copiado, setCopiado] = useState(false);
   const [erroCopia, setErroCopia] = useState<string | null>(null);
+  // Trava o botão enquanto o pedido está sendo gravado: dois toques não podem
+  // virar dois pedidos.
+  const [enviando, setEnviando] = useState(false);
+  const [erroEnvio, setErroEnvio] = useState<string | null>(null);
+
+  const zonas = useZonas((estado) => estado.zonas);
+  const carregarZonas = useZonas((estado) => estado.carregar);
+  const cidades = cidadesEmUso(zonas);
+
+  // A área de entrega e a taxa vêm da mesma configuração que o servidor usa.
+  useEffect(() => {
+    void carregarZonas();
+  }, [carregarZonas]);
 
   const estado = usePedido();
   const {
@@ -86,7 +106,7 @@ export function TelaPagamento() {
     ],
   );
 
-  const pendencias = pendenciasDoPedido(pedido);
+  const pendencias = pendenciasDoPedido(pedido, cidades);
 
   // Estas pendencias ja aparecem coladas no proprio campo. Repeti-las na lista
   // do rodape so faria a mesma frase surgir duas vezes na tela.
@@ -95,11 +115,12 @@ export function TelaPagamento() {
     (pendencia) => !COM_ERRO_NO_CAMPO.has(pendencia.campo),
   );
   const errosEndereco =
-    tentouEnviar && orderType === "entrega" ? validarEndereco(address) : {};
+    tentouEnviar && orderType === "entrega"
+      ? validarEndereco(address, cidades)
+      : {};
   const erroTroco = tentouEnviar
     ? pendencias.find((p) => p.campo === "troco")?.mensagem
     : undefined;
-  const link = linkWhatsapp(pedido);
 
   /**
    * Confere o pedido e leva o cliente ate o que falta. Vale para os dois
@@ -118,23 +139,80 @@ export function TelaPagamento() {
     return false;
   };
 
-  const enviar = () => {
+  /**
+   * Grava o pedido no fluxo de caixa e devolve o número.
+   *
+   * Se o caixa estiver desligado neste ambiente, segue sem número — é o site
+   * de antes, e nada se perde. Se o caixa estiver ligado mas não responder, o
+   * erro sobe: o WhatsApp NÃO abre como se tivesse dado tudo certo.
+   */
+  const gravarNoCaixa = async (): Promise<number | null> => {
+    if (!caixaLigado) return null;
+    if (estado.pedidoRegistrado) return estado.pedidoRegistrado.order_number;
+
+    const token = estado.checkoutToken || novoTokenDeCheckout();
+    try {
+      const registrado = await registrarPedido(pedido, token);
+      estado.definirPedidoRegistrado({
+        order_id: registrado.order_id,
+        order_number: registrado.order_number,
+      });
+      return registrado.order_number;
+    } catch (erro) {
+      if (
+        erro instanceof ErroDeRegistro &&
+        erro.message === "fluxo_de_caixa_desligado"
+      ) {
+        return null;
+      }
+      throw erro;
+    }
+  };
+
+  const enviar = async () => {
+    if (enviando) return;
     if (!pedidoCompleto()) return;
-    if (!link) return;
-    window.open(link, "_blank", "noopener,noreferrer");
-    router.push("/confirmacao");
+
+    setErroEnvio(null);
+    setEnviando(true);
+    try {
+      const numero = await gravarNoCaixa();
+      const destino = linkWhatsapp(pedido, numero);
+      if (!destino) return;
+      window.open(destino, "_blank", "noopener,noreferrer");
+      router.push("/confirmacao");
+    } catch (erro) {
+      setErroEnvio(
+        erro instanceof Error && erro.message
+          ? erro.message
+          : "Não foi possível registrar seu pedido. Tente novamente.",
+      );
+    } finally {
+      setEnviando(false);
+    }
   };
 
   const copiar = async () => {
+    if (enviando) return;
     if (!pedidoCompleto()) return;
+
+    setErroEnvio(null);
+    setEnviando(true);
     try {
-      await navigator.clipboard.writeText(montarMensagem(pedido));
+      const numero = await gravarNoCaixa();
+      await navigator.clipboard.writeText(montarMensagem(pedido, numero));
       setCopiado(true);
       window.setTimeout(() => setCopiado(false), 2000);
-    } catch {
-      setErroCopia(
-        "Não conseguimos copiar automaticamente. Selecione o texto do pedido abaixo e copie à mão.",
-      );
+    } catch (erro) {
+      if (erro instanceof ErroDeRegistro) {
+        setErroEnvio(erro.message);
+      } else {
+        setErroCopia(
+          "Não conseguimos copiar automaticamente. Selecione o texto do pedido abaixo e copie à mão.",
+        );
+      }
+    } finally {
+      setEnviando(false);
     }
   };
 
@@ -275,6 +353,7 @@ export function TelaPagamento() {
             <EstadoErro key={pendencia.campo} mensagem={pendencia.mensagem} />
           ))}
         {erroCopia && <EstadoErro mensagem={erroCopia} />}
+        {erroEnvio && <EstadoErro mensagem={erroEnvio} />}
       </div>
 
       {!temWhatsapp && (
@@ -291,19 +370,40 @@ export function TelaPagamento() {
             larguraTotal
             tamanho="grande"
             variante="whatsapp"
+            disabled={enviando}
             onClick={enviar}
           >
-            <MessageCircle className="h-5 w-5" aria-hidden="true" />
-            Enviar pedido no WhatsApp
+            {enviando ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
+                Registrando seu pedido…
+              </>
+            ) : (
+              <>
+                <MessageCircle className="h-5 w-5" aria-hidden="true" />
+                Enviar pedido no WhatsApp
+              </>
+            )}
           </Botao>
         ) : (
-          <Botao larguraTotal tamanho="grande" onClick={copiar}>
-            {copiado ? (
+          <Botao
+            larguraTotal
+            tamanho="grande"
+            disabled={enviando}
+            onClick={copiar}
+          >
+            {enviando ? (
+              <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
+            ) : copiado ? (
               <Check className="h-5 w-5" aria-hidden="true" />
             ) : (
               <Copy className="h-5 w-5" aria-hidden="true" />
             )}
-            {copiado ? "Mensagem copiada" : "Copiar mensagem do pedido"}
+            {enviando
+              ? "Registrando seu pedido…"
+              : copiado
+                ? "Mensagem copiada"
+                : "Copiar mensagem do pedido"}
           </Botao>
         )}
       </div>
@@ -313,7 +413,7 @@ export function TelaPagamento() {
           Ver a mensagem que será enviada
         </summary>
         <pre className="mt-3 whitespace-pre-wrap break-words font-sans text-[13px] leading-relaxed text-tinta-media">
-          {montarMensagem(pedido)}
+          {montarMensagem(pedido, estado.pedidoRegistrado?.order_number)}
         </pre>
       </details>
     </div>
