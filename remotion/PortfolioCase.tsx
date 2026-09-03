@@ -3,15 +3,12 @@ import { interpolate, useCurrentFrame } from 'remotion';
 import { BEAT } from './constants';
 
 /**
- * A pasta de couro.
+ * Pasta de couro da segunda parte da sequência.
  *
- * Ela é desenhada, não fotografada: a pasta do recorte é uma imagem fechada e
- * plana, que não abre. A peça desenhada nasce pequena e apagada sobre a região
- * onde a pasta aparece na foto, vem à frente e só então abre — quando cresce o
- * bastante para revelar a diferença, a fotográfica já saiu de cena.
- *
- * `parte` existe para o documento poder subir ENTRE o fundo e a aba da frente.
- * As duas partes leem a mesma geometria, então continuam encaixadas.
+ * Na nova abertura o advogado não segura pasta: ele ajusta a gravata. Por isso
+ * a pasta não tenta mais nascer sobre um objeto existente na fotografia. Ela
+ * entra como a próxima batida visual, subindo do centro inferior somente
+ * depois que a mão termina o gesto e volta ao meio.
  */
 
 const CENTRO_X = 960;
@@ -21,51 +18,44 @@ const ALTURA = 296;
 
 export const PortfolioCase: React.FC<{ parte: 'fundo' | 'frente' }> = ({ parte }) => {
   const frame = useCurrentFrame();
+  const presa = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } as const;
 
-  // A pasta não existe durante o gesto da gravata: ela só entra depois que a
-  // mão baixa, em `transicaoPasta`. Antes disso o protagonismo é do gesto.
-  //
-  // A opacidade sobe tarde e rápido de propósito. Enquanto a peça desenhada
-  // está semitransparente ela se sobrepõe à pasta da fotografia e lê como uma
-  // laje de vidro; encurtar essa janela faz a troca passar despercebida.
+  // só começa depois do ajuste da gravata ter terminado
   const surgimento = interpolate(
     frame,
-    [BEAT.transicaoPasta.from + 14, BEAT.pasta.from + 6],
+    [BEAT.transicaoPasta.from + 5, BEAT.pasta.from + 4],
     [0, 1],
-    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
+    presa,
   );
 
-  // vem da posição da pasta fotografada para o centro do quadro
+  // a pasta sobe do centro inferior e ganha escala, assumindo o foco da cena
   const avanco = interpolate(
     frame,
-    [BEAT.transicaoPasta.from + 6, BEAT.pasta.from + 8],
+    [BEAT.transicaoPasta.from + 3, BEAT.pasta.from + 8],
     [0, 1],
-    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
+    presa,
   );
-  const x = interpolate(avanco, [0, 1], [1062, CENTRO_X]);
-  const y = interpolate(avanco, [0, 1], [792, CENTRO_Y]);
-  const escala = interpolate(avanco, [0, 1], [0.52, 1]);
+  const x = CENTRO_X;
+  const y = interpolate(avanco, [0, 1], [895, CENTRO_Y]);
+  const escala = interpolate(avanco, [0, 1], [0.68, 1]);
+  const inclinacaoEntrada = interpolate(avanco, [0, 1], [3.5, 0], presa);
 
   // abertura da tampa
-  const abertura = interpolate(frame, [BEAT.pasta.from + 4, BEAT.pasta.to], [0, 1], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
+  const abertura = interpolate(frame, [BEAT.pasta.from + 4, BEAT.pasta.to], [0, 1], presa);
   const anguloTampa = interpolate(abertura, [0, 1], [-2, -116]);
 
-  // sai junto com o advogado quando a câmera fecha no documento
+  // sai quando a câmera fecha no documento
   const saida = interpolate(
     frame,
     [BEAT.aproximacao.from, BEAT.aproximacao.from + 22],
     [0, 1],
-    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
+    presa,
   );
 
   const opacidade = surgimento * (1 - saida);
   if (opacidade <= 0.003) return null;
 
-  const couro =
-    'linear-gradient(158deg, #1b2732 0%, #10181f 46%, #070b0e 100%)';
+  const couro = 'linear-gradient(158deg, #1b2732 0%, #10181f 46%, #070b0e 100%)';
 
   return (
     <div
@@ -77,7 +67,7 @@ export const PortfolioCase: React.FC<{ parte: 'fundo' | 'frente' }> = ({ parte }
         height: ALTURA,
         marginLeft: -LARGURA / 2,
         marginTop: -ALTURA / 2,
-        transform: `scale(${escala}) translateY(${saida * 26}px)`,
+        transform: `scale(${escala}) rotate(${inclinacaoEntrada}deg) translateY(${saida * 26}px)`,
         transformOrigin: '50% 60%',
         opacity: opacidade,
         filter: saida > 0.02 ? `blur(${saida * 7}px)` : undefined,
@@ -88,7 +78,6 @@ export const PortfolioCase: React.FC<{ parte: 'fundo' | 'frente' }> = ({ parte }
     >
       {parte === 'fundo' ? (
         <>
-          {/* tampa, articulada na borda de cima */}
           <div
             style={{
               position: 'absolute',
@@ -105,7 +94,6 @@ export const PortfolioCase: React.FC<{ parte: 'fundo' | 'frente' }> = ({ parte }
               boxShadow: '0 26px 60px rgba(0,0,0,0.7)',
             }}
           >
-            {/* forro interno, visível quando a tampa passa da vertical */}
             <div
               style={{
                 position: 'absolute',
@@ -119,7 +107,6 @@ export const PortfolioCase: React.FC<{ parte: 'fundo' | 'frente' }> = ({ parte }
             />
           </div>
 
-          {/* corpo da pasta */}
           <div
             style={{
               position: 'absolute',
@@ -127,7 +114,6 @@ export const PortfolioCase: React.FC<{ parte: 'fundo' | 'frente' }> = ({ parte }
               background: couro,
               borderRadius: '4px 4px 12px 12px',
               border: '1px solid rgba(184,155,97,0.16)',
-              // o fio claro no topo separa o couro escuro do fundo escuro
               boxShadow:
                 'inset 0 1px 0 rgba(210,191,146,0.30), inset 0 18px 34px rgba(0,0,0,0.62)',
             }}
@@ -135,7 +121,6 @@ export const PortfolioCase: React.FC<{ parte: 'fundo' | 'frente' }> = ({ parte }
         </>
       ) : (
         <>
-          {/* aba da frente: passa por cima do papel que sobe */}
           <div
             style={{
               position: 'absolute',
@@ -149,7 +134,6 @@ export const PortfolioCase: React.FC<{ parte: 'fundo' | 'frente' }> = ({ parte }
               boxShadow: '0 -16px 34px rgba(0,0,0,0.55)',
             }}
           />
-          {/* fio dourado — único detalhe metálico da peça */}
           <div
             style={{
               position: 'absolute',
