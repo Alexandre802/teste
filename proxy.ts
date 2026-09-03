@@ -18,13 +18,8 @@ import { NextResponse, type NextRequest } from 'next/server';
  * O risco é bem menor — CSS injetado não executa código.
  */
 
-// Caminhos que dispensam cabeçalho de segurança: imagem não executa script.
-// Filtrar aqui, e não por `config.matcher`, é deliberado — ver a nota no fim.
-//
-// `/sw.js` entra na lista por outro motivo: a CSP da página usa nonce com
-// `strict-dynamic`, e nonce não existe no contexto de um service worker — o
-// cabeçalho ali só atrapalharia. O arquivo é servido do próprio domínio e não
-// carrega script de lugar nenhum.
+// Caminhos que dispensam cabeçalho de segurança: imagem e demonstrativos
+// estáticos não executam lógica sensível do sistema principal.
 const SEM_CABECALHO = [
   '/_next/static',
   '/_next/image',
@@ -32,6 +27,8 @@ const SEM_CABECALHO = [
   '/lanche/',
   '/marca/',
   '/icones/',
+  '/vetcare/',
+  '/prime-smile/',
   '/sw.js',
 ];
 
@@ -74,10 +71,7 @@ export function proxy(request: NextRequest) {
   resposta.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
   resposta.headers.set('X-Content-Type-Options', 'nosniff');
   resposta.headers.set('X-Frame-Options', 'DENY');
-  // nenhum endereço de página sai junto com o clique — nem para o WhatsApp,
-  // nem para o Google Maps
   resposta.headers.set('Referrer-Policy', 'no-referrer');
-  // o site não usa câmera, microfone, localização nem sensores: tudo negado
   resposta.headers.set(
     'Permissions-Policy',
     'accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), interest-cohort=()',
@@ -89,26 +83,6 @@ export function proxy(request: NextRequest) {
   return resposta;
 }
 
-/*
- * ATENÇÃO ao mexer no bloco abaixo.
- *
- * A Vercel lê este `config` com @vercel/static-config, que percorre o AST do
- * TypeScript. O leitor dela faz:
- *
- *     const [nome, _doisPontos, valor] = prop.getChildren();
- *
- * e assume três filhos por propriedade. Comentário JSDoc (barra-asterisco-
- * asterisco) DENTRO do objeto vira um nó do AST, entra como primeiro filho e
- * desloca tudo: o leitor acaba pedindo o valor do próprio token de dois
- * pontos e a publicação morre com `Unhandled type: "ColonToken"` — depois de
- * o `next build` já ter concluído, o que torna o erro difícil de rastrear.
- *
- * Comentário de linha (barra-barra) é trivia, não vira nó, e é seguro.
- * Por isso toda explicação fica aqui fora e o objeto abaixo é mínimo.
- *
- * Há um verificador em scripts/checar-config-vercel.cjs que roda o mesmo
- * leitor da Vercel sobre o projeto.
- */
 export const config = {
   matcher: [
     '/((?!_next/static|_next/image|favicon|apple-icon|produtos/|lanche/|marca/|icones/|sw.js).*)',
