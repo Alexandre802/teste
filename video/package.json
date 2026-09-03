@@ -1,0 +1,34 @@
+{
+  "name": "waatzo-reel",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts WaatzoReel out/waatzo-reel.mp4 --concurrency=3 --crf=18",
+    "still": "remotion still src/index.ts",
+    "sfx": "python3 tools/make_sfx.py",
+    "fonts": "python3 tools/embed_fonts.py",
+    "web": "node tools/encode-web.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@remotion/cli": "^4.0.508",
+    "@remotion/google-fonts": "^4.0.508",
+    "@remotion/media-utils": "^4.0.508",
+    "@remotion/player": "^4.0.508",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "remotion": "^4.0.508"
+  },
+  "devDependencies": {
+    "@fontsource/inter": "^5.3.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "ffmpeg-static": "^5.3.0",
+    "typescript": "^5.9.3"
+  },
+  "private": true
+}
