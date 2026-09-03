@@ -22,13 +22,18 @@ const ALTURA = 296;
 export const PortfolioCase: React.FC<{ parte: 'fundo' | 'frente' }> = ({ parte }) => {
   const frame = useCurrentFrame();
 
-  const surgimento = interpolate(frame, [BEAT.pasta.from, BEAT.pasta.from + 18], [0, 1], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
+  // A opacidade sobe tarde e rápido de propósito. Enquanto a peça desenhada
+  // está semitransparente ela se sobrepõe à pasta da fotografia e lê como uma
+  // laje de vidro; encurtar essa janela faz a troca passar despercebida.
+  const surgimento = interpolate(
+    frame,
+    [BEAT.pasta.from + 14, BEAT.pasta.from + 27],
+    [0, 1],
+    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
+  );
 
   // vem da posição da pasta fotografada para o centro do quadro
-  const avanco = interpolate(frame, [BEAT.pasta.from, BEAT.pasta.from + 26], [0, 1], {
+  const avanco = interpolate(frame, [BEAT.pasta.from, BEAT.pasta.from + 28], [0, 1], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });
@@ -117,7 +122,9 @@ export const PortfolioCase: React.FC<{ parte: 'fundo' | 'frente' }> = ({ parte }
               background: couro,
               borderRadius: '4px 4px 12px 12px',
               border: '1px solid rgba(184,155,97,0.16)',
-              boxShadow: 'inset 0 18px 34px rgba(0,0,0,0.62)',
+              // o fio claro no topo separa o couro escuro do fundo escuro
+              boxShadow:
+                'inset 0 1px 0 rgba(210,191,146,0.30), inset 0 18px 34px rgba(0,0,0,0.62)',
             }}
           />
         </>
