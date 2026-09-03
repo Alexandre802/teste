@@ -29,6 +29,7 @@ const SEM_CABECALHO = [
   '/icones/',
   '/vetcare/',
   '/prime-smile/',
+  '/aura-estetica/',
   '/sw.js',
 ];
 
