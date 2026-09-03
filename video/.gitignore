@@ -1,0 +1,11 @@
+node_modules/
+.remotion/
+
+# saídas de render: só o corte final fica versionado
+out/*
+!out/.gitkeep
+!out/tres-estrelas-3840x1280.mp4
+
+# um render disparado com o cwd errado cria out/ aninhado; nunca versionar
+src/out/
+public/out/
