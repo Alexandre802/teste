@@ -1,0 +1,10 @@
+node_modules/
+.remotion/
+
+# Stills de conferência gerados durante o desenvolvimento
+out/*.png
+
+# O MP4 final é versionado (out/monttra-reel.mp4)
+
+# cache do Python das ferramentas de QA
+__pycache__/

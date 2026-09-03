@@ -1,0 +1,24 @@
+{
+  "name": "monttra-reel",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Reel vertical 1080x1920 da Monttra em Remotion",
+  "scripts": {
+    "dev": "remotion studio",
+    "render": "remotion render MonttraReel out/monttra-reel.mp4",
+    "still": "remotion still MonttraReel",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/transitions": "4.0.509",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "remotion": "4.0.509"
+  },
+  "devDependencies": {
+    "@remotion/cli": "4.0.509",
+    "@types/react": "19.0.0",
+    "@types/react-dom": "19.0.0",
+    "typescript": "5.7.3"
+  }
+}
