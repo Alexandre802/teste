@@ -30,6 +30,7 @@ const SEM_CABECALHO = [
   '/vetcare/',
   '/prime-smile/',
   '/aura-estetica/',
+  '/almeida-costa/',
   '/sw.js',
 ];
 
@@ -68,7 +69,6 @@ export function proxy(request: NextRequest) {
   const resposta = NextResponse.next({ request: { headers } });
 
   resposta.headers.set('Content-Security-Policy', csp);
-  // HTTPS obrigatório por 2 anos, incluindo subdomínios
   resposta.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
   resposta.headers.set('X-Content-Type-Options', 'nosniff');
   resposta.headers.set('X-Frame-Options', 'DENY');
