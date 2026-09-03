@@ -50,7 +50,7 @@ export function proxy(request: NextRequest) {
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' ${dev ? "'unsafe-eval'" : ''}`,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     'font-src \'self\' https://fonts.gstatic.com data:',
-    "img-src 'self' data: blob: https://lh3.googleusercontent.com",
+    "img-src 'self' data: blob: https://lh3.googleusercontent.com https://images.unsplash.com",
     // mapa do Google embutido na seção de contato
     "frame-src https://www.google.com https://maps.google.com",
     "connect-src 'self'",
