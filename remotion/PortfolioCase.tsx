@@ -22,27 +22,32 @@ const ALTURA = 296;
 export const PortfolioCase: React.FC<{ parte: 'fundo' | 'frente' }> = ({ parte }) => {
   const frame = useCurrentFrame();
 
+  // A pasta não existe durante o gesto da gravata: ela só entra depois que a
+  // mão baixa, em `transicaoPasta`. Antes disso o protagonismo é do gesto.
+  //
   // A opacidade sobe tarde e rápido de propósito. Enquanto a peça desenhada
   // está semitransparente ela se sobrepõe à pasta da fotografia e lê como uma
   // laje de vidro; encurtar essa janela faz a troca passar despercebida.
   const surgimento = interpolate(
     frame,
-    [BEAT.pasta.from + 14, BEAT.pasta.from + 27],
+    [BEAT.transicaoPasta.from + 14, BEAT.pasta.from + 6],
     [0, 1],
     { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
   );
 
   // vem da posição da pasta fotografada para o centro do quadro
-  const avanco = interpolate(frame, [BEAT.pasta.from, BEAT.pasta.from + 28], [0, 1], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
+  const avanco = interpolate(
+    frame,
+    [BEAT.transicaoPasta.from + 6, BEAT.pasta.from + 8],
+    [0, 1],
+    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
+  );
   const x = interpolate(avanco, [0, 1], [1062, CENTRO_X]);
   const y = interpolate(avanco, [0, 1], [792, CENTRO_Y]);
   const escala = interpolate(avanco, [0, 1], [0.52, 1]);
 
   // abertura da tampa
-  const abertura = interpolate(frame, [BEAT.pasta.from + 22, BEAT.pasta.to], [0, 1], {
+  const abertura = interpolate(frame, [BEAT.pasta.from + 4, BEAT.pasta.to], [0, 1], {
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });

@@ -40,6 +40,17 @@ export const LawyerSequence: React.FC<LawyerSequenceProps> = ({ compact = false 
 
   const documentoNaFrente = frame >= BEAT.papel.to - 7;
 
+  // Nos últimos frames tudo se apaga, menos o fundo. Como a seção seguinte
+  // (ProcessWords) começa no mesmo #030405, não há corte perceptível entre a
+  // sequência e a primeira palavra — era isso que a transição branca fazia,
+  // e mal.
+  const apagamento = interpolate(
+    frame,
+    [BEAT.final.from + 1, BEAT.final.to],
+    [1, 0],
+    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
+  );
+
   return (
     <AbsoluteFill style={{ background: SCENE_BG, overflow: 'hidden' }}>
       {/* iluminação azul muito escura, sem nada futurista */}
@@ -54,7 +65,7 @@ export const LawyerSequence: React.FC<LawyerSequenceProps> = ({ compact = false 
       <AbsoluteFill
         style={{
           transform: `scale(${interpolate(assentamento, [0, 1], [1.02, 1])})`,
-          opacity: interpolate(assentamento, [0, 1], [0, 1]),
+          opacity: interpolate(assentamento, [0, 1], [0, 1]) * apagamento,
         }}
       >
         <AbsoluteFill style={{ zIndex: 1 }}>
@@ -74,11 +85,18 @@ export const LawyerSequence: React.FC<LawyerSequenceProps> = ({ compact = false 
         </AbsoluteFill>
       </AbsoluteFill>
 
-      {/* legendas: atrás do documento enquanto ele domina o quadro */}
+      {/*
+        Uma legenda só, discreta, e fora do beat do gesto. As três anteriores
+        (Análise / Estratégia / Orientação) disputavam atenção justamente
+        enquanto a mão trabalhava; as palavras grandes agora ficam por conta
+        do ProcessWords, depois da sequência.
+      */}
       <AbsoluteFill style={{ zIndex: 5 }}>
-        <SceneCaption texto="Análise" entra={[10, 28]} sai={[60, 74]} />
-        <SceneCaption texto="Estratégia" entra={[76, 92]} sai={[118, 132]} />
-        <SceneCaption texto="Orientação" entra={[128, 144]} sai={[166, 178]} />
+        <SceneCaption
+          texto="Orientação"
+          entra={[BEAT.papel.from, BEAT.papel.from + 14]}
+          sai={[BEAT.aproximacao.from, BEAT.aproximacao.from + 12]}
+        />
       </AbsoluteFill>
 
       {/* vinheta por cima de tudo, para fechar as bordas do quadro */}
@@ -91,10 +109,10 @@ export const LawyerSequence: React.FC<LawyerSequenceProps> = ({ compact = false 
         }}
       />
 
-      <AbsoluteFill style={{ zIndex: 8 }}>
+      <AbsoluteFill style={{ zIndex: 8, opacity: apagamento }}>
         <SceneCaption
           texto="Clareza para decisões importantes."
-          entra={[BEAT.final.from - 3, BEAT.final.to]}
+          entra={[BEAT.assinatura.to - 8, BEAT.final.from]}
           sai={[BEAT.final.to + 60, BEAT.final.to + 61]}
           variante="frase"
           ancora="base"

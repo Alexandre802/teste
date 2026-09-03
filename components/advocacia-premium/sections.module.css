@@ -161,9 +161,11 @@
 /* todas empilhadas no mesmo ponto: a opacidade decide qual se lê */
 .palavra {
   grid-area: 1 / 1;
+  max-width: calc(100vw - 2rem);
   font-family: var(--pr-serif);
-  font-size: clamp(2.5rem, 9vw, 6.5rem);
+  font-size: clamp(3rem, 9vw, 6.5rem);
   font-weight: 300;
+  line-height: 1.04;
   letter-spacing: -0.02em;
   color: var(--pr-white);
   text-align: center;
@@ -171,7 +173,18 @@
   will-change: opacity, transform, filter;
 }
 
+/* "Compreender" é a palavra mais longa: a 13vw ela cabe em 375px sem quebrar
+   nem encostar nas bordas. */
+@media (max-width: 860px) {
+  .palavra {
+    font-size: clamp(2.6rem, 13vw, 4.5rem);
+  }
+}
+
 .processoSimples {
+  display: grid;
+  place-items: center;
+  padding: clamp(4rem, 10vh, 7rem) 1.25rem;
   background: #030405;
 }
 

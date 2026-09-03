@@ -77,11 +77,11 @@ export const PaperDocument: React.FC<{ compact: boolean }> = ({ compact }) => {
     [0, 1, 1, 0],
     { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
   );
-  // some depois de assinar
-  const canetaVisivel = interpolate(
+  // levanta e sai de quadro depois de assinar
+  const saidaCaneta = interpolate(
     frame,
-    [BEAT.assinatura.to, BEAT.assinatura.to + 5],
-    [1, 0],
+    [BEAT.assinatura.to, BEAT.assinatura.to + 4],
+    [0, 1],
     { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
   );
 
@@ -209,17 +209,27 @@ export const PaperDocument: React.FC<{ compact: boolean }> = ({ compact }) => {
 
       {/* área de assinatura — o traço e a caneta dividem o mesmo viewBox */}
       <div style={{ marginTop: 'auto' }}>
+        {/*
+          Estreita de propósito: a caneta é desenhada para fora do viewBox
+          (o corpo sobe para a direita a partir da ponta), e com a assinatura
+          ocupando a largura toda ela furava a borda da folha. Sobrando margem
+          à direita, a peça inteira cabe no papel.
+        */}
         <svg
           viewBox={`0 0 ${SIGNATURE_VIEWBOX.width} ${SIGNATURE_VIEWBOX.height}`}
-          width="100%"
+          width={compact ? '70%' : '76%'}
           style={{ overflow: 'visible', display: 'block' }}
           aria-hidden
         >
           <Signature progresso={progressoAssinatura} comprimento={comprimento} />
-          {entradaCaneta > 0.001 && canetaVisivel > 0.001 ? (
-            <g opacity={canetaVisivel}>
-              <PenProp ponto={ponto} entrada={entradaCaneta} apoio={apoio} />
-            </g>
+          {entradaCaneta > 0.001 && saidaCaneta < 0.999 ? (
+            <PenProp
+              ponto={ponto}
+              entrada={entradaCaneta}
+              apoio={apoio}
+              saida={saidaCaneta}
+              escala={compact ? 0.44 : 0.58}
+            />
           ) : null}
         </svg>
 

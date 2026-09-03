@@ -1,7 +1,9 @@
 /* Trilho alto: é o comprimento dele que vira a duração da sequência. */
+/* 340vh: o suficiente para conduzir 240 frames com precisão sem virar
+   rolagem interminável no celular. */
 .trilho {
   position: relative;
-  height: 360vh;
+  height: 340vh;
   background: #030405;
 }
 

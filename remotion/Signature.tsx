@@ -8,8 +8,10 @@ import { SIGNATURE_PATH } from './signaturePath';
  * viewBox, o ponto que o traço alcança e a ponta que o desenha são a mesma
  * coordenada — não há conversão entre sistemas para sair de sincronia.
  *
- * São dois traços sobrepostos com o mesmo dashoffset: um largo e translúcido,
- * que faz a tinta espalhar no papel, e o cheio por cima.
+ * São dois traços sobrepostos com o mesmo dashoffset: um largo e quase
+ * transparente, que dá a espessura da tinta no papel, e o cheio e fino por
+ * cima. O fino carrega o desenho — traço grosso lê como rabisco, não como
+ * assinatura.
  */
 export const Signature: React.FC<{
   /** 0 a 1 — mesma fração de comprimento que posiciona a caneta */
@@ -23,8 +25,8 @@ export const Signature: React.FC<{
       <path
         d={SIGNATURE_PATH}
         fill="none"
-        stroke="rgba(22,29,36,0.28)"
-        strokeWidth={6.2}
+        stroke="rgba(21,26,30,0.12)"
+        strokeWidth={3.2}
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeDasharray={comprimento}
@@ -33,8 +35,8 @@ export const Signature: React.FC<{
       <path
         d={SIGNATURE_PATH}
         fill="none"
-        stroke="#161d24"
-        strokeWidth={3.4}
+        stroke="#151a1e"
+        strokeWidth={1.9}
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeDasharray={comprimento}

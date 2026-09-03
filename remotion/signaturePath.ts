@@ -10,26 +10,21 @@
 export const SIGNATURE_VIEWBOX = { width: 520, height: 150 };
 
 export const SIGNATURE_PATH =
-  // A altura de cada laço varia de propósito: laços de mesmo raio em
-  // sequência leem como mola, não como letra.
-  'M 24 120 ' +
-  'C 34 70, 52 22, 72 26 ' +
-  'C 88 30, 80 74, 70 104 ' +
-  'C 64 122, 74 128, 86 116 ' +
-  'C 100 100, 106 72, 118 60 ' +
-  'C 128 50, 132 62, 126 80 ' +
-  'C 120 98, 128 112, 142 108 ' +
-  'C 158 103, 166 78, 178 66 ' +
-  'C 186 58, 190 70, 186 86 ' +
-  'C 182 102, 194 112, 210 104 ' +
-  'C 228 95, 236 62, 252 48 ' +
-  'C 264 38, 270 52, 264 74 ' +
-  'C 258 96, 268 110, 286 106 ' +
-  'C 306 101, 318 84, 332 78 ' +
-  'C 346 72, 352 86, 344 96 ' +
-  'C 336 106, 348 110, 366 104 ' +
-  'C 400 93, 448 96, 480 110 ' +
-  'C 490 114, 496 110, 500 100';
+  // Uma assinatura, não uma onda: a leitura vem da diferença de amplitude.
+  // Abre com a haste alta do A (y 120 → 19), fecha o A pelo lado direito,
+  // dá o laço de retorno na base e só então corre para a direita, cada vez
+  // mais baixa, terminando num floreio curto. Laços de raio igual em
+  // sequência — o erro da versão anterior — leem como mola.
+  'M 26 120 ' +
+  'C 36 74, 46 30, 63 19 ' +      // haste ascendente do A
+  'C 78 11, 84 46, 71 84 ' +      // desce pelo lado direito
+  'C 62 110, 68 126, 86 107 ' +   // laço de retorno na base
+  'C 100 92, 110 60, 119 41 ' +   // segunda subida, mais curta
+  'C 127 71, 131 97, 149 104 ' +  // desce e vira à direita
+  'C 175 113, 207 100, 233 94 ' + // traço fluido
+  'C 269 86, 305 92, 339 101 ' +  // ondulação ampla e baixa
+  'C 373 110, 409 103, 457 89 ' + // segue caindo
+  'C 476 84, 489 88, 498 97';     // floreio final
 
 export type SignaturePoint = { x: number; y: number; angle: number };
 
