@@ -1,0 +1,415 @@
+/* Estilos das seções da rota /advocacia-premium.
+   As primitivas (.shell, .display, .label, .action) vivem em premium.css. */
+
+.cabecaEspaco {
+  margin-bottom: clamp(3rem, 7vw, 5rem);
+}
+
+/* ───────────────────── áreas de atuação ───────────────────── */
+
+.areas {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--pr-hairline);
+}
+
+.area {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1.25rem;
+  align-items: start;
+  padding: clamp(1.5rem, 3.4vw, 2.25rem) 0;
+  border-bottom: 1px solid var(--pr-hairline);
+  transition: background-color 0.45s ease;
+}
+
+.area:hover {
+  background: rgba(244, 243, 239, 0.02);
+}
+
+.areaNumero {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: var(--pr-gold);
+  padding-top: 0.55rem;
+}
+
+.areaNome {
+  margin: 0;
+  font-family: var(--pr-serif);
+  font-size: clamp(1.5rem, 3.4vw, 2.25rem);
+  font-weight: 300;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  color: var(--pr-white);
+}
+
+.areaTexto {
+  margin: 0.6rem 0 0;
+  max-width: 46ch;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--pr-grey);
+}
+
+@media (min-width: 861px) {
+  .areas {
+    grid-template-columns: 1fr 1fr;
+    column-gap: clamp(2.5rem, 5vw, 4.5rem);
+  }
+}
+
+/* ───────────────────── seção clara ───────────────────── */
+
+.claraCabeca {
+  display: grid;
+  justify-items: center;
+  gap: 1.25rem;
+  text-align: center;
+  margin-bottom: clamp(3rem, 7vw, 5rem);
+}
+
+.claraLabel {
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #8a6f3c;
+}
+
+.claraTitulo {
+  font-size: clamp(2rem, 4.6vw, 3.25rem);
+  max-width: 18ch;
+  color: var(--pr-bone-ink);
+}
+
+.conceitos {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid rgba(20, 24, 28, 0.14);
+}
+
+.conceito {
+  padding: clamp(1.75rem, 3.4vw, 2.5rem) 0;
+  border-bottom: 1px solid rgba(20, 24, 28, 0.14);
+}
+
+.conceitoNumero {
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: #8a6f3c;
+}
+
+.conceitoTitulo {
+  margin: 0.9rem 0 0;
+  font-family: var(--pr-serif);
+  font-size: clamp(1.25rem, 2.4vw, 1.6rem);
+  font-weight: 400;
+  color: var(--pr-bone-ink);
+}
+
+.conceitoTexto {
+  margin: 0.5rem 0 0;
+  max-width: 40ch;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: #5a636b;
+}
+
+@media (min-width: 861px) {
+  .conceitos {
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: clamp(2.5rem, 5vw, 4.5rem);
+  }
+}
+
+/* ───────────────────── palavras do processo ───────────────────── */
+
+.processo {
+  position: relative;
+  height: 320vh;
+  background: #030405;
+}
+
+.processoPalco {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.processoCentro {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  padding-inline: 1.25rem;
+}
+
+/* todas empilhadas no mesmo ponto: a opacidade decide qual se lê */
+.palavra {
+  grid-area: 1 / 1;
+  font-family: var(--pr-serif);
+  font-size: clamp(2.5rem, 9vw, 6.5rem);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: var(--pr-white);
+  text-align: center;
+  white-space: nowrap;
+  will-change: opacity, transform, filter;
+}
+
+.processoSimples {
+  background: #030405;
+}
+
+.processoLista {
+  display: grid;
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: center;
+  font-family: var(--pr-serif);
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  font-weight: 300;
+  color: var(--pr-white);
+}
+
+/* ───────────────────── escritório ───────────────────── */
+
+.escritorio {
+  padding-block: clamp(4rem, 9vw, 7rem);
+  background: #030405;
+}
+
+.escritorioMoldura {
+  position: relative;
+  width: var(--pr-shell);
+  margin-inline: auto;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.escritorioImagem {
+  will-change: transform;
+}
+
+.escritorioFoto {
+  display: block;
+  width: 100%;
+  height: clamp(20rem, 52vh, 34rem);
+  object-fit: cover;
+  object-position: 54% 52%;
+  filter: saturate(0.85) brightness(0.78);
+}
+
+.escritorioTexto {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 1;
+  display: grid;
+  gap: 0.9rem;
+  padding: clamp(1.75rem, 5vw, 3rem);
+  background: linear-gradient(to top, rgba(3, 4, 5, 0.92) 12%, transparent 100%);
+}
+
+.escritorioTitulo {
+  margin: 0;
+  font-size: clamp(1.9rem, 4.4vw, 3rem);
+  color: var(--pr-white);
+}
+
+.escritorioLede {
+  margin: 0;
+  max-width: 42ch;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--pr-grey);
+}
+
+/* ───────────────────── profissionais ───────────────────── */
+
+.perfis {
+  display: grid;
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--pr-hairline);
+  border-block: 1px solid var(--pr-hairline);
+}
+
+.perfil {
+  display: grid;
+  justify-items: center;
+  gap: 0.9rem;
+  padding: clamp(2.25rem, 5vw, 3.25rem) 1.5rem;
+  background: #030405;
+  text-align: center;
+}
+
+.perfilMarca {
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  border: 1px solid var(--pr-hairline);
+  border-radius: 50%;
+  color: var(--pr-white);
+}
+
+.perfilNome {
+  margin: 0;
+  font-family: var(--pr-serif);
+  font-size: clamp(1.3rem, 2.6vw, 1.7rem);
+  font-weight: 400;
+  color: var(--pr-white);
+}
+
+.perfilPapel {
+  margin: 0;
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--pr-gold);
+}
+
+.perfilNota {
+  margin: 1.75rem 0 0;
+  text-align: center;
+  font-size: 0.6875rem;
+  color: var(--pr-grey-dim);
+}
+
+@media (min-width: 700px) {
+  .perfis {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ───────────────────── contato ───────────────────── */
+
+.contatoGrade {
+  display: grid;
+  gap: 2.5rem;
+}
+
+.mapa {
+  position: relative;
+  height: clamp(16rem, 42vh, 24rem);
+  border: 1px solid var(--pr-hairline);
+  overflow: hidden;
+}
+
+.mapa iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  /* o mapa do Google é claro demais para o resto da página */
+  filter: grayscale(1) invert(0.92) contrast(0.86) brightness(0.94);
+}
+
+.dados {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  border-top: 1px solid var(--pr-hairline);
+}
+
+.dados > div {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1.15rem 0;
+  border-bottom: 1px solid var(--pr-hairline);
+}
+
+.dados dt {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--pr-gold);
+}
+
+.dados dd {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--pr-white);
+}
+
+.dados a {
+  color: var(--pr-white);
+  border-bottom: 1px solid rgba(184, 155, 97, 0.5);
+  padding-bottom: 1px;
+  transition: color 0.35s ease;
+}
+
+.dados a:hover {
+  color: var(--pr-gold-light);
+}
+
+@media (min-width: 861px) {
+  .contatoGrade {
+    grid-template-columns: 1.35fr 0.65fr;
+    gap: 3.5rem;
+    align-items: start;
+  }
+}
+
+/* ───────────────────── fechamento ───────────────────── */
+
+.fechamento {
+  position: relative;
+  min-height: 92svh;
+  display: grid;
+  place-items: center;
+  padding: clamp(5rem, 12vh, 8rem) 1.25rem;
+  overflow: hidden;
+  background: #030405;
+  text-align: center;
+}
+
+.fechamentoCentro {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  max-width: 34rem;
+}
+
+.fechamentoTitulo {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  max-width: 16ch;
+}
+
+.fechamentoAcao {
+  margin-top: 2.75rem;
+}
+
+.fechamentoMarca {
+  margin-top: 4rem;
+  color: var(--pr-white);
+  opacity: 0.85;
+}
+
+@media (max-width: 480px) {
+  .fechamentoAcao a:global(.action) {
+    width: 100%;
+    max-width: 20rem;
+  }
+}

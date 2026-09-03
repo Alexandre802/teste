@@ -1,0 +1,59 @@
+.trilho {
+  position: relative;
+  height: 220vh;
+  background: #030405;
+}
+
+.palco {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #030405;
+}
+
+/* a folha que estoura a tela — herda o papel da composição */
+.folha {
+  grid-area: 1 / 1;
+  width: min(38vw, 22rem);
+  aspect-ratio: 700 / 960;
+  background: linear-gradient(178deg, #fbfaf7 0%, #f1eee7 100%);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6);
+  will-change: transform, opacity;
+}
+
+.branco {
+  position: absolute;
+  inset: 0;
+  background: #f4f3ef;
+  will-change: opacity;
+}
+
+.frase {
+  grid-area: 1 / 1;
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding-inline: 1.5rem;
+  max-width: 22ch;
+  text-align: center;
+  font-family: var(--pr-serif);
+  font-size: clamp(1.9rem, 5vw, 3.25rem);
+  font-weight: 300;
+  line-height: 1.14;
+  letter-spacing: -0.015em;
+  color: var(--pr-white);
+  text-wrap: balance;
+  will-change: opacity, transform;
+}
+
+/* estado sem movimento: só a frase, numa tela */
+.simples {
+  display: grid;
+  place-items: center;
+  min-height: 60svh;
+  padding: clamp(4rem, 10vh, 7rem) 1.25rem;
+  background: #030405;
+}

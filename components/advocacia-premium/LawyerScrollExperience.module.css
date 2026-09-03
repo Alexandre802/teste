@@ -1,0 +1,114 @@
+/* Trilho alto: é o comprimento dele que vira a duração da sequência. */
+.trilho {
+  position: relative;
+  height: 360vh;
+  background: #030405;
+}
+
+/* Com menos movimento não há o que percorrer: uma tela basta. */
+.trilho[data-reduzido='sim'] {
+  height: 100svh;
+}
+
+.palco {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  background: #030405;
+}
+
+/*
+   O fundo da composição é o mesmo #030405 da página, então a faixa vazia
+   acima e abaixo do quadro não aparece — o vídeo parece sangrar na tela.
+   No desktop a composição entra inteira, deitada e cinematográfica.
+*/
+/*
+   Centralizado por posicionamento absoluto, e não por `place-items:center`.
+   O palco tem `overflow:hidden`, e nesse caso o navegador aplica alinhamento
+   "seguro": um item mais largo que a área é grudado na borda inicial em vez
+   de centralizado, para não tornar conteúdo inalcançável. No retrato o quadro
+   é de propósito mais largo que a tela, então a centralização por grid o
+   jogava em L0 e a janela mostrava a borda vazia da composição.
+*/
+.quadro {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+/*
+   No retrato, encaixar por largura deixaria uma faixa de ~219px num aparelho
+   de 390px, e o texto do documento viraria borrão. Aqui a composição é
+   ampliada até a altura da tela e recortada nas laterais; o modo `compact`
+   da composição reenquadra o conteúdo para a coluna central que sobra.
+*/
+@media (max-width: 860px), (orientation: portrait) {
+  .quadro {
+    width: calc(100svh * 16 / 9);
+    height: 100svh;
+    aspect-ratio: auto;
+  }
+}
+
+.dica {
+  position: absolute;
+  bottom: clamp(1.5rem, 5vh, 3rem);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(158, 164, 170, 0.65);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.dicaTrilho {
+  position: relative;
+  display: block;
+  width: 1px;
+  height: 34px;
+  background: rgba(244, 243, 239, 0.16);
+  overflow: hidden;
+}
+
+.dicaPonto {
+  position: absolute;
+  left: -1px;
+  width: 3px;
+  height: 10px;
+  border-radius: 2px;
+  background: #b89b61;
+  animation: correr 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes correr {
+  0% {
+    transform: translateY(-12px);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(34px);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dicaPonto {
+    animation: none;
+  }
+}

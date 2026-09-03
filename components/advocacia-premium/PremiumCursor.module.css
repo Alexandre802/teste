@@ -1,0 +1,47 @@
+.ponto {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 90;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f4f3ef;
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    opacity 0.35s ease,
+    width 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.32s ease;
+  will-change: transform;
+}
+
+.ponto[data-visivel='sim'] {
+  opacity: 1;
+}
+
+.ponto[data-sobre='sim'] {
+  width: 34px;
+  height: 34px;
+  background: rgba(210, 191, 146, 0.28);
+}
+
+/* Sem mouse não há ponto; com movimento reduzido ele para de crescer. */
+@media (pointer: coarse) {
+  .ponto {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ponto {
+    transition: opacity 0.2s ease;
+  }
+
+  .ponto[data-sobre='sim'] {
+    width: 8px;
+    height: 8px;
+    background: #d2bf92;
+  }
+}

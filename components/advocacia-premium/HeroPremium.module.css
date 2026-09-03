@@ -1,0 +1,136 @@
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: clamp(5rem, 12vh, 8rem) 1.25rem clamp(6rem, 14vh, 9rem);
+  overflow: hidden;
+  background: #030405;
+  text-align: center;
+}
+
+.spotlightCamada {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.centro {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: 0;
+  max-width: 44rem;
+}
+
+.marca {
+  width: clamp(58px, 8vw, 74px);
+  height: clamp(58px, 8vw, 74px);
+  margin-bottom: 2rem;
+}
+
+.nome {
+  margin: 0;
+  font-family: var(--pr-serif);
+  font-size: clamp(1.15rem, 2.4vw, 1.5rem);
+  font-weight: 400;
+  letter-spacing: 0.34em;
+  text-indent: 0.34em;
+  text-transform: uppercase;
+  color: var(--pr-white);
+}
+
+.assinatura {
+  margin: 0.9rem 0 0;
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+  text-transform: uppercase;
+  color: var(--pr-gold);
+}
+
+/* fio entre a marca e o título */
+.assinatura::after {
+  content: '';
+  display: block;
+  width: 46px;
+  height: 1px;
+  margin: 2.4rem auto 0;
+  background: rgba(184, 155, 97, 0.4);
+}
+
+.titulo {
+  margin: 2.2rem 0 0;
+  font-size: clamp(2.15rem, 5.4vw, 4.25rem);
+  max-width: 15ch;
+}
+
+.lede {
+  margin: 2.4rem auto 0;
+  max-width: 40ch;
+}
+
+.acoes {
+  margin-top: 2.6rem;
+}
+
+.rolar {
+  position: absolute;
+  z-index: 1;
+  bottom: clamp(1.5rem, 4vh, 2.75rem);
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  justify-items: center;
+  gap: 0.85rem;
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--pr-grey-dim);
+  white-space: nowrap;
+}
+
+.seta {
+  display: block;
+  color: rgba(184, 155, 97, 0.75);
+  animation: descer 2.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes descer {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  50% {
+    transform: translateY(7px);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seta {
+    animation: none;
+    opacity: 0.8;
+  }
+}
+
+@media (max-width: 480px) {
+  .titulo {
+    font-size: clamp(2rem, 9.2vw, 2.5rem);
+    max-width: 13ch;
+  }
+
+  .nome {
+    letter-spacing: 0.24em;
+    text-indent: 0.24em;
+  }
+
+  .acoes a:global(.action) {
+    width: 100%;
+    max-width: 20rem;
+  }
+}

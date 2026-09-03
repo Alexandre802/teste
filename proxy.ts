@@ -50,6 +50,9 @@ export function proxy(request: NextRequest) {
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     'font-src \'self\' https://fonts.gstatic.com data:',
     "img-src 'self' data: blob: https://lh3.googleusercontent.com https://images.unsplash.com",
+    // o Remotion Player destrava o áudio do navegador com um mp3 silencioso
+    // embutido em data: — sem esta linha o console enche de violação de CSP
+    "media-src 'self' data: blob:",
     // mapa do Google embutido na seção de contato
     "frame-src https://www.google.com https://maps.google.com",
     "connect-src 'self'",

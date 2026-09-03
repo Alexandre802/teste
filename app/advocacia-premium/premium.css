@@ -1,0 +1,260 @@
+/* ─────────────────────────────────────────────────────────────
+   Almeida & Costa — demonstrativo premium (rota /advocacia-premium)
+
+   Projeto visualmente independente do demonstrativo em
+   /public/almeida-costa. Nenhum token, classe ou medida vem de lá.
+
+   O layout raiz do repositório é o site da lanchonete e pinta o body
+   de laranja; como no App Router um layout aninhado não substitui a
+   raiz, `:has()` devolve o fundo escuro enquanto esta rota estiver
+   montada. O shell também pinta o próprio fundo, para o caso de o
+   navegador não suportar `:has()`.
+   ───────────────────────────────────────────────────────────── */
+
+.premium {
+  /* base escura */
+  --pr-void: #030405;
+  --pr-black: #07090b;
+  --pr-graphite: #0d1115;
+  --pr-navy-deep: #111d28;
+  --pr-navy: #182c3a;
+
+  /* texto */
+  --pr-white: #f4f3ef;
+  --pr-grey: #9ea4aa;
+  --pr-grey-dim: #6b7176;
+
+  /* dourado — apenas detalhe */
+  --pr-gold: #b89b61;
+  --pr-gold-light: #d2bf92;
+
+  /* seção clara, para quebrar o ritmo escuro */
+  --pr-bone: #f2f0ea;
+  --pr-bone-ink: #14181c;
+
+  --pr-hairline: rgba(244, 243, 239, 0.11);
+  --pr-shell: min(calc(100% - 2.5rem), 1120px);
+
+  --pr-serif: var(--font-cormorant), 'Cormorant Garamond', 'Times New Roman', serif;
+  --pr-sans: var(--font-inter), Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  position: relative;
+  z-index: 0;
+  background: var(--pr-void);
+  color: var(--pr-white);
+  font-family: var(--pr-sans);
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+}
+
+body:has(.premium) {
+  background: #030405;
+  /* o site principal reserva espaço para a barra de pedido; aqui não há */
+  padding-bottom: 0;
+}
+
+/* o scrub do Remotion precisa de posição de rolagem exata, sem interpolação */
+html:has(.premium) {
+  scroll-behavior: auto;
+  background: #030405;
+}
+
+.premium ::selection {
+  background: var(--pr-gold);
+  color: var(--pr-void);
+}
+
+.premium :focus-visible {
+  outline: 1px solid var(--pr-gold-light);
+  outline-offset: 3px;
+}
+
+/* ───────────────────────── primitivas ───────────────────────── */
+
+.premium .shell {
+  width: var(--pr-shell);
+  margin-inline: auto;
+}
+
+/* micro-label em caixa alta: o dourado vive quase só aqui */
+.premium .label {
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--pr-gold);
+}
+
+.premium .display {
+  margin: 0;
+  font-family: var(--pr-serif);
+  font-weight: 300;
+  line-height: 1.06;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.premium .lede {
+  margin: 0;
+  max-width: 46ch;
+  color: var(--pr-grey);
+  font-size: 0.9375rem;
+  line-height: 1.7;
+}
+
+/* fio horizontal — a divisão do projeto é sempre linha, nunca caixa */
+.premium .rule {
+  height: 1px;
+  border: 0;
+  margin: 0;
+  background: var(--pr-hairline);
+}
+
+/* ───────────────────────── ações ───────────────────────── */
+
+.premium .action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 3.25rem;
+  padding: 0 1.75rem;
+  border: 1px solid rgba(184, 155, 97, 0.42);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--pr-white);
+  font-family: var(--pr-sans);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    border-color 0.45s ease,
+    background-color 0.45s ease,
+    color 0.45s ease;
+}
+
+.premium .action:hover {
+  border-color: var(--pr-gold-light);
+  background: rgba(184, 155, 97, 0.09);
+  color: var(--pr-gold-light);
+}
+
+.premium .action--solid {
+  border-color: transparent;
+  background: var(--pr-white);
+  color: var(--pr-void);
+}
+
+.premium .action--solid:hover {
+  background: var(--pr-gold-light);
+  color: var(--pr-void);
+}
+
+.premium .action__arrow {
+  transition: transform 0.45s ease;
+}
+
+.premium .action:hover .action__arrow {
+  transform: translateX(4px);
+}
+
+/* ───────────────────────── seções ───────────────────────── */
+
+.premium .section {
+  padding-block: clamp(5rem, 12vw, 9.5rem);
+}
+
+.premium .section--light {
+  background: var(--pr-bone);
+  color: var(--pr-bone-ink);
+}
+
+.premium .section__head {
+  text-align: center;
+  display: grid;
+  justify-items: center;
+  gap: 1.25rem;
+}
+
+.premium .section__head .display {
+  font-size: clamp(2rem, 4.6vw, 3.25rem);
+}
+
+/* ───────────────── atmosfera do fundo escuro ───────────────── */
+
+/* grão: ruído estático em SVG, sem imagem externa e sem animação */
+.premium .grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.4;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+.premium .vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(115% 78% at 50% 42%, transparent 38%, rgba(3, 4, 5, 0.72) 100%);
+}
+
+/* malha geométrica quase invisível */
+.premium .mesh {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image:
+    linear-gradient(to right, rgba(244, 243, 239, 0.028) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(244, 243, 239, 0.028) 1px, transparent 1px);
+  background-size: 96px 96px;
+  mask-image: radial-gradient(70% 60% at 50% 45%, #000 0%, transparent 72%);
+}
+
+.premium .spotlight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(52% 42% at 50% 30%, rgba(24, 44, 58, 0.55) 0%, transparent 68%),
+    radial-gradient(30% 22% at 50% 22%, rgba(184, 155, 97, 0.09) 0%, transparent 70%);
+}
+
+/* ───────────────────────── acessibilidade ───────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .premium *,
+  .premium *::before,
+  .premium *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ───────────────────────── rodapé ───────────────────────── */
+
+.premium .rodape {
+  padding: clamp(2.5rem, 6vw, 3.5rem) 1.25rem clamp(3rem, 7vw, 4rem);
+  border-top: 1px solid var(--pr-hairline);
+  background: var(--pr-black);
+  text-align: center;
+}
+
+.premium .rodape p {
+  margin: 0;
+  font-size: 0.6875rem;
+  line-height: 1.7;
+  color: var(--pr-grey-dim);
+}
+
+.premium .rodape p + p {
+  margin-top: 0.5rem;
+  max-width: 44ch;
+  margin-inline: auto;
+  font-size: 0.625rem;
+}
