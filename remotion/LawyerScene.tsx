@@ -4,54 +4,80 @@ import { BEAT } from './constants';
 import { FONTE, MASCARAS, POSE_GRAVATA } from './personagem';
 
 /**
- * Cena do advogado.
+ * Cena do advogado baseada no vídeo de referência enviado.
  *
- * A nova fotografia já começa com a mão sobre o nó da gravata. O gesto é
- * construído em camadas: torso quase imóvel, antebraço acompanhando com pouca
- * amplitude, mão fazendo o trajeto esquerda -> direita -> centro e o nó da
- * gravata respondendo alguns pixels. Assim o scroll realmente comunica um
- * ajuste de gravata, em vez de mover a fotografia inteira.
+ * O corpo permanece praticamente imóvel. O gesto acontece principalmente na
+ * mão que segura o nó, com o antebraço acompanhando pouco e o próprio nó da
+ * gravata reagindo ainda menos. A mão vai para a esquerda, para a direita e
+ * volta ao centro antes da sequência da pasta começar.
  */
 export const LawyerScene: React.FC = () => {
   const frame = useCurrentFrame();
   const presa = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } as const;
 
-  // entrada do personagem
-  const entrada = interpolate(frame, [BEAT.entrada.from, BEAT.entrada.to], [0, 1], presa);
-  const escalaEntrada = interpolate(frame, [BEAT.entrada.from, BEAT.entrada.to], [1.025, 1], presa);
+  const entrada = interpolate(
+    frame,
+    [BEAT.entrada.from, BEAT.entrada.to],
+    [0, 1],
+    presa,
+  );
+  const escalaEntrada = interpolate(
+    frame,
+    [BEAT.entrada.from, BEAT.entrada.to],
+    [1.018, 1],
+    presa,
+  );
 
-  // gesto em três tempos: esquerda, direita e volta exatamente para o centro
-  const chaves = [BEAT.gravata.from, 43, 63, BEAT.gravata.to];
-  const maoX = interpolate(frame, chaves, [0, -14, 12, 0], presa);
-  const maoY = interpolate(frame, chaves, [0, -2, 1.5, 0], presa);
-  const maoGiro = interpolate(frame, chaves, [0, -2.2, 2, 0], presa);
+  // Movimento inspirado no vídeo: curto, controlado e sem balanço exagerado.
+  // 20 -> 45: leva o nó levemente para a esquerda
+  // 45 -> 72: corrige para a direita
+  // 72 -> 96: retorna ao centro e assenta
+  const chaves = [BEAT.gravata.from, 45, 72, BEAT.gravata.to];
 
-  // o antebraço acompanha menos que a mão: mantém o punho conectado ao corpo
+  const maoX = interpolate(frame, chaves, [0, -6, 5, 0], presa);
+  const maoY = interpolate(frame, chaves, [0, -1.5, 0.8, 0], presa);
+  const maoGiro = interpolate(frame, chaves, [0, -0.9, 0.8, 0], presa);
+
+  // O antebraço acompanha o punho, mas com amplitude bem menor para preservar
+  // a sensação de braço conectado ao ombro.
   const bracoX = maoX * 0.34;
-  const bracoY = maoY * 0.28;
+  const bracoY = maoY * 0.32;
   const bracoGiro = maoGiro * 0.42;
 
-  // o nó reage, mas com amplitude bem menor
-  const noX = interpolate(frame, chaves, [0, -3.2, 2.8, 0], presa);
-  const noY = interpolate(frame, chaves, [0, -1, 0.6, 0], presa);
-  const noGiro = interpolate(frame, chaves, [0, -1.2, 1.15, 0], presa);
-  const noEscala = interpolate(frame, [BEAT.gravata.from, 51, BEAT.gravata.to], [1, 1.012, 1], presa);
+  // O nó reage sutilmente ao ajuste, como no vídeo.
+  const noX = interpolate(frame, chaves, [0, -1.8, 1.5, 0], presa);
+  const noY = interpolate(frame, chaves, [0, -0.6, 0.35, 0], presa);
+  const noGiro = interpolate(frame, chaves, [0, -0.55, 0.5, 0], presa);
+  const noEscala = interpolate(
+    frame,
+    [BEAT.gravata.from, 56, BEAT.gravata.to],
+    [1, 1.006, 1],
+    presa,
+  );
 
-  // micro reação corporal para o gesto não parecer uma mão solta
+  // Reação mínima de corpo e cabeça. O vídeo mantém o personagem quase parado,
+  // então a amplitude é deliberadamente pequena.
   const giroCabeca = interpolate(
     frame,
-    [BEAT.gravata.from, 46, BEAT.gravata.to, BEAT.transicaoPasta.to],
-    [0, 0.8, 0.25, 0],
+    [BEAT.gravata.from, 52, BEAT.gravata.to, BEAT.transicaoPasta.to],
+    [0, 0.28, 0, 0],
     presa,
   );
   const giroTorso = interpolate(
     frame,
-    [BEAT.gravata.from, 48, BEAT.gravata.to, BEAT.transicaoPasta.to],
-    [0, 1.45, 0.35, 0],
+    [BEAT.gravata.from, 55, BEAT.gravata.to, BEAT.transicaoPasta.to],
+    [0, 0.5, 0, 0],
     presa,
   );
 
-  // depois que a mão volta ao centro, o homem cede espaço para a sequência da pasta
+  // Pequeno assentamento final depois que a mão volta ao centro.
+  const assentamento = interpolate(
+    frame,
+    [BEAT.gravata.to - 10, BEAT.gravata.to],
+    [0, 1],
+    presa,
+  );
+
   const cedeFoco = interpolate(
     frame,
     [BEAT.transicaoPasta.from, BEAT.transicaoPasta.to],
@@ -66,10 +92,14 @@ export const LawyerScene: React.FC = () => {
     presa,
   );
 
-  const opacidade = entrada * (1 - cedeFoco * 0.18) * (1 - saida * 0.94);
-  const desfoque = saida * 9;
-  const escala = escalaEntrada * (1 - cedeFoco * 0.025) * (1 + saida * 0.12);
-  const recuoY = cedeFoco * 9 + saida * -30;
+  const opacidade = entrada * (1 - cedeFoco * 0.22) * (1 - saida * 0.95);
+  const desfoque = saida * 8;
+  const escala =
+    escalaEntrada *
+    (1 - assentamento * 0.004) *
+    (1 - cedeFoco * 0.025) *
+    (1 + saida * 0.1);
+  const recuoY = cedeFoco * 8 + saida * -28;
 
   const foto = {
     width: '100%',
@@ -97,13 +127,13 @@ export const LawyerScene: React.FC = () => {
         style={{
           position: 'absolute',
           left: '50%',
-          bottom: 35,
+          bottom: 34,
           width: 1160,
           height: 840,
           transform: 'translateX(-50%)',
           background:
-            'radial-gradient(50% 50% at 50% 50%, rgba(30,58,78,0.58) 0%, rgba(17,29,40,0.24) 46%, transparent 73%)',
-          opacity: entrada * (1 - cedeFoco * 0.32),
+            'radial-gradient(50% 50% at 50% 50%, rgba(30,58,78,0.56) 0%, rgba(17,29,40,0.22) 46%, transparent 73%)',
+          opacity: entrada * (1 - cedeFoco * 0.34),
         }}
       />
 
@@ -115,7 +145,7 @@ export const LawyerScene: React.FC = () => {
           transformStyle: 'preserve-3d',
         }}
       >
-        {/* torso: a pequena área da mão é vazada para a cópia móvel não duplicar a mão */}
+        {/* Torso sem a região central da mão, para evitar uma cópia fantasma. */}
         <div
           style={{
             position: 'absolute',
@@ -139,13 +169,13 @@ export const LawyerScene: React.FC = () => {
           </div>
         </div>
 
-        {/* braço acompanha o gesto com cerca de um terço da amplitude */}
+        {/* Antebraço acompanha a mão de forma suave. */}
         <div
           style={{
             position: 'absolute',
             inset: 0,
             transform: `translate(${bracoX}px, ${bracoY}px) rotate(${bracoGiro}deg)`,
-            transformOrigin: '39% 49%',
+            transformOrigin: '37% 46%',
             WebkitMaskImage: MASCARAS.braco,
             maskImage: MASCARAS.braco,
             willChange: 'transform',
@@ -154,7 +184,7 @@ export const LawyerScene: React.FC = () => {
           <Img src={FONTE} alt="" style={foto} />
         </div>
 
-        {/* cabeça quase imóvel, apenas reagindo ao ajuste */}
+        {/* Cabeça praticamente estática, como na referência. */}
         <div
           style={{
             position: 'absolute',
@@ -169,7 +199,7 @@ export const LawyerScene: React.FC = () => {
           <Img src={FONTE} alt="" style={foto} />
         </div>
 
-        {/* nó da gravata reage alguns pixels ao movimento da mão */}
+        {/* Nó da gravata acompanha o gesto alguns pixels. */}
         <div
           style={{
             position: 'absolute',
@@ -184,7 +214,7 @@ export const LawyerScene: React.FC = () => {
           <Img src={FONTE} alt="" style={foto} />
         </div>
 
-        {/* mão: esquerda -> direita -> centro, encerrando o gesto antes da pasta */}
+        {/* Mão: esquerda -> direita -> centro. */}
         {POSE_GRAVATA ? (
           <div
             style={{
