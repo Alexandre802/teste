@@ -126,13 +126,15 @@ export const HeroScrollExperience = () => {
   }, [atualizar, montado, menosMovimento]);
 
   /*
-   * Pré-carga: um elemento de vídeo solto puxa o arquivo para o cache antes de
-   * o Player precisar dele. Enquanto isso o poster do primeiro quadro segura a
-   * tela — sem preto, sem flash. Se o arquivo falhar, o poster simplesmente
-   * fica: a página continua utilizável.
+   * Pré-carga da fonte UHD. O poster só sai quando o navegador já conseguiu
+   * decodificar dados reais do vídeo. Não existe mais timeout que esconda o
+   * poster à força: em conexão lenta é melhor manter uma imagem UHD nítida do
+   * que revelar um frame preto ou incompleto.
    */
   useEffect(() => {
     if (!fonte || menosMovimento) return;
+
+    setVideoPronto(false);
 
     const sonda = document.createElement('video');
     sonda.preload = 'auto';
@@ -140,17 +142,15 @@ export const HeroScrollExperience = () => {
     sonda.playsInline = true;
 
     const pronto = () => setVideoPronto(true);
-    sonda.addEventListener('canplaythrough', pronto, { once: true });
+    sonda.addEventListener('loadeddata', pronto, { once: true });
+    sonda.addEventListener('canplay', pronto, { once: true });
 
     sonda.src = fonte;
     sonda.load();
 
-    // Rede ruim não pode deixar o poster preso para sempre.
-    const desistir = window.setTimeout(pronto, 8000);
-
     return () => {
-      window.clearTimeout(desistir);
-      sonda.removeEventListener('canplaythrough', pronto);
+      sonda.removeEventListener('loadeddata', pronto);
+      sonda.removeEventListener('canplay', pronto);
       sonda.removeAttribute('src');
       sonda.load();
     };
@@ -169,15 +169,16 @@ export const HeroScrollExperience = () => {
       </noscript>
 
       <div className="sticky top-0 h-screen w-full overflow-hidden bg-preto">
-        {/* Caixa que cobre a viewport mantendo a proporção do vídeo. */}
+        {/* Caixa que cobre a viewport mantendo a proporção vertical do vídeo. */}
         <div className="hero-cobertura">
           <Image
             src={HERO_POSTER_INICIO}
             alt="Vista aérea de uma casa de alto padrão com piscina, cercada por mata e montanhas ao pôr do sol."
             fill
             priority
+            unoptimized
             sizes="100vw"
-            className={`hero-poster-inicio object-cover transition-opacity duration-700 ${
+            className={`hero-poster-inicio object-cover transition-opacity duration-500 ${
               videoPronto ? 'opacity-0' : 'opacity-100'
             }`}
           />
@@ -186,6 +187,7 @@ export const HeroScrollExperience = () => {
             src={HERO_POSTER_FINAL}
             alt="Sala de estar da casa, com abertura para a área externa, mesa de jantar e floresta ao fundo."
             fill
+            unoptimized
             sizes="100vw"
             className="hero-poster-final object-cover"
           />
