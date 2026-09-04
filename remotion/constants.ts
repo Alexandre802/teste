@@ -1,26 +1,24 @@
 /**
- * Medidas do vídeo de referência do hero.
+ * Medidas da composição UHD do hero.
  *
- * O vídeo é a fonte oficial do movimento da câmera. O Remotion não reconstrói
- * a trajetória: ele apenas controla QUAL QUADRO do arquivo está na tela. Estes
- * números vêm do próprio arquivo (`ffprobe`) e precisam continuar batendo com
- * ele — se o vídeo for trocado, atualize aqui.
+ * O vídeo original enviado tem 720×1280, 24 fps e 192 quadros. Para evitar
+ * que o navegador estique uma fonte pequena em telas grandes, o site usa uma
+ * recodificação UHD vertical 2160×3840, preservando exatamente os mesmos
+ * 192 quadros e o mesmo movimento da câmera.
  */
 export const HERO_FPS = 24;
 export const HERO_DURATION_IN_FRAMES = 192;
-export const HERO_WIDTH = 720;
-export const HERO_HEIGHT = 1280;
+export const HERO_WIDTH = 2160;
+export const HERO_HEIGHT = 3840;
 
 /**
- * Recodificações do original com um keyframe em cada quadro (`-g 1`), para o
- * seek do scroll responder na hora. O original fica em `hero-original.mp4`.
+ * Fonte principal do scroll-scrub em UHD. Todo quadro continua sendo keyframe
+ * (`-g 1`) para que `seekTo()` responda imediatamente ao scroll.
  *
- * O H.264 cobre praticamente todos os navegadores e é a primeira escolha; o
- * VP9 existe porque algumas compilações de Chromium em Linux saem sem os
- * codecs proprietários e ficariam sem hero nenhum.
+ * O WebM antigo fica apenas como fallback raro para navegadores sem H.264.
  */
 export const HERO_FONTES = [
-  { src: '/videos/remotion/hero-scrub.mp4', tipo: 'video/mp4; codecs="avc1.42E01E"' },
+  { src: '/videos/remotion/hero-scrub-uhd.mp4', tipo: 'video/mp4' },
   { src: '/videos/remotion/hero-scrub.webm', tipo: 'video/webm; codecs="vp9"' },
 ] as const;
 
@@ -36,10 +34,9 @@ export const escolherFonteDoHero = () => {
   return (suportada ?? HERO_FONTES[0]).src;
 };
 
-/** Primeiro quadro — evita tela preta enquanto o vídeo carrega. */
-export const HERO_POSTER_INICIO = '/imagens/hero/hero-inicio.webp';
-/** Último quadro — é o que aparece em `prefers-reduced-motion`. */
-export const HERO_POSTER_FINAL = '/imagens/hero/hero-final.webp';
+/** Posters UHD: servidos sem nova recompressão no hero. */
+export const HERO_POSTER_INICIO = '/imagens/hero/hero-inicio-uhd.webp';
+export const HERO_POSTER_FINAL = '/imagens/hero/hero-final-uhd.webp';
 
 /**
  * Marcos do percurso, em fração do scroll da seção. Medidos no vídeo:
