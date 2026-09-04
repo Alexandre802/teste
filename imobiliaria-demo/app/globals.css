@@ -1,0 +1,271 @@
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------ *
+ * Paleta e tipografia. Nenhuma cor da marca é escrita solta em JSX:
+ * tudo sai destes tokens.
+ * ------------------------------------------------------------------ */
+@theme {
+  --color-preto: #090909;
+  --color-carvao: #111111;
+  --color-carvao-claro: #171717;
+  --color-card: #141414;
+
+  --color-creme: #f4e9d4;
+  --color-creme-escuro: #efe0c1;
+
+  --color-dourado: #c8a35d;
+  --color-dourado-medio: #d6b36c;
+  --color-dourado-claro: #e6c986;
+
+  --color-branco: #f8f6f1;
+  --color-texto: #bebab2;
+
+  --font-serif: var(--fonte-serif), 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-sans: var(--fonte-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  --radius-botao: 14px;
+  --radius-foto: 18px;
+  --radius-card: 20px;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    background-color: var(--color-preto);
+  }
+
+  body {
+    background-color: var(--color-preto);
+    color: var(--color-texto);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background-color: var(--color-dourado);
+    color: #120d07;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-dourado-claro);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* Barra de rolagem discreta, só onde existe cursor. */
+  @media (pointer: fine) {
+    html {
+      scrollbar-width: thin;
+      scrollbar-color: #6b5429 #0b0b0b;
+    }
+
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #0b0b0b;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #6b5429;
+      border: 2px solid #0b0b0b;
+      border-radius: 999px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--color-dourado);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Hero
+ * ------------------------------------------------------------------ */
+
+/*
+ * Altura da seção que o scroll percorre. É ela que define quanto scroll
+ * corresponde ao percurso inteiro da câmera: a divisão é linear, então
+ * altura maior = movimento mais lento e mais confortável de acompanhar.
+ */
+.hero-scroll {
+  height: 520vh;
+}
+
+@media (min-width: 1024px) {
+  .hero-scroll {
+    height: 600vh;
+  }
+}
+
+/*
+ * Sem movimento: a seção encolhe para uma tela só, ainda antes da
+ * hidratação — assim não existe salto de layout quando o JS assume.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .hero-scroll {
+    height: 100vh;
+  }
+}
+
+/*
+ * Caixa que envolve o Player. O Remotion sempre encaixa a composição
+ * inteira dentro do espaço disponível (comportamento "contain"), o que
+ * deixaria tarja preta. Dimensionando a caixa para SEMPRE cobrir a
+ * viewport — mantendo a proporção 720×1280 do vídeo — o resultado é o
+ * mesmo de um `object-fit: cover`, sem esticar a imagem.
+ *
+ * `inset: 0` + `margin: auto` centralizam nos dois eixos, então o corte
+ * cai igualmente dos dois lados e a porta continua no meio da tela.
+ */
+.hero-cobertura {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: max(100vw, calc(100vh * 720 / 1280));
+  height: max(100vh, calc(100vw * 1280 / 720));
+}
+
+/* Poster do último quadro: só aparece quando o usuário pediu menos movimento. */
+.hero-poster-final {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-poster-inicio {
+    display: none;
+  }
+
+  .hero-poster-final {
+    display: block;
+  }
+
+  /* O convite para rolar não faz sentido sem o percurso. */
+  .hero-convite {
+    display: none;
+  }
+
+  /* E o conteúdo comercial já entra visível. */
+  .hero-final {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .hero-veu {
+    opacity: 1 !important;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Utilitários
+ * ------------------------------------------------------------------ */
+
+/* Grão de papel sobre os fundos creme — o mesmo das referências. */
+@utility textura-papel {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='0.5'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* Chapinha de texto miúdo e espaçado usada no topo de cada seção. */
+@utility sobrescrito {
+  font-size: 0.6875rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* Faixa de rolagem horizontal sem barra à vista (linha de filtros). */
+@utility rolagem-invisivel {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@keyframes descer-seta {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.75;
+  }
+  50% {
+    transform: translateY(6px);
+    opacity: 1;
+  }
+}
+
+@utility seta-pulsando {
+  animation: descer-seta 2.4s ease-in-out infinite;
+}
+
+@keyframes pulo-coracao {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.28);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@utility coracao-pulou {
+  animation: pulo-coracao 340ms ease-out;
+}
+
+/* ------------------------------------------------------------------ *
+ * Botões
+ * ------------------------------------------------------------------ */
+
+/* Preenchimento champanhe do botão principal. */
+@utility botao-champanhe {
+  background-image: linear-gradient(105deg, #f2e2bd 0%, #e7cf9d 46%, #cfae72 100%);
+  color: #16110a;
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.28) inset;
+}
+
+/* Dourado mais fechado — usado nas chamadas sobre fundo escuro. */
+@utility botao-dourado {
+  background-image: linear-gradient(105deg, #e6c986 0%, #cfa961 52%, #b8904c 100%);
+  color: #14100a;
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.24) inset;
+}
+
+/* Contorno discreto para a ação secundária. */
+@utility botao-contorno {
+  border: 1px solid rgb(200 163 93 / 0.55);
+  background-color: rgb(9 9 9 / 0.35);
+  color: var(--color-creme);
+  backdrop-filter: blur(6px);
+}
+
+/* Véu escuro que entra junto com o conteúdo comercial do hero. */
+@utility veu-hero {
+  background-image: linear-gradient(
+    180deg,
+    rgb(14 10 6 / 0.94) 0%,
+    rgb(16 11 7 / 0.9) 40%,
+    rgb(18 12 7 / 0.68) 62%,
+    rgb(12 9 6 / 0.3) 80%,
+    rgb(9 9 9 / 0) 96%
+  );
+}
