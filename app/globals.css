@@ -125,21 +125,35 @@
 }
 
 /*
- * Caixa que envolve o Player. O Remotion sempre encaixa a composição
- * inteira dentro do espaço disponível (comportamento "contain"), o que
- * deixaria tarja preta. Dimensionando a caixa para SEMPRE cobrir a
- * viewport — mantendo a proporção 720×1280 do vídeo — o resultado é o
- * mesmo de um `object-fit: cover`, sem esticar a imagem.
- *
- * `inset: 0` + `margin: auto` centralizam nos dois eixos, então o corte
- * cai igualmente dos dois lados e a porta continua no meio da tela.
+ * Caixa que envolve o Player. A composição é UHD vertical 2160×3840.
+ * A caixa cobre a viewport preservando exatamente a proporção 9:16; não há
+ * esticamento, zoom CSS extra nem filtro de suavização. O corte é central e a
+ * porta permanece no mesmo eixo do vídeo original.
  */
 .hero-cobertura {
   position: absolute;
   inset: 0;
   margin: auto;
-  width: max(100vw, calc(100vh * 720 / 1280));
-  height: max(100vh, calc(100vw * 1280 / 720));
+  width: max(100vw, calc(100vh * 2160 / 3840));
+  height: max(100vh, calc(100vw * 3840 / 2160));
+  overflow: hidden;
+}
+
+/*
+ * A mídia do hero precisa permanecer nítida. Não aplicar blur, filtros ou
+ * interpolação artificial sobre o vídeo/posters. O navegador só faz a
+ * reamostragem necessária para encaixar os pixels UHD na tela.
+ */
+.hero-cobertura video,
+.hero-cobertura img,
+.hero-cobertura .__remotion-player {
+  filter: none !important;
+  image-rendering: auto;
+}
+
+.hero-cobertura video {
+  object-fit: cover;
+  object-position: 50% 50%;
 }
 
 /* Poster do último quadro: só aparece quando o usuário pediu menos movimento. */
@@ -250,12 +264,11 @@
   box-shadow: 0 1px 0 rgb(255 255 255 / 0.24) inset;
 }
 
-/* Contorno discreto para a ação secundária. */
+/* Contorno discreto para a ação secundária, sem blur do cenário atrás. */
 @utility botao-contorno {
   border: 1px solid rgb(200 163 93 / 0.55);
-  background-color: rgb(9 9 9 / 0.35);
+  background-color: rgb(9 9 9 / 0.52);
   color: var(--color-creme);
-  backdrop-filter: blur(6px);
 }
 
 /* Véu escuro que entra junto com o conteúdo comercial do hero. */
