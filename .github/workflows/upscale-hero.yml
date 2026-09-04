@@ -36,14 +36,18 @@ jobs:
             -of default=noprint_wrappers=1 \
             public/videos/remotion/hero-original.mp4 | tee /tmp/hero-source.txt
 
-      - name: Gerar versão UHD para scroll-scrub
+      - name: Gerar versão UHD mais nítida para scroll-scrub
         shell: bash
         run: |
           set -euo pipefail
 
           INPUT="public/videos/remotion/hero-original.mp4"
           OUTPUT="public/videos/remotion/hero-scrub-uhd.mp4"
-          FILTER='delogo=x=545:y=16:w=100:h=58,scale=2160:3840:flags=lanczos,unsharp=5:5:0.65:3:3:0.25'
+
+          # O original é 720x1280. Aqui fazemos upscale Lanczos para UHD e
+          # aplicamos nitidez mais forte e controlada para tornar arquitetura,
+          # porta, piscina e vegetação visivelmente mais definidas. Não há blur.
+          FILTER='delogo=x=545:y=16:w=100:h=58,scale=2160:3840:flags=lanczos,unsharp=7:7:1.15:5:5:0.35'
 
           gerar() {
             local crf="$1"
@@ -52,6 +56,7 @@ jobs:
               -vf "$FILTER" \
               -c:v libx264 \
               -preset slow \
+              -tune grain \
               -crf "$crf" \
               -g 1 \
               -keyint_min 1 \
@@ -62,9 +67,9 @@ jobs:
               "$OUTPUT"
           }
 
-          # Começa em CRF 16 para preservar bastante detalhe. Se ultrapassar
-          # o limite de 100 MB do GitHub, sobe gradualmente sem mudar resolução.
-          for CRF in 16 18 20 22; do
+          # Começa em CRF 14 para reduzir perda por compressão. Se passar do
+          # limite seguro do GitHub, sobe só o necessário mantendo 2160x3840.
+          for CRF in 14 15 16 18; do
             gerar "$CRF"
             BYTES=$(stat -c%s "$OUTPUT")
             echo "CRF=$CRF tamanho=$BYTES bytes"
@@ -80,13 +85,13 @@ jobs:
             exit 1
           fi
 
-      - name: Gerar posters UHD sem recompressão do Next
+      - name: Gerar posters UHD
         run: |
           ffmpeg -y -i public/videos/remotion/hero-scrub-uhd.mp4 \
             -vf "select=eq(n\,0)" \
             -frames:v 1 \
             -c:v libwebp \
-            -quality 96 \
+            -quality 100 \
             -compression_level 6 \
             public/imagens/hero/hero-inicio-uhd.webp
 
@@ -95,7 +100,7 @@ jobs:
             -vsync 0 \
             -frames:v 1 \
             -c:v libwebp \
-            -quality 96 \
+            -quality 100 \
             -compression_level 6 \
             public/imagens/hero/hero-final-uhd.webp
 
@@ -119,8 +124,9 @@ jobs:
             echo "- Codec: H.264 / yuv420p"
             echo "- CRF aplicado: ${CRF}"
             echo "- GOP: 1 (todo quadro é keyframe para scroll-scrub)"
-            echo "- Filtro: Lanczos 3x + sharpen leve + remoção do selo do exportador"
-            echo "- Observação: a fonte original é 720x1280; o arquivo UHD evita nova perda por reescala/compressão e melhora a percepção de nitidez, mas detalhe óptico inexistente na fonte não pode ser recuperado perfeitamente sem uma fonte nativa 4K."
+            echo "- Filtro: Lanczos 3x + unsharp 7x7 forte/controlado + remoção do selo"
+            echo "- Tune: grain, para preservar microtextura e evitar aparência plastificada"
+            echo "- Observação: a fonte original é 720x1280. Esta versão prioriza nitidez percebida e baixa perda de compressão, mas não consegue inventar detalhe óptico que não exista no original."
             echo
             echo "## Tamanho"
             stat -c '%n: %s bytes' public/videos/remotion/hero-scrub-uhd.mp4
@@ -144,5 +150,5 @@ jobs:
                   public/imagens/hero/hero-inicio-uhd.webp \
                   public/imagens/hero/hero-final-uhd.webp \
                   HERO-UHD-REPORT.md
-          git commit -m "Gera hero UHD 4K para o Remotion"
+          git commit -m "Reprocessa hero UHD com nitidez reforçada"
           git push origin HEAD:imobiliaria-demo-deploy
