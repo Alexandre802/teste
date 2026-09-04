@@ -1,34 +1,10 @@
-node_modules/
-dist/
-build/
-out/
-.next/
-.cache/
-.remotion/
-*.log
-
-.env
-.env.local
-.env.*.local
-
+node_modules
+.next
+out
+next-env.d.ts
+*.tsbuildinfo
 .DS_Store
-Thumbs.db
-
-# saída de render e modelos pesados
-/render-out/
-/pretrained_models/
-/.next/
-/next-env.d.ts
-/node_modules
-.vercel
-
-# Preview autocontido gerado por scripts/build-preview.py
-preview.html
-
-# Saída dos testes de ponta a ponta
-/test-results
-/playwright-report
-/blob-report
-
-# Cache incremental do TypeScript
-tsconfig.tsbuildinfo
+.env*.local
+test-results
+playwright-report
+blob-report

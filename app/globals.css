@@ -1,65 +1,90 @@
 @import 'tailwindcss';
 
-/* ───────────────────────── design tokens ─────────────────────────
-   Laranja vivo em toda a página — não há fundo escuro em lugar nenhum.
-   A profundidade vem de tons dentro do próprio laranja e de vidro branco
-   translúcido, nunca de preto.                                           */
+/* ------------------------------------------------------------------ *
+ * Paleta e tipografia. Nenhuma cor da marca é escrita solta em JSX:
+ * tudo sai destes tokens.
+ * ------------------------------------------------------------------ */
 @theme {
-  --color-flare: #ff8a2b; /* laranja mais claro — topo do gradiente */
-  --color-flame: #f2620c; /* laranja base da marca */
-  --color-ember: #d8490a; /* laranja queimado */
-  --color-ember-deep: #a8380a; /* profundidade, cantos e rodapé */
-  --color-amber: #ffa43d;
-  --color-gold: #ffd28a; /* dourado claro — detalhes sobre laranja */
+  --color-preto: #090909;
+  --color-carvao: #111111;
+  --color-carvao-claro: #171717;
+  --color-card: #141414;
 
-  --color-cream: #ffffff; /* texto principal */
-  --color-muted: #ffe4cf; /* texto auxiliar sobre laranja */
-  --color-cocoa: #5a2005; /* marrom — texto sobre superfície branca */
+  --color-creme: #f4e9d4;
+  --color-creme-escuro: #efe0c1;
 
-  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --color-dourado: #c8a35d;
+  --color-dourado-medio: #d6b36c;
+  --color-dourado-claro: #e6c986;
 
-  --radius-card: 1.25rem;
+  --color-branco: #f8f6f1;
+  --color-texto: #bebab2;
+
+  --font-serif: var(--fonte-serif), 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-sans: var(--fonte-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  --radius-botao: 14px;
+  --radius-foto: 18px;
+  --radius-card: 20px;
 }
 
-/* ───────────────────────────── base ───────────────────────────── */
 @layer base {
-  * {
-    border-color: rgb(255 255 255 / 0.25);
-  }
-
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 5.5rem;
-    -webkit-text-size-adjust: 100%;
+    background-color: var(--color-preto);
   }
 
   body {
-    color: var(--color-cream);
+    background-color: var(--color-preto);
+    color: var(--color-texto);
     font-family: var(--font-sans);
-    /* laranja vivo do topo ao rodapé, com variação suave para dar volume */
-    background-color: var(--color-flame);
-    background-image:
-      radial-gradient(120% 70% at 78% 0%, #ff9a3f 0%, transparent 55%),
-      radial-gradient(90% 60% at 5% 40%, #ff7a18 0%, transparent 60%),
-      linear-gradient(180deg, #ff7a18 0%, #f2620c 38%, #e2530b 70%, #d0450a 100%);
-    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
   }
 
   ::selection {
-    background: #fff;
-    color: var(--color-ember);
+    background-color: var(--color-dourado);
+    color: #120d07;
   }
 
-  :where(a, button, input, textarea, select, [tabindex]):focus-visible {
-    outline: 2px solid #fff;
+  :focus-visible {
+    outline: 2px solid var(--color-dourado-claro);
     outline-offset: 3px;
-    border-radius: 0.5rem;
+    border-radius: 4px;
+  }
+
+  /* Barra de rolagem discreta, só onde existe cursor. */
+  @media (pointer: fine) {
+    html {
+      scrollbar-width: thin;
+      scrollbar-color: #6b5429 #0b0b0b;
+    }
+
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #0b0b0b;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #6b5429;
+      border: 2px solid #0b0b0b;
+      border-radius: 999px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--color-dourado);
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;
     }
+
     *,
     *::before,
     *::after {
@@ -70,59 +95,177 @@
   }
 }
 
-/* ──────────────────────────── utilitários ──────────────────────── */
+/* ------------------------------------------------------------------ *
+ * Hero
+ * ------------------------------------------------------------------ */
 
-/* vidro branco sobre laranja — a única fonte de "card" do site */
-@utility glass {
-  /* laranja profundo translúcido: mantém a paleta e devolve contraste para o
-     texto branco, que sobre branco-sobre-laranja ficava ilegível */
-  background: linear-gradient(165deg, rgb(255 255 255 / 0.24) 0%, rgb(150 48 8 / 0.46) 100%);
-  backdrop-filter: blur(16px) saturate(1.15);
-  -webkit-backdrop-filter: blur(16px) saturate(1.15);
-  border: 1px solid rgb(255 255 255 / 0.28);
-  box-shadow:
-    0 14px 34px -16px rgb(120 45 5 / 0.55),
-    inset 0 1px 0 0 rgb(255 255 255 / 0.3);
+/*
+ * Altura da seção que o scroll percorre. É ela que define quanto scroll
+ * corresponde ao percurso inteiro da câmera: a divisão é linear, então
+ * altura maior = movimento mais lento e mais confortável de acompanhar.
+ */
+.hero-scroll {
+  height: 520vh;
 }
 
-@utility glass-strong {
-  background: rgb(255 255 255 / 0.2);
-  backdrop-filter: blur(24px) saturate(1.2);
-  -webkit-backdrop-filter: blur(24px) saturate(1.2);
-  border: 1px solid rgb(255 255 255 / 0.36);
-  box-shadow: 0 26px 60px -22px rgb(110 40 5 / 0.7);
+@media (min-width: 1024px) {
+  .hero-scroll {
+    height: 600vh;
+  }
 }
 
-/* painéis (sacola, modal): fundo laranja sólido para o texto não competir
-   com o conteúdo atrás */
-@utility panel {
-  background: linear-gradient(170deg, #ff8a2b 0%, #ef5c0a 55%, #d8490a 100%);
-  border: 1px solid rgb(255 255 255 / 0.32);
-  box-shadow: 0 30px 70px -20px rgb(90 32 5 / 0.75);
+/*
+ * Sem movimento: a seção encolhe para uma tela só, ainda antes da
+ * hidratação — assim não existe salto de layout quando o JS assume.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .hero-scroll {
+    height: 100vh;
+  }
 }
 
-/* Realce quente para uma palavra dentro do título. Fica na família do
-   laranja: vai do branco ao dourado claro, sem introduzir outro matiz. */
-@utility text-realce {
-  background: linear-gradient(100deg, #ffffff 0%, #ffd28a 55%, #ffb35c 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+/*
+ * Caixa que envolve o Player. O Remotion sempre encaixa a composição
+ * inteira dentro do espaço disponível (comportamento "contain"), o que
+ * deixaria tarja preta. Dimensionando a caixa para SEMPRE cobrir a
+ * viewport — mantendo a proporção 720×1280 do vídeo — o resultado é o
+ * mesmo de um `object-fit: cover`, sem esticar a imagem.
+ *
+ * `inset: 0` + `margin: auto` centralizam nos dois eixos, então o corte
+ * cai igualmente dos dois lados e a porta continua no meio da tela.
+ */
+.hero-cobertura {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: max(100vw, calc(100vh * 720 / 1280));
+  height: max(100vh, calc(100vw * 1280 / 720));
 }
 
-@utility no-scrollbar {
+/* Poster do último quadro: só aparece quando o usuário pediu menos movimento. */
+.hero-poster-final {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-poster-inicio {
+    display: none;
+  }
+
+  .hero-poster-final {
+    display: block;
+  }
+
+  /* O convite para rolar não faz sentido sem o percurso. */
+  .hero-convite {
+    display: none;
+  }
+
+  /* E o conteúdo comercial já entra visível. */
+  .hero-final {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .hero-veu {
+    opacity: 1 !important;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Utilitários
+ * ------------------------------------------------------------------ */
+
+/* Grão de papel sobre os fundos creme — o mesmo das referências. */
+@utility textura-papel {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='0.5'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* Chapinha de texto miúdo e espaçado usada no topo de cada seção. */
+@utility sobrescrito {
+  font-size: 0.6875rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* Faixa de rolagem horizontal sem barra à vista (linha de filtros). */
+@utility rolagem-invisivel {
   scrollbar-width: none;
   -ms-overflow-style: none;
+
   &::-webkit-scrollbar {
     display: none;
   }
 }
 
-@keyframes mfh-bob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(6px); }
+@keyframes descer-seta {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.75;
+  }
+  50% {
+    transform: translateY(6px);
+    opacity: 1;
+  }
 }
 
-@utility animate-bob {
-  animation: mfh-bob 2.2s ease-in-out infinite;
+@utility seta-pulsando {
+  animation: descer-seta 2.4s ease-in-out infinite;
+}
+
+@keyframes pulo-coracao {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.28);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@utility coracao-pulou {
+  animation: pulo-coracao 340ms ease-out;
+}
+
+/* ------------------------------------------------------------------ *
+ * Botões
+ * ------------------------------------------------------------------ */
+
+/* Preenchimento champanhe do botão principal. */
+@utility botao-champanhe {
+  background-image: linear-gradient(105deg, #f2e2bd 0%, #e7cf9d 46%, #cfae72 100%);
+  color: #16110a;
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.28) inset;
+}
+
+/* Dourado mais fechado — usado nas chamadas sobre fundo escuro. */
+@utility botao-dourado {
+  background-image: linear-gradient(105deg, #e6c986 0%, #cfa961 52%, #b8904c 100%);
+  color: #14100a;
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.24) inset;
+}
+
+/* Contorno discreto para a ação secundária. */
+@utility botao-contorno {
+  border: 1px solid rgb(200 163 93 / 0.55);
+  background-color: rgb(9 9 9 / 0.35);
+  color: var(--color-creme);
+  backdrop-filter: blur(6px);
+}
+
+/* Véu escuro que entra junto com o conteúdo comercial do hero. */
+@utility veu-hero {
+  background-image: linear-gradient(
+    180deg,
+    rgb(14 10 6 / 0.94) 0%,
+    rgb(16 11 7 / 0.9) 40%,
+    rgb(18 12 7 / 0.68) 62%,
+    rgb(12 9 6 / 0.3) 80%,
+    rgb(9 9 9 / 0) 96%
+  );
 }

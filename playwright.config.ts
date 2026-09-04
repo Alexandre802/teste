@@ -1,81 +1,43 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
+
+const PORTA = 3210;
 
 /**
- * Testes de ponta a ponta.
- *
- * Rodam contra o BUILD DE PRODUÇÃO (`next build` + `next start`), não contra
- * o servidor de desenvolvimento: é a versão de produção que vai para o ar, e
- * ela difere do dev em coisas que quebram pedido — cabeçalhos, CSP com nonce
- * e as rotas que se desligam sozinhas sem credencial configurada.
- *
- *   npm run test:e2e            tudo
- *   npm run test:e2e -- --ui    modo interativo
- *
- * O Chromium já vem instalado na imagem, num build que pode não ser o que
- * esta versão do @playwright/test baixaria. Por isso o binário é apontado
- * explicitamente por `CHROMIUM` quando ele existe: assim os testes rodam sem
- * `playwright install` e sem depender de rede. Em máquina onde o caminho não
- * existe, o Playwright usa o navegador que ele mesmo instalou.
+ * Escape hatch para ambientes (CI, contêiner) que já trazem um Chromium
+ * instalado fora do diretório do Playwright. Vazio na máquina do dia a dia,
+ * onde vale o `npx playwright install chromium`.
  */
+const chromiumDoAmbiente = process.env.PLAYWRIGHT_CHROMIUM_PATH;
 
-import { existsSync } from 'node:fs';
-
-/** Chromium pré-instalado na imagem, quando houver. */
-const CHROMIUM = process.env.PLAYWRIGHT_CHROMIUM_PATH ?? '/opt/pw-browsers/chromium';
-const executablePath = existsSync(CHROMIUM) ? CHROMIUM : undefined;
-
-const PORTA = Number(process.env.E2E_PORT ?? 3399);
-const BASE = process.env.E2E_BASE_URL ?? `http://127.0.0.1:${PORTA}`;
-
+/**
+ * Os cinco tamanhos exigidos no briefing. O hero depende da altura da
+ * viewport (é ela que divide o scroll em quadros), então cada tamanho roda
+ * a suíte inteira.
+ */
 export default defineConfig({
   testDir: './e2e',
-  fullyParallel: true,
-  forbidOnly: Boolean(process.env.CI),
-  retries: process.env.CI ? 1 : 0,
-  reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
-  timeout: 45_000,
+  fullyParallel: false,
+  workers: 1,
+  reporter: [['list']],
+  timeout: 90_000,
   expect: { timeout: 10_000 },
-
   use: {
-    baseURL: BASE,
+    baseURL: `http://localhost:${PORTA}`,
     trace: 'retain-on-failure',
-    screenshot: 'only-on-failure',
-    locale: 'pt-BR',
-    timezoneId: 'America/Sao_Paulo',
-    // O site anima bastante no scroll (o lanche do hero abre conforme rola).
-    // Com o movimento ligado, o contexto de execução da página é destruído no
-    // meio de um clique e o teste falha por motivo que não é bug do produto.
-    // O site respeita `prefers-reduced-motion`, então isto também exercita
-    // esse caminho — que é o que quem tem sensibilidade a movimento recebe.
-    contextOptions: { reducedMotion: 'reduce' },
+    browserName: 'chromium',
+    ...(chromiumDoAmbiente ? { launchOptions: { executablePath: chromiumDoAmbiente } } : {}),
   },
-
   projects: [
-    // O celular é a prioridade do projeto, então vem primeiro: se algo só
-    // quebra no telefone, quebra no primeiro projeto da lista.
-    {
-      name: 'celular',
-      use: { ...devices['Pixel 7'], locale: 'pt-BR', launchOptions: { executablePath } },
-    },
-    {
-      name: 'desktop',
-      use: {
-        ...devices['Desktop Chrome'],
-        viewport: { width: 1440, height: 900 },
-        locale: 'pt-BR',
-        launchOptions: { executablePath },
-      },
-    },
+    { name: 'iphone-390', use: { viewport: { width: 390, height: 844 }, hasTouch: true } },
+    { name: 'iphone-430', use: { viewport: { width: 430, height: 932 }, hasTouch: true } },
+    { name: 'tablet-768', use: { viewport: { width: 768, height: 1024 }, hasTouch: true } },
+    { name: 'notebook-1440', use: { viewport: { width: 1440, height: 900 } } },
+    { name: 'monitor-1920', use: { viewport: { width: 1920, height: 1080 } } },
   ],
-
-  webServer: process.env.E2E_BASE_URL
-    ? undefined
-    : {
-        command: `npx next start -p ${PORTA}`,
-        url: BASE,
-        reuseExistingServer: !process.env.CI,
-        timeout: 120_000,
-        stdout: 'ignore',
-        stderr: 'pipe',
-      },
+  webServer: {
+    command: `npx next start -p ${PORTA}`,
+    url: `http://localhost:${PORTA}`,
+    reuseExistingServer: !process.env.CI,
+    timeout: 120_000,
+  },
 });

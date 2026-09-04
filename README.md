@@ -1,155 +1,133 @@
-# Michel Food House
+# imobiliaria-demo
 
-Site oficial da **Michel Food House** — lanchonete no Bandeira Branca I, em Jacareí-SP.
-Cardápio completo, sacola, pagamento e fechamento de pedido pelo WhatsApp.
+Site demonstrativo de uma imobiliária de imóveis de alto padrão. Existe para
+ser apresentado a possíveis clientes do ramo — **não é o site de nenhuma
+imobiliária real**, e todos os dados são fictícios.
 
-```bash
+A peça central é o hero: o scroll do visitante percorre, quadro a quadro, um
+vídeo de câmera entrando na casa.
+
+```
 npm install
-npm run dev     # http://localhost:3000
-npm run build   # produção
-npm run lint
+npm run dev      # http://localhost:3000
+npm run build
+npm run test:e2e # constrói antes, por pretest:e2e
 ```
 
-## Stack
+Antes do primeiro `test:e2e`: `npx playwright install chromium`.
 
-Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Framer Motion · Zustand.
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind v4 · Remotion ·
+Framer Motion · Lucide.
 
-Sem backend próprio: a sacola, a identificação do cliente e o histórico ficam no
-navegador; pagamento e WhatsApp são rotas de API que falam com serviços externos.
+## O hero
 
-## Como atualizar o conteúdo
+O movimento não é reconstruído com CSS nem aproximado com zoom: quem produz
+o movimento é o arquivo de vídeo. O Remotion entra para controlar **qual
+quadro** está na tela, e o scroll decide esse quadro.
 
-Nenhum produto ou dado da casa está escrito dentro de componente. Tudo sai de dois
-arquivos:
+```
+progresso = scrollPercorrido / (alturaDaSecao − alturaDaTela)
+quadro    = round(progresso × (192 − 1))
+playerRef.current.seekTo(quadro)
+```
 
-| O que mudar | Arquivo |
+A divisão é linear de propósito. Qualquer easing aqui reordenaria os quadros
+e mudaria o ritmo gravado na filmagem. O resultado: parou de rolar, a câmera
+para; voltou o scroll, a câmera volta; o vídeo nunca toca sozinho.
+
+Peças envolvidas:
+
+| Arquivo | Papel |
 |---|---|
-| Produtos, preços, descrições, categorias, esgotados, destaques | `lib/catalog.ts` |
-| Endereço, telefone, WhatsApp, horário, avaliações, textos institucionais | `lib/business.ts` |
-| Fotos de ambiente da galeria | `lib/photos.ts` |
-| Promoções | array `promocoes` em `components/sections/Promocoes.tsx` |
-| Termos de busca local | `lib/seo.ts` |
+| `remotion/RealEstateHero.tsx` | A composição. Um `<Video>` do Remotion e nada mais. |
+| `remotion/constants.ts` | Medidas do arquivo (fps, quadros, dimensões) e os marcos do percurso. |
+| `remotion/utils.ts` | `progressoParaQuadro`, e o easing que só a interface usa. |
+| `remotion/Root.tsx` | Registro da composição para abrir no Remotion Studio. O site não passa por aqui. |
+| `components/HeroScrollExperience.tsx` | A seção alta, o `sticky`, o `<Player>` e o laço de scroll. |
 
-### Mudar um preço
+Detalhes que valem saber:
 
-`lib/catalog.ts`, campo `price` (número, sem `R$`). A formatação em real é automática.
+- **Nada de `setState` por quadro.** As opacidades do convite e do bloco final
+  são escritas direto no DOM dentro de um `requestAnimationFrame`; os
+  listeners são `passive`. O único estado de React que muda durante o scroll
+  é o booleano que libera o clique nos botões do fim.
+- **Enquadramento.** O `<Player>` do Remotion sempre encaixa a composição
+  inteira no espaço disponível, o que deixaria tarja preta. A classe
+  `.hero-cobertura` dimensiona a caixa em volta dele para *sempre cobrir* a
+  viewport mantendo a proporção 720×1280 — mesmo efeito de um
+  `object-fit: cover`, sem esticar. O corte cai igual dos dois lados, então a
+  porta continua no centro tanto no celular quanto no monitor.
+- **Altura do percurso.** 520vh no celular, 600vh a partir de 1024px
+  (`.hero-scroll`, em `app/globals.css`). É essa altura que define o ritmo:
+  quanto maior, mais devagar a câmera anda para o mesmo gesto de scroll.
+- **Pré-carga.** Um elemento de vídeo solto puxa o arquivo para o cache
+  enquanto o poster do primeiro quadro segura a tela. Sem preto, sem flash.
+  Se o arquivo falhar, o poster fica e a página continua utilizável.
+- **Codec.** O site escolhe entre MP4/H.264 e WebM/VP9 por `canPlayType`.
+- **`prefers-reduced-motion`.** A seção encolhe para uma tela só por CSS —
+  antes da hidratação, então não há salto de layout —, o último quadro entra
+  como imagem parada, o conteúdo comercial já nasce visível e o `<Player>`
+  nem chega a montar: o vídeo não é baixado.
 
-### Marcar um item como esgotado
+## Seções
 
-`available: false`. O card mostra "Esgotado" e desabilita o botão sozinho.
+Na ordem: hero → `#imoveis` → `#sobre` → `#localizacao` (com `#contato`
+dentro) → rodapé.
 
-### Trocar o número do WhatsApp
+O catálogo filtra de verdade, sem back-end: categorias, busca por nome,
+cidade e estado (ignorando acento), e um painel com ordenação, quartos
+mínimos e teto de preço. Os dados estão em `lib/properties.ts`.
 
-`lib/business.ts` → `whatsapp` (formato internacional, só dígitos: `5512988447711`),
-`phoneE164` e `phoneDisplay`. Muda em todos os botões, no rodapé e no JSON-LD de uma vez.
+**O acervo demonstrativo só tem casas.** O filtro "Apartamentos" existe
+porque o layout de referência o traz, e ele funciona — devolve zero e a tela
+diz por quê, em vez de fingir um resultado. Basta acrescentar itens com
+`tipo: 'apartamento'` em `lib/properties.ts` para a categoria ganhar conteúdo.
 
-### Adicionar a foto de um produto
+## Adaptar para outro cliente
 
-Coloque o arquivo em `public/produtos/<slug>.webp` e preencha `image: img('<slug>')`
-no produto. **Um produto sem foto própria deve continuar com `image: null`** — ele cai
-no placeholder da marca em vez de exibir a foto de outro item.
+`lib/site-config.ts` concentra nome, telefone, WhatsApp, e-mail, endereço,
+horário e redes sociais. Nenhuma dessas informações aparece escrita dentro de
+JSX, então trocar esse arquivo adapta o demonstrativo inteiro.
 
-## Fotos
+> **Antes de publicar:** os contatos em `site-config.ts` são inventados. O
+> telefone e o WhatsApp fictícios podem pertencer a alguém de verdade — troque
+> pelos dados do cliente antes de qualquer publicação. Enquanto isso, o rodapé
+> avisa ao visitante que os dados são demonstrativos.
 
-- `public/produtos/` — 34 fotos reais, extraídas do cardápio da casa e mapeadas
-  item a item. São de baixa resolução (≈380 px): servem, mas um ensaio fotográfico
-  melhora muito os cards. 43 dos 77 itens ainda não têm foto e usam o placeholder.
-- `lib/photos.ts` — fotos de ambiente vindas do perfil do Google Maps, por URL.
-  São links do Google e **podem expirar**. O ideal é baixar cada arquivo, salvar em
-  `public/galeria/` e trocar o `src` pelo caminho local; aí dá para remover o
-  `remotePatterns` de `next.config.ts`.
+O acervo fica em `lib/properties.ts` e as fotografias em `public/imagens/`.
+Veja `ASSET_MAP.md` para a origem de cada arquivo.
 
-## Configuração externa
+## Imagens
 
-Copie `.env.example` para `.env.local`. Sem nenhuma variável o site funciona: o pedido
-fecha pelo WhatsApp e o pagamento roda em modo demonstração, que avisa na tela que
-nada foi cobrado.
+As fotografias dos imóveis foram recortadas das capturas de tela de
+referência, que é o material que existia. Elas seguram bem no celular e
+ficam macias em tela grande — a resolução das capturas é o limite. Em
+produção, entram no lugar as fotos do acervo do cliente, com as mesmas
+proporções.
 
-### Pagamento (Pix e cartão)
+Nenhuma captura de tela é usada como fundo de seção: títulos, cards, botões,
+filtros, ícones e grid são HTML e CSS de verdade.
 
-1. Crie uma aplicação no [painel do Mercado Pago](https://www.mercadopago.com.br/developers/panel/app).
-2. Preencha `MP_ACCESS_TOKEN`.
-3. Cadastre o webhook apontando para `https://SEU_DOMINIO/api/webhook/mercadopago`
-   e preencha `MP_WEBHOOK_SECRET` — **sem ele qualquer um pode forjar um
-   "pagamento aprovado"**.
-4. `MP_SANDBOX=1` durante os testes.
+## Testes
 
-### WhatsApp automático
+`npm run test:e2e` roda a suíte nos cinco tamanhos do briefing — 390×844,
+430×932, 768×1024, 1440×900 e 1920×1080 — e cobre:
 
-Precisa da [WhatsApp Cloud API](https://developers.facebook.com/docs/whatsapp/cloud-api/get-started)
-com número comercial verificado. Preencha `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`
-e `WHATSAPP_VERIFY_TOKEN`, e aponte o webhook para
-`https://SEU_DOMINIO/api/whatsapp/webhook`.
+- o quadro do hero acompanhando o scroll nos dois sentidos, com o vídeo
+  sempre pausado;
+- a câmera parando quando o scroll para;
+- o conteúdo comercial ausente durante o movimento e presente no fim;
+- o caminho de `prefers-reduced-motion`;
+- filtros, busca, ordenação, favoritos e o estado vazio honesto;
+- ausência de rolagem horizontal e de erro no console;
+- os contatos vindo do `site-config`, e o `noindex`.
 
-Com isso funcionam três coisas:
+Em ambiente que já traz um Chromium instalado fora do diretório do Playwright,
+aponte `PLAYWRIGHT_CHROMIUM_PATH` para o executável.
 
-- **pagamento aprovado → a lanchonete recebe o pedido** no WhatsApp, com itens,
-  total, tipo, cliente e endereço;
-- **o cliente recebe a confirmação** no número dele;
-- **atendente automático** responde as mensagens recebidas.
+## Licença do Remotion
 
-O atendente usa a API da Anthropic (`ANTHROPIC_API_KEY`) e recebe o cardápio inteiro
-no prompt, com instrução explícita de não inventar item, preço, promoção nem prazo —
-quando não sabe, diz que vai confirmar com a equipe.
-
-> **Limite da plataforma:** a API só envia mensagens a partir do número **da loja**.
-> Não existe forma de disparar uma mensagem em nome do cliente. Quem manda do número
-> dele é ele mesmo, pelo link `wa.me` do site — que é como o site já fecha o pedido.
-
-### Login
-
-A identificação por nome + WhatsApp funciona sem configuração e é o que alimenta a
-saudação de retorno, o histórico e a mensagem do pedido. **Não há verificação por SMS**
-— para isso é preciso um provedor (Firebase Auth, Twilio Verify). O botão do Facebook
-só aparece com `NEXT_PUBLIC_FACEBOOK_APP_ID` definido e exige um app Meta configurado.
-
-O histórico é por aparelho: trocou de celular, ele não vai junto. Para acompanhar o
-cliente entre dispositivos é preciso guardar o histórico no servidor, com login real.
-
-## SEO
-
-`app/layout.tsx` traz metadata, Open Graph e dois blocos JSON-LD (`Restaurant` com
-cardápio completo e `WebSite`), montados a partir de `lib/business.ts` e `lib/catalog.ts`
-— só com dados confirmados, sem horário de fechamento inventado. Há `sitemap.xml` e
-`robots.txt` gerados.
-
-Os termos de busca local aparecem em **conteúdo visível**, na seção "O que servimos em
-Jacareí" (`components/sections/BuscaLocal.tsx`). Não existe bloco de texto escondido
-para robô: texto que só o buscador enxerga é *cloaking*, contraria as
-[políticas de spam do Google](https://developers.google.com/search/docs/essentials/spam-policies)
-e arrisca rebaixamento ou remoção do índice.
-
-## Acessibilidade e movimento
-
-Navegação por teclado, foco visível, HTML semântico, `aria-label` nos controles e
-`alt` descritivo nas fotos. `prefers-reduced-motion` desliga o movimento: o lanche do
-hero aparece montado e imóvel. Em telas pequenas e aparelhos com pouca memória a
-animação usa afastamento menor e dispensa os rótulos.
-
-## Estrutura
-
-```
-app/
-  layout.tsx           metadata, fontes, JSON-LD
-  page.tsx             composição das seções
-  globals.css          tokens de cor, glass, utilitários
-  api/checkout         abre o pagamento (Mercado Pago)
-  api/webhook/mercadopago   pagamento aprovado → WhatsApp
-  api/whatsapp/webhook      atendente automático
-components/
-  layout/    Header, Footer
-  hero/      Hero, ExplodedBurger, BurgerLayers
-  menu/      MenuSection, CategoryTabs, ProductCard, ProductModal
-  cart/      CartFab, CartDrawer, PaymentStep
-  account/   LoginSheet, ClienteDeVolta
-  sections/  Featured, About, Reviews, Gallery, Promocoes, Location, BuscaLocal
-  ui/        Button, Sheet, Reveal, ProductImage, Icons
-lib/         business, catalog, photos, store, whatsapp, whatsapp-api, payments, seo
-referencias/ cardápio de origem e prints usados para montar o catálogo
-```
-
-## Ferramental de design
-
-`.claude/skills/` traz as skills de design (`ui-ux-pro-max` e irmãs) e a skill
-`remotion-site`, para peças de vídeo. `.mcp.json` configura os MCPs de UI. Detalhes em
-`CLAUDE.md`.
+O Remotion é gratuito para uso individual e para empresas pequenas, mas exige
+licença paga acima de certo porte — veja <https://remotion.dev/license>.
+O `<Player>` é montado com `acknowledgeRemotionLicense`; confirme o
+enquadramento do cliente antes de colocar no ar.

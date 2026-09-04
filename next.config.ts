@@ -1,11 +1,14 @@
+import path from 'node:path';
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  // O repositório guarda mais de um projeto; sem isto o Turbopack sobe um
+  // nível procurando a raiz e encontra o lockfile errado.
+  turbopack: {
+    root: path.resolve(import.meta.dirname),
+  },
   images: {
     formats: ['image/avif', 'image/webp'],
-    // Fotos hospedadas no Google (perfil do Google Maps). Trocar por arquivos
-    // locais em /public assim que houver ensaio fotográfico próprio.
-    remotePatterns: [{ protocol: 'https', hostname: 'lh3.googleusercontent.com' }],
   },
 };
 
